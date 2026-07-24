@@ -88,10 +88,6 @@ export default function ArticleScreen({
             </View>
           )}
 
-          <TouchableOpacity activeOpacity={0.85} style={styles.discuss}>
-            <Ionicons name="chatbubbles-outline" size={18} color="#fff" />
-            <Text style={styles.discussText}>Обсудить в Клубе</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

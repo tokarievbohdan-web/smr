@@ -111,7 +111,7 @@ export function ProfileScreen({
 
         <View style={[styles.proCard, { marginTop: space(5) }]}>
           <Text style={styles.proLabel}>SMR PRO</Text>
-          <Text style={styles.proTitle}>Все разборы, клуб и «Цифры недели»</Text>
+          <Text style={styles.proTitle}>Все разборы, архив кейсов и «Цифры недели»</Text>
           <Text style={styles.proPrice}>590 ₽<Text style={styles.proPer}> / мес</Text></Text>
         </View>
       </ScrollView>

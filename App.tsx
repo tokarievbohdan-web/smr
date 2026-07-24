@@ -8,6 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {
   useFonts,
@@ -20,29 +21,26 @@ import { colors, space, fonts } from './src/theme';
 import { NewsItem, NEWS } from './src/data';
 import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
-import ClubScreen from './src/screens/ClubScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
-import { TrendsScreen, ProfileScreen } from './src/screens/StubScreens';
+import { ProfileScreen } from './src/screens/StubScreens';
 
-type TabKey = 'feed' | 'trends' | 'club' | 'profile';
+type TabKey = 'feed' | 'profile';
 
 const TABS: { key: TabKey; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { key: 'feed', label: 'Лента', icon: 'flash' },
-  { key: 'trends', label: 'Тренды', icon: 'flame' },
-  { key: 'club', label: 'Клуб', icon: 'chatbubbles' },
+  { key: 'feed', label: 'Лента', icon: 'newspaper' },
   { key: 'profile', label: 'Профиль', icon: 'person' },
 ];
 
-function TabBar({ active, onChange }: { active: TabKey; onChange: (k: TabKey) => void }) {
+function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (k: TabKey) => void; bottomInset: number }) {
   return (
-    <View style={styles.tabbar}>
+    <View style={[styles.tabbar, { paddingBottom: Math.max(bottomInset, space(3)) }]}>
       {TABS.map((t) => {
         const on = active === t.key;
         return (
           <TouchableOpacity key={t.key} style={styles.tab} activeOpacity={0.7} onPress={() => onChange(t.key)}>
             <Ionicons
               name={on ? t.icon : (`${t.icon}-outline` as any)}
-              size={22}
+              size={23}
               color={on ? colors.accent : colors.textFaint}
             />
             <Text style={[styles.tabLabel, { color: on ? colors.accent : colors.textFaint }]}>{t.label}</Text>
@@ -53,14 +51,16 @@ function TabBar({ active, onChange }: { active: TabKey; onChange: (k: TabKey) =>
   );
 }
 
-export default function App() {
+function AppInner() {
   const [tab, setTab] = useState<TabKey>('feed');
   const [article, setArticle] = useState<NewsItem | null>(null);
   const [onboarded, setOnboarded] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const framed = Platform.OS === 'web' && width > 500;
+  const topPad = Math.max(insets.top, framed ? 14 : 10);
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -78,12 +78,7 @@ export default function App() {
 
   const app = (
     <View style={styles.app}>
-      <View style={styles.statusPad}>
-        <Text style={styles.clock}>9:41</Text>
-        <Text style={styles.status}>5G  ▮▮▮  100%</Text>
-      </View>
-
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingTop: topPad }}>
         {!onboarded ? (
           <OnboardingScreen
             onDone={(picked) => {
@@ -98,21 +93,14 @@ export default function App() {
             saved={saved.includes(article.id)}
             onToggleSave={() => toggleSave(article.id)}
           />
+        ) : tab === 'feed' ? (
+          <FeedScreen onOpen={setArticle} interests={interests} saved={saved} onToggleSave={toggleSave} />
         ) : (
-          <>
-            {tab === 'feed' && (
-              <FeedScreen onOpen={setArticle} interests={interests} saved={saved} onToggleSave={toggleSave} />
-            )}
-            {tab === 'trends' && <TrendsScreen />}
-            {tab === 'club' && <ClubScreen />}
-            {tab === 'profile' && (
-              <ProfileScreen savedItems={savedItems} interestsCount={interests.length} onOpen={setArticle} />
-            )}
-          </>
+          <ProfileScreen savedItems={savedItems} interestsCount={interests.length} onOpen={setArticle} />
         )}
       </View>
 
-      {onboarded && !article && <TabBar active={tab} onChange={setTab} />}
+      {onboarded && !article && <TabBar active={tab} onChange={setTab} bottomInset={insets.bottom} />}
     </View>
   );
 
@@ -121,6 +109,14 @@ export default function App() {
       <StatusBar style="dark" />
       {framed ? <View style={styles.phone}>{app}</View> : app}
     </View>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <AppInner />
+    </SafeAreaProvider>
   );
 }
 
@@ -141,25 +137,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 30 },
   },
   app: { flex: 1, width: '100%', backgroundColor: colors.bg },
-  statusPad: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: space(5),
-    paddingTop: space(3),
-    paddingBottom: space(1),
-  },
-  clock: { fontFamily: fonts.serif, color: colors.text, fontSize: 14, fontWeight: '700' },
-  status: { fontFamily: fonts.mono, color: colors.text, fontSize: 11, fontWeight: '600' },
   tabbar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingTop: space(2.5),
-    paddingBottom: space(4),
     borderTopWidth: 1,
     borderTopColor: colors.line,
     backgroundColor: 'rgba(255,255,255,0.96)',
   },
-  tab: { alignItems: 'center', gap: 4 },
-  tabLabel: { fontFamily: fonts.mono, fontSize: 9.5, fontWeight: '600', letterSpacing: 0.3 },
+  tab: { alignItems: 'center', gap: 4, paddingHorizontal: space(6) },
+  tabLabel: { fontFamily: fonts.mono, fontSize: 10, letterSpacing: 0.3 },
 });

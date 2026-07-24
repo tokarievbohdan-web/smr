@@ -15,7 +15,7 @@ export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: space(6), paddingTop: space(8), flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ padding: space(6), paddingTop: space(3), flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View style={styles.logo}>
           <Dot />
           <Text style={styles.logoText}>SMR</Text>
