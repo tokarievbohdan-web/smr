@@ -1,67 +1,35 @@
-// Дизайн-система SMR — Sport Market Review
-// Бренд: кислотно-жёлтый #DEDE19 + чёрный, шрифт Inter, фирменные градиенты
+// Дизайн-система Sport Market Community — нейтральний tech-стиль, Manrope, синій акцент
 export const colors = {
   bg: '#FFFFFF',
-  bgElevated: '#F5F5F0',
+  canvas: '#EEF0F4',
   surface: '#FFFFFF',
-  surfaceGrad1: '#FAFAF5',
-  surfaceGrad2: '#F1F1EA',
-  line: 'rgba(17,17,18,0.12)',
-  line2: 'rgba(17,17,18,0.07)',
-  chip: '#F1F1EC',
-  text: '#111112',
-  textDim: '#5A5A56',
-  textFaint: '#9A9A92',
-  accent: '#DEDE19',        // фирменный жёлтый — только как ЗАЛИВКА (текст поверх — onAccent)
-  accent2: '#C9C912',
-  accentSoft: 'rgba(222,222,25,0.20)',
-  onAccent: '#111112',      // текст/иконки на жёлтом
-  live: '#DEDE19',          // «Молния»
-  liveSoft: 'rgba(222,222,25,0.20)',
-  amber: '#5A5A56',
-  amberSoft: '#F1F1EC',
-  olive: '#3A3A38',
-  oliveSoft: '#EDEDE8',
-  green: '#00AF50',
-  pink: '#FF014A',
+  soft: '#F7F8FA',
+  ink: '#16181D',
+  body: '#33363E',
+  dim: '#5C6370',
+  muted: '#9AA1AE',
+  line: '#E6E8EE',
+  chipBg: '#F2F4F8',
+  accent: '#2F6BFF',
+  accentHover: '#1F52D4',
+  accentSoft: '#EAF0FF',
+  dark: '#16181D',
+  onDark: '#FFFFFF',
+  onDarkDim: '#8FB0FF',
+  stripe: '#EEF1F6',
+  stripe2: '#E7EBF2',
+  avatar: ['#DFE5F0', '#CFD8E8', '#BFCBE0'],
 };
 
-// Фирменные градиенты (для expo-linear-gradient — массив цветов)
-export const gradients = {
-  yellowBlack: ['#DEDE19', '#121211'] as const,
-  spectrum: ['#FF014A', '#DEDE19', '#00AF50'] as const,
-  lavenderYellow: ['#D6CCEF', '#DEDE19'] as const,
-  yellowGreen: ['#DEDE19', '#00AF50'] as const,
-  greenDark: ['#002400', '#00AF50'] as const,
-};
-
-export const radius = { sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, pill: 999 };
+export const radius = { sm: 8, md: 12, lg: 14, xl: 16, xxl: 18, card: 20, sheet: 28, pill: 999 };
 
 export const space = (n: number) => n * 4;
 
-// Гарнитуры — Inter. serif = заголовки (bold), black = лого/дисплей (extrabold),
-// mono = подписи/лейблы (medium), body = текст.
+// Manrope
 export const fonts = {
-  serif: 'Inter_700Bold',
-  black: 'Inter_800ExtraBold',
-  mono: 'Inter_500Medium',
-  body: 'Inter_400Regular',
-  med: 'Inter_500Medium',
-  semi: 'Inter_600SemiBold',
-};
-
-export const display = (size: number) => ({
-  fontFamily: fonts.black,
-  fontSize: size,
-  letterSpacing: -size * 0.02,
-});
-
-export const shadow = {
-  card: {
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
-  },
+  reg: 'Manrope_400Regular',
+  med: 'Manrope_500Medium',
+  semi: 'Manrope_600SemiBold',
+  bold: 'Manrope_700Bold',
+  extra: 'Manrope_800ExtraBold',
 };

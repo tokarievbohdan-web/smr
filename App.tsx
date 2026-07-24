@@ -1,38 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {
   useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  Inter_800ExtraBold,
-} from '@expo-google-fonts/inter';
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
 import { colors, space, fonts } from './src/theme';
-import { NewsItem, NEWS } from './src/data';
+import { Article } from './src/data';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
-import OnboardingScreen from './src/screens/OnboardingScreen';
-import { ProfileScreen } from './src/screens/StubScreens';
+import DiscussionsScreen from './src/screens/DiscussionsScreen';
+import CommunityScreen from './src/screens/CommunityScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import SearchScreen from './src/screens/SearchScreen';
+import SavedScreen from './src/screens/SavedScreen';
 
-const STORE_KEY = 'smr_state_v1';
+const STORE_KEY = 'smc_state_v1';
 
-type TabKey = 'feed' | 'profile';
+type TabKey = 'home' | 'discussions' | 'community' | 'profile';
 
 const TABS: { key: TabKey; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { key: 'feed', label: 'Лента', icon: 'newspaper' },
-  { key: 'profile', label: 'Профиль', icon: 'person' },
+  { key: 'home', label: 'Головна', icon: 'home' },
+  { key: 'discussions', label: 'Обговорення', icon: 'chatbubble-ellipses' },
+  { key: 'community', label: 'Спільнота', icon: 'people' },
+  { key: 'profile', label: 'Профіль', icon: 'person' },
 ];
 
 function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (k: TabKey) => void; bottomInset: number }) {
@@ -42,8 +41,8 @@ function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (
         const on = active === t.key;
         return (
           <TouchableOpacity key={t.key} style={styles.tab} activeOpacity={0.7} onPress={() => onChange(t.key)}>
-            <Ionicons name={on ? t.icon : (`${t.icon}-outline` as any)} size={23} color={on ? colors.text : colors.textFaint} />
-            <Text style={[styles.tabLabel, { color: on ? colors.text : colors.textFaint }]}>{t.label}</Text>
+            <Ionicons name={on ? t.icon : (`${t.icon}-outline` as any)} size={21} color={on ? colors.accent : colors.muted} />
+            <Text style={[styles.tabLabel, { color: on ? colors.accent : colors.muted }]}>{t.label}</Text>
           </TouchableOpacity>
         );
       })}
@@ -52,12 +51,12 @@ function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (
 }
 
 function AppInner() {
-  const [tab, setTab] = useState<TabKey>('feed');
-  const [article, setArticle] = useState<NewsItem | null>(null);
+  const [tab, setTab] = useState<TabKey>('home');
+  const [article, setArticle] = useState<Article | null>(null);
+  const [overlay, setOverlay] = useState<'search' | 'saved' | null>(null);
   const [onboarded, setOnboarded] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
-  const [read, setRead] = useState<string[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -65,14 +64,13 @@ function AppInner() {
   const topPad = Math.max(insets.top, framed ? 14 : 10);
 
   const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Inter_800ExtraBold,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
   });
 
-  // Загрузка сохранённого состояния
   useEffect(() => {
     (async () => {
       try {
@@ -82,62 +80,59 @@ function AppInner() {
           setOnboarded(!!s.onboarded);
           setInterests(Array.isArray(s.interests) ? s.interests : []);
           setSaved(Array.isArray(s.saved) ? s.saved : []);
-          setRead(Array.isArray(s.read) ? s.read : []);
         }
       } catch {}
       setHydrated(true);
     })();
   }, []);
 
-  // Сохранение состояния
   useEffect(() => {
     if (!hydrated) return;
-    AsyncStorage.setItem(STORE_KEY, JSON.stringify({ onboarded, interests, saved, read })).catch(() => {});
-  }, [hydrated, onboarded, interests, saved, read]);
+    AsyncStorage.setItem(STORE_KEY, JSON.stringify({ onboarded, interests, saved })).catch(() => {});
+  }, [hydrated, onboarded, interests, saved]);
 
   if (!fontsLoaded || !hydrated) {
     return <View style={[styles.root, { backgroundColor: colors.bg }]} />;
   }
 
-  const toggleSave = (id: string) =>
-    setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-  const savedItems = NEWS.filter((n) => saved.includes(n.id));
-
-  const openArticle = (item: NewsItem) => {
-    setArticle(item);
-    setRead((r) => (r.includes(item.id) ? r : [...r, item.id]));
+  const toggleSave = (id: string) => setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const openArticle = (a: Article) => setArticle(a);
+  const goTab = (k: TabKey) => {
+    setTab(k);
+    setArticle(null);
+    setOverlay(null);
   };
+
+  let content: React.ReactNode;
+  if (!onboarded) {
+    content = <OnboardingScreen onDone={(picked) => { setInterests(picked); setOnboarded(true); }} />;
+  } else if (article) {
+    content = <ArticleScreen item={article} onBack={() => setArticle(null)} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} />;
+  } else if (overlay === 'search') {
+    content = <SearchScreen onCancel={() => setOverlay(null)} onOpen={openArticle} />;
+  } else if (overlay === 'saved') {
+    content = <SavedScreen saved={saved} onBack={() => setOverlay(null)} onOpen={openArticle} onToggleSave={toggleSave} />;
+  } else if (tab === 'home') {
+    content = <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoDiscussions={() => setTab('discussions')} saved={saved} onToggleSave={toggleSave} />;
+  } else if (tab === 'discussions') {
+    content = <DiscussionsScreen />;
+  } else if (tab === 'community') {
+    content = <CommunityScreen />;
+  } else {
+    content = <ProfileScreen onOpenSaved={() => setOverlay('saved')} />;
+  }
+
+  const showTabs = onboarded && !article && !overlay;
 
   const app = (
     <View style={styles.app}>
-      <View style={{ flex: 1, paddingTop: topPad }}>
-        {!onboarded ? (
-          <OnboardingScreen
-            onDone={(picked) => {
-              setInterests(picked);
-              setOnboarded(true);
-            }}
-          />
-        ) : article ? (
-          <ArticleScreen
-            item={article}
-            onBack={() => setArticle(null)}
-            saved={saved.includes(article.id)}
-            onToggleSave={() => toggleSave(article.id)}
-          />
-        ) : tab === 'feed' ? (
-          <FeedScreen onOpen={openArticle} interests={interests} saved={saved} onToggleSave={toggleSave} read={read} />
-        ) : (
-          <ProfileScreen savedItems={savedItems} interestsCount={interests.length} onOpen={openArticle} />
-        )}
-      </View>
-
-      {onboarded && !article && <TabBar active={tab} onChange={setTab} bottomInset={insets.bottom} />}
+      <View style={{ flex: 1, paddingTop: topPad }}>{content}</View>
+      {showTabs && <TabBar active={tab} onChange={goTab} bottomInset={insets.bottom} />}
     </View>
   );
 
   return (
-    <View style={[styles.root, { backgroundColor: framed ? '#E4E4E7' : colors.bg }]}>
+    <View style={[styles.root, { backgroundColor: framed ? colors.canvas : colors.bg }]}>
       <StatusBar style="dark" />
       {framed ? <View style={styles.phone}>{app}</View> : app}
     </View>
@@ -156,15 +151,15 @@ const styles = StyleSheet.create({
   root: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   phone: {
     width: 400,
-    height: 840,
+    height: 844,
     maxHeight: '96%',
     borderRadius: 44,
     overflow: 'hidden',
     borderWidth: 10,
-    borderColor: '#111112',
+    borderColor: '#16181D',
     backgroundColor: colors.bg,
     shadowColor: '#000',
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.35,
     shadowRadius: 60,
     shadowOffset: { width: 0, height: 30 },
   },
@@ -175,8 +170,8 @@ const styles = StyleSheet.create({
     paddingTop: space(2.5),
     borderTopWidth: 1,
     borderTopColor: colors.line,
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: '#fff',
   },
-  tab: { alignItems: 'center', gap: 4, paddingHorizontal: space(6) },
-  tabLabel: { fontFamily: fonts.mono, fontSize: 10, letterSpacing: 0.3 },
+  tab: { alignItems: 'center', gap: 4, flex: 1 },
+  tabLabel: { fontFamily: fonts.semi, fontSize: 10.5 },
 });

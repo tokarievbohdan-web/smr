@@ -1,64 +1,104 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing, ViewStyle } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from 'react-native';
 import { colors, radius, fonts } from './theme';
-import { Format } from './data';
 
-// Пульсирующая точка «в эфире»
-export function LivePulse() {
-  const a = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(a, { toValue: 0.25, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(a, { toValue: 1, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [a]);
-  return <Animated.View style={[styles.pulse, { opacity: a }]} />;
-}
-
-export function LiveBadge({ label = 'Молния' }: { label?: string }) {
+// Плейсхолдер під фото (смугаста поверхня в дизайні → нейтральний блок з підписом)
+export function Photo({
+  label,
+  height,
+  round = radius.card,
+  style,
+  children,
+}: {
+  label?: string;
+  height: number;
+  round?: number;
+  style?: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
+}) {
   return (
-    <View style={styles.liveBadge}>
-      <LivePulse />
-      <Text style={styles.liveText}>{label}</Text>
+    <View style={[{ height, borderRadius: round, backgroundColor: colors.stripe, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }, style]}>
+      {label ? <Text style={styles.photoLabel}>{label}</Text> : null}
+      {children}
     </View>
   );
 }
 
-export function FormatTag({ format }: { format: Format }) {
+// Категорія великими літерами (синій)
+export function CategoryText({ text, style }: { text: string; style?: StyleProp<ViewStyle> }) {
+  return <Text style={[styles.cat, style as any]}>{text.toUpperCase()}</Text>;
+}
+
+// Бейдж на зображенні (біла плашка, синій текст)
+export function ImageBadge({ text }: { text: string }) {
   return (
-    <View style={styles.tag}>
-      <Text style={styles.tagText}>{format.toUpperCase()}</Text>
+    <View style={styles.imgBadge}>
+      <Text style={styles.imgBadgeText}>{text.toUpperCase()}</Text>
     </View>
   );
 }
 
-export function Avatar({ kind = 'a', size = 30 }: { kind?: 'a' | 'b' | 'c'; size?: number }) {
-  const grad: Record<string, string> = { a: colors.text, b: colors.olive, c: colors.amber };
-  return <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: grad[kind] }} />;
+export function Avatar({ initials, size = 36, shade = 0 }: { initials: string; size?: number; shade?: number }) {
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: colors.avatar[shade % colors.avatar.length],
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Text style={{ fontFamily: fonts.bold, color: colors.dim, fontSize: size * 0.34 }}>{initials}</Text>
+    </View>
+  );
 }
 
-export function Dot({ style }: { style?: ViewStyle }) {
-  return <View style={[styles.brandDot, style]} />;
+// Чіп-фільтр: dark (обраний чорний) або accent (обраний синій)
+export function Chip({
+  label,
+  active,
+  variant = 'dark',
+  onPress,
+}: {
+  label: string;
+  active?: boolean;
+  variant?: 'dark' | 'accent';
+  onPress?: () => void;
+}) {
+  const onBg = variant === 'accent' ? colors.accent : colors.dark;
+  return (
+    <TouchableOpacity activeOpacity={0.85} onPress={onPress}>
+      <View
+        style={[
+          styles.chip,
+          active ? { backgroundColor: onBg, borderColor: onBg } : { backgroundColor: colors.surface, borderColor: colors.line },
+        ]}
+      >
+        <Text style={[styles.chipText, { color: active ? '#fff' : colors.ink }]}>{label}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+// Логотип SM
+export function Logo({ size = 32, text = 'Sport Market' }: { size?: number; text?: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+      <View style={{ width: size, height: size, borderRadius: size * 0.28, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ fontFamily: fonts.extra, color: '#fff', fontSize: size * 0.34, letterSpacing: -0.3 }}>SM</Text>
+      </View>
+      {text ? <Text style={{ fontFamily: fonts.extra, color: colors.ink, fontSize: 16, letterSpacing: -0.3 }}>{text}</Text> : null}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  pulse: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.onAccent },
-  liveBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: colors.live,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.sm,
-    alignSelf: 'flex-start',
-  },
-  liveText: { fontFamily: fonts.mono, color: colors.onAccent, fontSize: 10, letterSpacing: 0.6, textTransform: 'uppercase' },
-  tag: { backgroundColor: colors.chip, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, alignSelf: 'flex-start' },
-  tagText: { fontFamily: fonts.mono, color: '#3A3A38', fontSize: 9, letterSpacing: 0.4 },
-  brandDot: { width: 9, height: 9, borderRadius: 4.5, backgroundColor: colors.accent },
+  photoLabel: { fontFamily: 'ui-monospace' as any, color: colors.muted, fontSize: 10 },
+  cat: { fontFamily: fonts.bold, color: colors.accent, fontSize: 10, letterSpacing: 0.8 },
+  imgBadge: { position: 'absolute', top: 12, left: 12, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
+  imgBadgeText: { fontFamily: fonts.bold, color: colors.accent, fontSize: 10, letterSpacing: 0.8 },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1 },
+  chipText: { fontFamily: fonts.semi, fontSize: 12.5 },
 });

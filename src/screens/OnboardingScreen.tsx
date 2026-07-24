@@ -1,97 +1,81 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { CATEGORIES } from '../data';
-import { Dot } from '../components';
-import { Ionicons } from '@expo/vector-icons';
+import { INTERESTS, ME } from '../data';
 
-const TOPICS = CATEGORIES.filter((c) => c !== 'Всё');
-
-export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]) => void }) {
-  const [picked, setPicked] = useState<string[]>(['Спонсорство', 'Права']);
-
-  const toggle = (t: string) =>
-    setPicked((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
-
+function Field({ label, value, dashed }: { label: string; value?: string; dashed?: boolean }) {
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: space(6), paddingTop: space(3), flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-        <View style={styles.logo}>
-          <Dot />
-          <Text style={styles.logoText}>SMR</Text>
-        </View>
-        <Text style={styles.tagline}>BUSINESS SPORT MEDIA</Text>
-
-        <Text style={styles.eyebrow}>НАСТРОЙКА ЛЕНТЫ</Text>
-        <Text style={styles.h}>Что тебе интересно в спортивном маркетинге?</Text>
-        <Text style={styles.sub}>Выбери темы — соберём ленту под тебя. Позже можно изменить.</Text>
-
-        <View style={styles.grid}>
-          {TOPICS.map((t) => {
-            const on = picked.includes(t);
-            return (
-              <Pressable key={t} onPress={() => toggle(t)} style={[styles.topic, on && styles.topicOn]}>
-                <Text style={[styles.topicText, on && styles.topicTextOn]}>{t}</Text>
-                {on && <Ionicons name="checkmark-circle" size={18} color={colors.onAccent} />}
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <View style={{ flex: 1 }} />
-
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={[styles.cta, picked.length === 0 && styles.ctaOff]}
-          disabled={picked.length === 0}
-          onPress={() => onDone(picked)}
-        >
-          <Text style={styles.ctaText}>
-            {picked.length ? `Собрать ленту · ${picked.length}` : 'Выбери хотя бы одну тему'}
-          </Text>
-          {picked.length > 0 && <Ionicons name="arrow-forward" size={18} color={colors.onAccent} />}
-        </TouchableOpacity>
-        <Text style={styles.skip} onPress={() => onDone([])}>
-          Пропустить
-        </Text>
-      </ScrollView>
+    <View style={{ gap: 6 }}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        defaultValue={value}
+        placeholder={dashed ? 'linkedin.com/in/…' : undefined}
+        placeholderTextColor={colors.muted}
+        style={[styles.input, dashed && { borderStyle: 'dashed', borderColor: '#D3D8E2' }]}
+      />
     </View>
   );
 }
 
+export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]) => void }) {
+  const [picked, setPicked] = useState<string[]>(['Спонсорство', 'Комерція']);
+  const toggle = (t: string) => setPicked((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
+
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space(8) }}>
+      <View style={{ paddingHorizontal: space(6), paddingTop: space(6), gap: 8 }}>
+        <View style={styles.logo}><Text style={styles.logoText}>SM</Text></View>
+        <Text style={styles.h1}>Створіть профіль</Text>
+        <Text style={styles.sub}>Займе не більше двох хвилин. Одразу після цього — персональна стрічка.</Text>
+      </View>
+
+      <View style={{ paddingHorizontal: space(6), paddingTop: space(4), gap: 12 }}>
+        <Field label="Ім'я" value={ME.name} />
+        <Field label="Email" value={ME.email} />
+        <Field label="Посада" value={ME.position} />
+        <Field label="Компанія" value={ME.company} />
+
+        <View style={{ gap: 8, marginTop: 6 }}>
+          <Text style={styles.label}>Які напрями вам цікаві?</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {INTERESTS.map((t) => {
+              const on = picked.includes(t);
+              return (
+                <Pressable key={t} onPress={() => toggle(t)} style={[styles.pill, on ? styles.pillOn : styles.pillOff]}>
+                  <Text style={[styles.pillText, { color: on ? '#fff' : colors.ink }]}>{t}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={{ marginTop: 6 }}>
+          <Field label="LinkedIn — необов'язково" dashed />
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: space(6), paddingTop: space(5), gap: 12 }}>
+        <TouchableOpacity style={styles.cta} activeOpacity={0.85} onPress={() => onDone(picked)}>
+          <Text style={styles.ctaText}>Продовжити</Text>
+        </TouchableOpacity>
+        <Text style={styles.note}>Заповнений профіль відкриває коментарі —{'\n'}статус Community Member</Text>
+      </View>
+    </ScrollView>
+  );
+}
+
 const styles = StyleSheet.create({
-  logo: { flexDirection: 'row', alignItems: 'center', gap: 9 },
-  logoText: { fontFamily: fonts.black, color: colors.text, fontSize: 24, letterSpacing: 0.3 },
-  tagline: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 10, letterSpacing: 2, marginTop: 6, marginBottom: space(8) },
-  eyebrow: { fontFamily: fonts.mono, color: colors.text, fontSize: 11, letterSpacing: 1.4, marginBottom: space(3) },
-  h: { fontFamily: fonts.black, color: colors.text, fontSize: 30, lineHeight: 37, letterSpacing: -0.6 },
-  sub: { fontFamily: fonts.body, color: colors.textDim, fontSize: 15, lineHeight: 22, marginTop: space(3) },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: space(6) },
-  topic: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  topicOn: { backgroundColor: colors.accent, borderColor: colors.accent },
-  topicText: { fontFamily: fonts.serif, color: colors.text, fontSize: 16 },
-  topicTextOn: { color: colors.onAccent },
-  cta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: colors.accent,
-    borderRadius: radius.lg,
-    paddingVertical: 16,
-    marginTop: space(6),
-  },
-  ctaOff: { backgroundColor: colors.textFaint },
-  ctaText: { fontFamily: fonts.semi, color: colors.onAccent, fontSize: 16 },
-  skip: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 13, textAlign: 'center', paddingVertical: space(4) },
+  logo: { width: 44, height: 44, borderRadius: 12, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  logoText: { fontFamily: fonts.extra, color: '#fff', fontSize: 15, letterSpacing: -0.5 },
+  h1: { fontFamily: fonts.extra, color: colors.ink, fontSize: 28, lineHeight: 32, letterSpacing: -0.6 },
+  sub: { fontFamily: fonts.med, color: colors.dim, fontSize: 14, lineHeight: 21 },
+  label: { fontFamily: fonts.semi, color: colors.dim, fontSize: 12 },
+  input: { height: 48, borderWidth: 1, borderColor: colors.line, borderRadius: 12, paddingHorizontal: 14, fontFamily: fonts.med, fontSize: 14, color: colors.ink, outlineStyle: 'none' } as any,
+  pill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill },
+  pillOn: { backgroundColor: colors.accent },
+  pillOff: { borderWidth: 1, borderColor: colors.line },
+  pillText: { fontFamily: fonts.semi, fontSize: 13 },
+  cta: { height: 52, borderRadius: radius.lg, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
+  ctaText: { fontFamily: fonts.bold, color: '#fff', fontSize: 15 },
+  note: { fontFamily: fonts.med, color: colors.muted, fontSize: 12, textAlign: 'center', lineHeight: 18 },
 });

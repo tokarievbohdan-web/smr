@@ -1,10 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, radius, space, fonts, gradients } from '../theme';
-import { NewsItem } from '../data';
-import { LiveBadge, Avatar } from '../components';
+import { colors, radius, space, fonts } from '../theme';
+import { Article } from '../data';
+import { Photo, CategoryText, Avatar } from '../components';
 import { Ionicons } from '@expo/vector-icons';
+
+function HBtn({ name, onPress, active }: { name: any; onPress?: () => void; active?: boolean }) {
+  return (
+    <TouchableOpacity style={styles.hbtn} onPress={onPress} activeOpacity={0.8}>
+      <Ionicons name={name} size={17} color={active ? colors.accent : colors.ink} />
+    </TouchableOpacity>
+  );
+}
 
 export default function ArticleScreen({
   item,
@@ -12,88 +19,80 @@ export default function ArticleScreen({
   saved,
   onToggleSave,
 }: {
-  item: NewsItem;
+  item: Article;
   onBack: () => void;
   saved: boolean;
   onToggleSave: () => void;
 }) {
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.appbar}>
-        <TouchableOpacity style={styles.iconBtn} onPress={onBack}>
-          <Ionicons name="chevron-back" size={20} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.appbarTitle}>{item.format.toUpperCase()}</Text>
+      <View style={styles.header}>
+        <HBtn name="arrow-back" onPress={onBack} />
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <TouchableOpacity style={styles.iconBtn} onPress={onToggleSave}>
-            <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={17} color={colors.text} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="share-outline" size={18} color={colors.text} />
-          </TouchableOpacity>
+          <HBtn name={saved ? 'bookmark' : 'bookmark-outline'} onPress={onToggleSave} active={saved} />
+          <HBtn name="share-social-outline" />
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space(10) }}>
-        {/* Hero — фирменный градиент */}
-        <LinearGradient
-          colors={gradients.spectrum}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.hero}
-        >
-          <Text style={styles.heroEmoji}>{item.emoji}</Text>
-          {item.live && <LiveBadge label={item.format} />}
-        </LinearGradient>
-
-        <View style={{ paddingHorizontal: space(4) }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space(8) }}>
+        <View style={{ paddingHorizontal: space(5), gap: 10, paddingTop: space(2) }}>
+          <CategoryText text={`${item.category} · ${item.kind}`} />
           <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.meta}>{item.date} · {item.readMin} хв читання</Text>
+        </View>
 
-          <View style={styles.byline}>
-            <Avatar kind="a" size={22} />
-            <Text style={styles.bylineText}>{item.source} · сегодня, 09:12</Text>
+        <Photo label="ключовий візуал кампанії" height={190} style={{ marginHorizontal: space(5), marginTop: space(3) }} />
+
+        <View style={{ paddingHorizontal: space(5), paddingTop: space(4), gap: 14 }}>
+          <Text style={styles.body}>{item.excerpt}</Text>
+
+          <View style={styles.factsBox}>
+            <Text style={styles.factsLabel}>ОСНОВНІ ФАКТИ</Text>
+            {item.facts.map((f, i) => (
+              <Text key={i} style={styles.factItem}>· {f}</Text>
+            ))}
           </View>
 
-          {item.lead && <Text style={styles.lead}>{item.lead}</Text>}
+          <View style={styles.whyBox}>
+            <Text style={styles.whyLabel}>ЧОМУ ЦЕ ВАЖЛИВО</Text>
+            <Text style={styles.whyText}>{item.why}</Text>
+          </View>
 
-          {item.stats && (
-            <View style={styles.stats}>
-              {item.stats.map((s, i) => (
-                <View key={i} style={styles.stat}>
-                  <Text style={styles.statValue}>{s.value}</Text>
-                  <Text style={styles.statLabel}>{s.label.toUpperCase()}</Text>
+          <View style={{ gap: 6 }}>
+            <Text style={styles.factsLabel}>ВИСНОВОК ДЛЯ ІНДУСТРІЇ</Text>
+            <Text style={styles.body}>{item.conclusion}</Text>
+          </View>
+
+          <Text style={styles.source}>Першоджерело: {item.source} ↗</Text>
+        </View>
+
+        {/* Коментарі */}
+        <View style={styles.commentsWrap}>
+          <View style={styles.rowHead}>
+            <Text style={styles.h3}>Коментарі спільноти</Text>
+            <Text style={styles.count}>{item.commentsCount}</Text>
+          </View>
+          {item.comments.map((c, i) => (
+            <View key={i} style={[styles.comment, c.reply && { paddingLeft: 28 }]}>
+              <Avatar initials={c.initials} size={36} shade={i} />
+              <View style={{ flex: 1, gap: 5 }}>
+                <View style={styles.cHead}>
+                  <Text style={styles.cName}>{c.author}</Text>
+                  <Text style={styles.cRole}>{c.role}</Text>
                 </View>
-              ))}
+                <Text style={styles.cText}>{c.text}</Text>
+                <View style={{ flexDirection: 'row', gap: 14, marginTop: 2 }}>
+                  <Text style={[styles.cAction, !c.reply && { color: colors.accent, fontFamily: fonts.bold }]}>Корисно · {c.helpful}</Text>
+                  <Text style={styles.cAction}>Відповісти</Text>
+                </View>
+              </View>
             </View>
-          )}
-
-          {item.body?.[0] && <Text style={styles.body}>{item.body[0]}</Text>}
-
-          {item.pull && (
-            <View style={styles.pull}>
-              <Text style={styles.pullText}>{item.pull}</Text>
-            </View>
-          )}
-
-          {item.body?.slice(1).map((p, i) => (
-            <Text key={i} style={styles.body}>{p}</Text>
           ))}
+        </View>
 
-          {/* Reactions */}
-          {item.reactions && (
-            <View style={styles.reactions}>
-              <View style={styles.reactBtn}>
-                <Text style={styles.reactText}>🔥 {item.reactions.fire}</Text>
-              </View>
-              <View style={styles.reactBtn}>
-                <Text style={styles.reactText}>🧠 {item.reactions.brain}</Text>
-              </View>
-              <View style={styles.reactBtn}>
-                <Text style={styles.reactText}>💬 {item.reactions.comments}</Text>
-              </View>
-            </View>
-          )}
-
+        <View style={styles.inputRow}>
+          <View style={styles.input}><Text style={styles.inputPh}>Ваш професійний коментар…</Text></View>
+          <View style={styles.send}><Ionicons name="paper-plane" size={15} color="#fff" /></View>
         </View>
       </ScrollView>
     </View>
@@ -101,55 +100,33 @@ export default function ArticleScreen({
 }
 
 const styles = StyleSheet.create({
-  appbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: space(4),
-    paddingTop: space(2),
-    paddingBottom: space(2),
-  },
-  appbarTitle: { fontFamily: fonts.mono, color: colors.textDim, fontSize: 11, fontWeight: '700', letterSpacing: 1.5 },
-  iconBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: colors.chip,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  hero: {
-    marginHorizontal: space(4),
-    height: 170,
-    borderRadius: radius.xl,
-    padding: space(4),
-    justifyContent: 'space-between',
-    marginBottom: space(4),
-    overflow: 'hidden',
-  },
-  heroEmoji: { fontSize: 60, alignSelf: 'flex-end' },
-  title: { fontFamily: fonts.serif, color: colors.text, fontSize: 27, fontWeight: '700', lineHeight: 33, letterSpacing: -0.5 },
-  byline: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: space(3), marginBottom: space(4) },
-  bylineText: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 11 },
-  lead: { fontFamily: fonts.med, color: colors.text, fontSize: 17, lineHeight: 26, marginBottom: space(4) },
-  body: { fontFamily: fonts.body, color: colors.textDim, fontSize: 15, lineHeight: 24, marginBottom: space(4) },
-  stats: { flexDirection: 'row', gap: 8, marginBottom: space(4) },
-  stat: { flex: 1, backgroundColor: colors.chip, borderRadius: radius.md, paddingVertical: 10, paddingHorizontal: 12 },
-  statValue: { fontFamily: fonts.black, color: colors.text, fontSize: 26, letterSpacing: -0.5 },
-  statLabel: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 9, letterSpacing: 0.5, marginTop: 3 },
-  pull: { borderLeftWidth: 2, borderLeftColor: colors.text, paddingLeft: 14, marginBottom: space(4) },
-  pullText: { fontFamily: fonts.serif, color: colors.text, fontSize: 18, lineHeight: 25, letterSpacing: -0.3 },
-  reactions: { flexDirection: 'row', gap: 8, marginBottom: space(4) },
-  reactBtn: { flex: 1, backgroundColor: colors.chip, borderRadius: radius.md, paddingVertical: 10, alignItems: 'center' },
-  reactText: { color: colors.text, fontSize: 13, fontWeight: '600' },
-  discuss: {
-    flexDirection: 'row',
-    gap: 8,
-    backgroundColor: colors.accent,
-    borderRadius: radius.lg,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  discussText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space(5), paddingTop: space(2), paddingBottom: space(2) },
+  hbtn: { width: 38, height: 38, borderRadius: 12, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+  title: { fontFamily: fonts.extra, color: colors.ink, fontSize: 23, lineHeight: 28, letterSpacing: -0.5 },
+  meta: { fontFamily: fonts.semi, color: colors.muted, fontSize: 12 },
+  body: { fontFamily: fonts.med, color: colors.body, fontSize: 14.5, lineHeight: 23 },
+
+  factsBox: { borderWidth: 1, borderColor: colors.line, borderRadius: radius.xl, padding: 16, gap: 8 },
+  factsLabel: { fontFamily: fonts.bold, color: colors.muted, fontSize: 11, letterSpacing: 0.8 },
+  factItem: { fontFamily: fonts.med, color: colors.body, fontSize: 13.5, lineHeight: 21 },
+  whyBox: { backgroundColor: colors.accentSoft, borderRadius: radius.xl, padding: 16, gap: 6 },
+  whyLabel: { fontFamily: fonts.extra, color: colors.accent, fontSize: 12, letterSpacing: 0.8 },
+  whyText: { fontFamily: fonts.med, color: colors.ink, fontSize: 14, lineHeight: 22 },
+  source: { fontFamily: fonts.semi, color: colors.accent, fontSize: 13 },
+
+  commentsWrap: { marginHorizontal: space(5), marginTop: space(4), borderTopWidth: 1, borderTopColor: colors.line, paddingTop: space(4), gap: 14 },
+  rowHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
+  h3: { fontFamily: fonts.extra, color: colors.ink, fontSize: 16, letterSpacing: -0.2 },
+  count: { fontFamily: fonts.semi, color: colors.muted, fontSize: 12 },
+  comment: { flexDirection: 'row', gap: 10 },
+  cHead: { flexDirection: 'row', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' },
+  cName: { fontFamily: fonts.bold, color: colors.ink, fontSize: 13 },
+  cRole: { fontFamily: fonts.med, color: colors.muted, fontSize: 11 },
+  cText: { fontFamily: fonts.med, color: colors.body, fontSize: 13.5, lineHeight: 20 },
+  cAction: { fontFamily: fonts.semi, color: colors.muted, fontSize: 12 },
+
+  inputRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: space(5), marginTop: space(4) },
+  input: { flex: 1, height: 46, borderWidth: 1, borderColor: colors.line, borderRadius: radius.pill, justifyContent: 'center', paddingHorizontal: 16 },
+  inputPh: { fontFamily: fonts.med, color: colors.muted, fontSize: 13.5 },
+  send: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
 });
