@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { ARTICLES, FEED_FILTERS, DISCUSSIONS, Article } from '../data';
+import { ARTICLES, FEED_FILTERS, DISCUSSIONS, Article, Discussion } from '../data';
 import { Photo, CategoryText, ImageBadge, Chip, Logo } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -18,16 +18,19 @@ export default function FeedScreen({
   onOpen,
   onOpenSearch,
   onGoDiscussions,
+  onOpenDiscussion,
   saved,
   onToggleSave,
 }: {
   onOpen: (a: Article) => void;
   onOpenSearch: () => void;
   onGoDiscussions: () => void;
+  onOpenDiscussion: (d: Discussion) => void;
   saved: string[];
   onToggleSave: (id: string) => void;
 }) {
   const [filter, setFilter] = useState('Усе');
+  const [subscribed, setSubscribed] = useState(false);
   const top = ARTICLES.filter((a) => a.topToday);
   const feed = ARTICLES.filter((a) => filter === 'Усе' || a.category === filter);
 
@@ -93,7 +96,7 @@ export default function FeedScreen({
             <Text style={styles.link} onPress={onGoDiscussions}>Усі</Text>
           </View>
           {DISCUSSIONS.slice(0, 2).map((d) => (
-            <Pressable key={d.id} style={styles.discRow} onPress={onGoDiscussions}>
+            <Pressable key={d.id} style={({ pressed }) => [styles.discRow, pressed && { opacity: 0.7 }]} onPress={() => onOpenDiscussion(d)}>
               <View style={{ flex: 1, gap: 4 }}>
                 <Text style={styles.discTitle}>{d.title}</Text>
                 <Text style={styles.discMeta}>{d.category} · {d.meta.split(' · ')[0]}</Text>
@@ -107,7 +110,9 @@ export default function FeedScreen({
           <View style={styles.digest}>
             <Text style={styles.digestEyebrow}>ЩОТИЖНЕВИЙ ДАЙДЖЕСТ</Text>
             <Text style={styles.digestTitle}>Головне за тиждень — щоп'ятниці на вашій пошті</Text>
-            <View style={styles.digestBtn}><Text style={styles.digestBtnText}>Отримувати</Text></View>
+            <TouchableOpacity style={styles.digestBtn} activeOpacity={0.85} onPress={() => setSubscribed((s) => !s)}>
+              <Text style={styles.digestBtnText}>{subscribed ? 'Готово ✓' : 'Отримувати'}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

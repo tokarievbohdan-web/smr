@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { DISCUSSIONS } from '../data';
+import { DISCUSSIONS, Discussion } from '../data';
 import { Chip } from '../components';
 
 const FILTERS = ['Популярні', 'Нові', 'Питання', 'Тема тижня'];
@@ -18,7 +18,7 @@ function AvatarStack({ items }: { items: string[] }) {
   );
 }
 
-export default function DiscussionsScreen() {
+export default function DiscussionsScreen({ onOpen }: { onOpen: (d: Discussion) => void }) {
   const [filter, setFilter] = useState('Популярні');
   return (
     <View style={{ flex: 1 }}>
@@ -33,7 +33,7 @@ export default function DiscussionsScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: space(5), gap: 12, paddingBottom: space(6) }}>
         {DISCUSSIONS.map((d) => (
-          <View key={d.id} style={styles.card}>
+          <Pressable key={d.id} style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]} onPress={() => onOpen(d)}>
             {d.badge ? (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <View style={[styles.badge, d.badge === 'Тема тижня' ? styles.badgeBlue : styles.badgeGray]}>
@@ -54,7 +54,7 @@ export default function DiscussionsScreen() {
             ) : (
               <Text style={styles.meta}>{d.meta}</Text>
             )}
-          </View>
+          </Pressable>
         ))}
       </ScrollView>
     </View>

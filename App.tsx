@@ -13,11 +13,12 @@ import {
   Manrope_800ExtraBold,
 } from '@expo-google-fonts/manrope';
 import { colors, space, fonts } from './src/theme';
-import { Article } from './src/data';
+import { Article, Discussion } from './src/data';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
 import DiscussionsScreen from './src/screens/DiscussionsScreen';
+import DiscussionDetailScreen from './src/screens/DiscussionDetailScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SearchScreen from './src/screens/SearchScreen';
@@ -53,6 +54,7 @@ function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (
 function AppInner() {
   const [tab, setTab] = useState<TabKey>('home');
   const [article, setArticle] = useState<Article | null>(null);
+  const [discussion, setDiscussion] = useState<Discussion | null>(null);
   const [overlay, setOverlay] = useState<'search' | 'saved' | null>(null);
   const [onboarded, setOnboarded] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
@@ -97,9 +99,11 @@ function AppInner() {
 
   const toggleSave = (id: string) => setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const openArticle = (a: Article) => setArticle(a);
+  const openDiscussion = (d: Discussion) => setDiscussion(d);
   const goTab = (k: TabKey) => {
     setTab(k);
     setArticle(null);
+    setDiscussion(null);
     setOverlay(null);
   };
 
@@ -108,21 +112,23 @@ function AppInner() {
     content = <OnboardingScreen onDone={(picked) => { setInterests(picked); setOnboarded(true); }} />;
   } else if (article) {
     content = <ArticleScreen item={article} onBack={() => setArticle(null)} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} />;
+  } else if (discussion) {
+    content = <DiscussionDetailScreen item={discussion} onBack={() => setDiscussion(null)} />;
   } else if (overlay === 'search') {
-    content = <SearchScreen onCancel={() => setOverlay(null)} onOpen={openArticle} />;
+    content = <SearchScreen onCancel={() => setOverlay(null)} onOpen={openArticle} onOpenDiscussion={openDiscussion} />;
   } else if (overlay === 'saved') {
     content = <SavedScreen saved={saved} onBack={() => setOverlay(null)} onOpen={openArticle} onToggleSave={toggleSave} />;
   } else if (tab === 'home') {
-    content = <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoDiscussions={() => setTab('discussions')} saved={saved} onToggleSave={toggleSave} />;
+    content = <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoDiscussions={() => setTab('discussions')} onOpenDiscussion={openDiscussion} saved={saved} onToggleSave={toggleSave} />;
   } else if (tab === 'discussions') {
-    content = <DiscussionsScreen />;
+    content = <DiscussionsScreen onOpen={openDiscussion} />;
   } else if (tab === 'community') {
     content = <CommunityScreen />;
   } else {
     content = <ProfileScreen onOpenSaved={() => setOverlay('saved')} />;
   }
 
-  const showTabs = onboarded && !article && !overlay;
+  const showTabs = onboarded && !article && !discussion && !overlay;
 
   const app = (
     <View style={styles.app}>

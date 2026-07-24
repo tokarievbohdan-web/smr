@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ViewStyle, StyleProp } from 'react-native';
 import { colors, radius, fonts } from './theme';
+import { Comment } from './data';
+import { Ionicons } from '@expo/vector-icons';
 
 // Плейсхолдер під фото (смугаста поверхня в дизайні → нейтральний блок з підписом)
 export function Photo({
@@ -93,6 +95,79 @@ export function Logo({ size = 32, text = 'Sport Market' }: { size?: number; text
     </View>
   );
 }
+
+// Один коментар з робочою кнопкою «Корисно»
+export function CommentItem({
+  c,
+  index,
+  liked,
+  onToggleLike,
+}: {
+  c: Comment;
+  index: number;
+  liked: boolean;
+  onToggleLike: () => void;
+}) {
+  return (
+    <View style={[cstyles.comment, c.reply && { paddingLeft: 28 }]}>
+      <Avatar initials={c.initials} size={36} shade={index} />
+      <View style={{ flex: 1, gap: 5 }}>
+        <View style={cstyles.head}>
+          <Text style={cstyles.name}>{c.author}</Text>
+          <Text style={cstyles.role}>{c.role}</Text>
+        </View>
+        <Text style={cstyles.text}>{c.text}</Text>
+        <View style={{ flexDirection: 'row', gap: 14, marginTop: 2 }}>
+          <TouchableOpacity onPress={onToggleLike} hitSlop={6}>
+            <Text style={[cstyles.action, liked && { color: colors.accent, fontFamily: fonts.bold }]}>
+              Корисно · {c.helpful}
+            </Text>
+          </TouchableOpacity>
+          <Text style={cstyles.action}>Відповісти</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// Поле вводу коментаря
+export function CommentComposer({ onSubmit }: { onSubmit: (text: string) => void }) {
+  const [text, setText] = useState('');
+  const submit = () => {
+    const t = text.trim();
+    if (!t) return;
+    onSubmit(t);
+    setText('');
+  };
+  return (
+    <View style={cstyles.inputRow}>
+      <TextInput
+        value={text}
+        onChangeText={setText}
+        placeholder="Ваш професійний коментар…"
+        placeholderTextColor={colors.muted}
+        style={cstyles.input}
+        onSubmitEditing={submit}
+        returnKeyType="send"
+      />
+      <TouchableOpacity style={[cstyles.send, !text.trim() && { opacity: 0.5 }]} onPress={submit} activeOpacity={0.85}>
+        <Ionicons name="paper-plane" size={15} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const cstyles = StyleSheet.create({
+  comment: { flexDirection: 'row', gap: 10 },
+  head: { flexDirection: 'row', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' },
+  name: { fontFamily: fonts.bold, color: colors.ink, fontSize: 13 },
+  role: { fontFamily: fonts.med, color: colors.muted, fontSize: 11 },
+  text: { fontFamily: fonts.med, color: colors.body, fontSize: 13.5, lineHeight: 20 },
+  action: { fontFamily: fonts.semi, color: colors.muted, fontSize: 12 },
+  inputRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  input: { flex: 1, height: 46, borderWidth: 1, borderColor: colors.line, borderRadius: radius.pill, paddingHorizontal: 16, fontFamily: fonts.med, fontSize: 13.5, color: colors.ink, outlineStyle: 'none' } as any,
+  send: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
+});
 
 const styles = StyleSheet.create({
   photoLabel: { fontFamily: 'ui-monospace' as any, color: colors.muted, fontSize: 10 },

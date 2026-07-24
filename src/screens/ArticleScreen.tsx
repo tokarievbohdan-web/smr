@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { Article } from '../data';
-import { Photo, CategoryText, Avatar } from '../components';
+import { Article, Comment, ME } from '../data';
+import { Photo, CategoryText, CommentItem, CommentComposer } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 
 function HBtn({ name, onPress, active }: { name: any; onPress?: () => void; active?: boolean }) {
@@ -24,6 +24,16 @@ export default function ArticleScreen({
   saved: boolean;
   onToggleSave: () => void;
 }) {
+  const [comments, setComments] = useState<Comment[]>(item.comments);
+  const [liked, setLiked] = useState<number[]>([]);
+
+  const toggleLike = (i: number) => {
+    setLiked((l) => (l.includes(i) ? l.filter((x) => x !== i) : [...l, i]));
+    setComments((cs) => cs.map((c, idx) => (idx === i ? { ...c, helpful: c.helpful + (liked.includes(i) ? -1 : 1) } : c)));
+  };
+  const addComment = (text: string) =>
+    setComments((cs) => [...cs, { author: ME.name, role: ME.role, initials: ME.initials, text, helpful: 0 }]);
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
@@ -70,29 +80,15 @@ export default function ArticleScreen({
         <View style={styles.commentsWrap}>
           <View style={styles.rowHead}>
             <Text style={styles.h3}>Коментарі спільноти</Text>
-            <Text style={styles.count}>{item.commentsCount}</Text>
+            <Text style={styles.count}>{comments.length}</Text>
           </View>
-          {item.comments.map((c, i) => (
-            <View key={i} style={[styles.comment, c.reply && { paddingLeft: 28 }]}>
-              <Avatar initials={c.initials} size={36} shade={i} />
-              <View style={{ flex: 1, gap: 5 }}>
-                <View style={styles.cHead}>
-                  <Text style={styles.cName}>{c.author}</Text>
-                  <Text style={styles.cRole}>{c.role}</Text>
-                </View>
-                <Text style={styles.cText}>{c.text}</Text>
-                <View style={{ flexDirection: 'row', gap: 14, marginTop: 2 }}>
-                  <Text style={[styles.cAction, !c.reply && { color: colors.accent, fontFamily: fonts.bold }]}>Корисно · {c.helpful}</Text>
-                  <Text style={styles.cAction}>Відповісти</Text>
-                </View>
-              </View>
-            </View>
+          {comments.map((c, i) => (
+            <CommentItem key={i} c={c} index={i} liked={liked.includes(i)} onToggleLike={() => toggleLike(i)} />
           ))}
         </View>
 
-        <View style={styles.inputRow}>
-          <View style={styles.input}><Text style={styles.inputPh}>Ваш професійний коментар…</Text></View>
-          <View style={styles.send}><Ionicons name="paper-plane" size={15} color="#fff" /></View>
+        <View style={{ marginHorizontal: space(5), marginTop: space(4) }}>
+          <CommentComposer onSubmit={addComment} />
         </View>
       </ScrollView>
     </View>
