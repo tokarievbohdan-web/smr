@@ -18,7 +18,7 @@ export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]
       <ScrollView contentContainerStyle={{ padding: space(6), paddingTop: space(8), flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View style={styles.logo}>
           <Dot />
-          <Text style={styles.logoText}>PITCH</Text>
+          <Text style={styles.logoText}>SMR</Text>
         </View>
 
         <Text style={styles.eyebrow}>НАСТРОЙКА ЛЕНТЫ</Text>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   logoText: { fontFamily: fonts.serif, color: colors.text, fontSize: 24, fontWeight: '700', letterSpacing: 0.5 },
   eyebrow: { fontFamily: fonts.mono, color: colors.accent, fontSize: 11, fontWeight: '700', letterSpacing: 1.4, marginBottom: space(3) },
   h: { fontFamily: fonts.serif, color: colors.text, fontSize: 30, fontWeight: '700', lineHeight: 37, letterSpacing: -0.6 },
-  sub: { color: colors.textDim, fontSize: 15, lineHeight: 22, marginTop: space(3) },
+  sub: { fontFamily: fonts.body, color: colors.textDim, fontSize: 15, lineHeight: 22, marginTop: space(3) },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: space(6) },
   topic: {
     flexDirection: 'row',

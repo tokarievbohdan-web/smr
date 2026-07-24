@@ -14,8 +14,8 @@ function PollRow({ opt, voted, onVote }: { opt: PollOption; voted: boolean; onVo
             styles.optFill,
             {
               width: `${opt.pct}%`,
-              backgroundColor: opt.lead ? 'rgba(255,90,44,0.42)' : 'rgba(255,90,44,0.20)',
-              opacity: voted ? 1 : 0.35,
+              backgroundColor: opt.lead ? 'rgba(10,10,10,0.12)' : 'rgba(10,10,10,0.06)',
+              opacity: voted ? 1 : 0,
             },
           ]}
         />
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   threadHead: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 5 },
   threadName: { fontFamily: fonts.serif, color: colors.text, fontSize: 15, fontWeight: '700' },
   threadRole: { fontFamily: fonts.mono, color: colors.accent, fontSize: 10.5, fontWeight: '700', textTransform: 'uppercase' },
-  threadText: { color: colors.textDim, fontSize: 13.5, lineHeight: 19, marginBottom: 8 },
+  threadText: { fontFamily: fonts.body, color: colors.textDim, fontSize: 13.5, lineHeight: 19, marginBottom: 8 },
   threadFoot: { flexDirection: 'row', gap: 16 },
   threadMeta: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 11 },
 });

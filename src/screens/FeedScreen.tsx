@@ -148,7 +148,7 @@ function Header({ onToggleSearch, searchOpen }: { onToggleSearch: () => void; se
     <View style={styles.appbar}>
       <View style={styles.logo}>
         <Dot />
-        <Text style={styles.logoText}>PITCH</Text>
+        <Text style={styles.logoText}>SMR</Text>
       </View>
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <TouchableOpacity style={styles.iconBtn} onPress={onToggleSearch}>
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.chip,
   },
   chipOn: { backgroundColor: colors.accent },
-  chipText: { color: colors.textDim, fontSize: 13, fontWeight: '600' },
+  chipText: { fontFamily: fonts.med, color: colors.textDim, fontSize: 13 },
   chipTextOn: { color: '#fff' },
 
   feature: {

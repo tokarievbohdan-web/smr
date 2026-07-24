@@ -110,7 +110,7 @@ export function ProfileScreen({
         )}
 
         <View style={[styles.proCard, { marginTop: space(5) }]}>
-          <Text style={styles.proLabel}>PITCH PRO</Text>
+          <Text style={styles.proLabel}>SMR PRO</Text>
           <Text style={styles.proTitle}>Все разборы, клуб и «Цифры недели»</Text>
           <Text style={styles.proPrice}>590 ₽<Text style={styles.proPer}> / мес</Text></Text>
         </View>
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   logo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoText: { fontFamily: fonts.serif, color: colors.text, fontSize: 22, fontWeight: '700', letterSpacing: 0.5 },
   h: { fontFamily: fonts.serif, color: colors.text, fontSize: 24, fontWeight: '700', letterSpacing: -0.4 },
-  sub: { color: colors.textDim, fontSize: 14, marginTop: 6 },
+  sub: { fontFamily: fonts.body, color: colors.textDim, fontSize: 14, marginTop: 6 },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   cardIcon: { width: 38, height: 38, borderRadius: radius.md, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center' },
   cardTitle: { fontFamily: fonts.serif, color: colors.text, fontSize: 16, fontWeight: '700' },
-  cardDesc: { color: colors.textDim, fontSize: 12.5, marginTop: 2 },
+  cardDesc: { fontFamily: fonts.body, color: colors.textDim, fontSize: 12.5, marginTop: 2 },
 
   profileHead: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: space(5) },
   bigAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.accent, opacity: 0.9 },
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     borderRadius: radius.lg,
   },
-  emptyText: { color: colors.textDim, fontSize: 13.5, textAlign: 'center', lineHeight: 19 },
+  emptyText: { fontFamily: fonts.body, color: colors.textDim, fontSize: 13.5, textAlign: 'center', lineHeight: 19 },
   savedRow: {
     flexDirection: 'row',
     alignItems: 'center',

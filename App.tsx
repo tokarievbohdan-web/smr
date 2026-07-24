@@ -9,6 +9,13 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 import { colors, space, fonts } from './src/theme';
 import { NewsItem, NEWS } from './src/data';
 import FeedScreen from './src/screens/FeedScreen';
@@ -55,6 +62,16 @@ export default function App() {
   const { width } = useWindowDimensions();
   const framed = Platform.OS === 'web' && width > 500;
 
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+  if (!fontsLoaded) {
+    return <View style={[styles.root, { backgroundColor: colors.bg }]} />;
+  }
+
   const toggleSave = (id: string) =>
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const savedItems = NEWS.filter((n) => saved.includes(n.id));
@@ -100,7 +117,7 @@ export default function App() {
   );
 
   return (
-    <View style={[styles.root, { backgroundColor: framed ? '#E4DECF' : colors.bg }]}>
+    <View style={[styles.root, { backgroundColor: framed ? '#E4E4E7' : colors.bg }]}>
       <StatusBar style="dark" />
       {framed ? <View style={styles.phone}>{app}</View> : app}
     </View>
@@ -116,7 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: 44,
     overflow: 'hidden',
     borderWidth: 10,
-    borderColor: '#1C1A16',
+    borderColor: '#0A0A0A',
     backgroundColor: colors.bg,
     shadowColor: '#000',
     shadowOpacity: 0.5,
@@ -141,7 +158,7 @@ const styles = StyleSheet.create({
     paddingBottom: space(4),
     borderTopWidth: 1,
     borderTopColor: colors.line,
-    backgroundColor: 'rgba(251,248,241,0.96)',
+    backgroundColor: 'rgba(255,255,255,0.96)',
   },
   tab: { alignItems: 'center', gap: 4 },
   tabLabel: { fontFamily: fonts.mono, fontSize: 9.5, fontWeight: '600', letterSpacing: 0.3 },

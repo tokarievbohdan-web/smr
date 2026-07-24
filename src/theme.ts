@@ -1,60 +1,53 @@
-import { Platform } from 'react-native';
-
-// Дизайн-система PITCH — светлая «газетно-зиновая» тема (hipster editorial)
+// Дизайн-система SMR — монохром (чёрно-белая), шрифт Inter
 export const colors = {
-  bg: '#F0EBE0',          // тёплый newsprint
-  bgElevated: '#FBF8F1',  // приподнятая бумага (превью, иконки)
-  surface: '#FBF8F1',     // карточки
-  surfaceGrad1: '#FBF8F1',
-  surfaceGrad2: '#F0EBE0',
-  line: 'rgba(28,25,20,0.14)',
-  line2: 'rgba(28,25,20,0.08)',
-  chip: '#E7E1D2',        // чипы на бумаге
-  text: '#1C1A16',        // тёплый чернильный
-  textDim: '#5C554A',
-  textFaint: '#948C7C',
-  accent: '#2B41D8',      // кобальт (riso-print)
-  accent2: '#1F31A8',
-  accentSoft: 'rgba(43,65,216,0.12)',
-  live: '#E0492A',        // томат — «молния / в эфире»
-  liveSoft: 'rgba(224,73,42,0.12)',
-  amber: '#B4801C',       // горчица
-  amberSoft: 'rgba(180,128,28,0.16)',
-  olive: '#5C7A2C',       // олива — «данные»
-  oliveSoft: 'rgba(92,122,44,0.15)',
+  bg: '#FFFFFF',
+  bgElevated: '#F4F4F5',
+  surface: '#FFFFFF',
+  surfaceGrad1: '#FAFAFA',
+  surfaceGrad2: '#F4F4F5',
+  line: 'rgba(0,0,0,0.12)',
+  line2: 'rgba(0,0,0,0.07)',
+  chip: '#F1F1F1',
+  text: '#0A0A0A',
+  textDim: '#5A5A5A',
+  textFaint: '#9A9A9A',
+  accent: '#0A0A0A',
+  accent2: '#333333',
+  accentSoft: '#ECECEC',
+  live: '#0A0A0A',
+  liveSoft: '#ECECEC',
+  amber: '#5A5A5A',
+  amberSoft: '#F1F1F1',
+  olive: '#3A3A3A',
+  oliveSoft: '#ECECEC',
 };
 
 export const radius = { sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, pill: 999 };
 
 export const space = (n: number) => n * 4;
 
-// Гарнитуры: сериф для заголовков, моно для подписей/«ньюсвайра»
+// Все гарнитуры — Inter. Ключи serif/mono сохранены для совместимости со стилями:
+// serif = крупные заголовки (bold), mono = подписи/лейблы (medium), body = текст, med = средний.
 export const fonts = {
-  serif: Platform.select({
-    ios: 'Georgia',
-    android: 'serif',
-    default: 'Georgia, "Times New Roman", serif',
-  }) as string,
-  mono: Platform.select({
-    ios: 'Menlo',
-    android: 'monospace',
-    default: '"SFMono-Regular", Menlo, "Courier New", monospace',
-  }) as string,
+  serif: 'Inter_700Bold',
+  mono: 'Inter_500Medium',
+  body: 'Inter_400Regular',
+  med: 'Inter_500Medium',
+  semi: 'Inter_600SemiBold',
 };
 
-export const display = (size: number, weight: '700' | '800' | '900' = '800') => ({
+export const display = (size: number, weight: '700' | '800' | '900' = '700') => ({
   fontFamily: fonts.serif,
   fontSize: size,
-  fontWeight: weight as any,
-  letterSpacing: -size * 0.015,
+  letterSpacing: -size * 0.02,
 });
 
 export const shadow = {
   card: {
-    shadowColor: '#1C1A16',
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 3,
   },
 };

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "PITCH",
+    "name": "SMR",
     "slug": "pitch",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#2B41D8",
+        "backgroundColor": "#0A0A0A",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
@@ -28,9 +28,9 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
+          "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#2B41D8"
+          "backgroundColor": "#FFFFFF"
         }
       ]
     ]
