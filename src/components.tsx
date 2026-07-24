@@ -1,14 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  Easing,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing, ViewStyle } from 'react-native';
 import { colors, radius, fonts } from './theme';
-import { Format, FORMAT_COLOR } from './data';
+import { Format } from './data';
 
 // Пульсирующая точка «в эфире»
 export function LivePulse() {
@@ -35,42 +28,17 @@ export function LiveBadge({ label = 'Молния' }: { label?: string }) {
   );
 }
 
-const TAG_BG: Record<string, string> = {
-  orange: colors.accentSoft,
-  amber: colors.amberSoft,
-  green: colors.oliveSoft,
-};
-const TAG_FG: Record<string, string> = {
-  orange: colors.accent,
-  amber: colors.amber,
-  green: colors.olive,
-};
-
 export function FormatTag({ format }: { format: Format }) {
-  const key = FORMAT_COLOR[format];
   return (
-    <View style={[styles.tag, { backgroundColor: TAG_BG[key] }]}>
-      <Text style={[styles.tagText, { color: TAG_FG[key] }]}>{format.toUpperCase()}</Text>
+    <View style={styles.tag}>
+      <Text style={styles.tagText}>{format.toUpperCase()}</Text>
     </View>
   );
 }
 
 export function Avatar({ kind = 'a', size = 30 }: { kind?: 'a' | 'b' | 'c'; size?: number }) {
-  const grad: Record<string, string> = {
-    a: colors.accent,
-    b: colors.olive,
-    c: colors.amber,
-  };
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: grad[kind],
-      }}
-    />
-  );
+  const grad: Record<string, string> = { a: colors.text, b: colors.olive, c: colors.amber };
+  return <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: grad[kind] }} />;
 }
 
 export function Dot({ style }: { style?: ViewStyle }) {
@@ -78,7 +46,7 @@ export function Dot({ style }: { style?: ViewStyle }) {
 }
 
 const styles = StyleSheet.create({
-  pulse: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#fff' },
+  pulse: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.onAccent },
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -89,8 +57,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     alignSelf: 'flex-start',
   },
-  liveText: { fontFamily: fonts.mono, color: '#fff', fontSize: 10, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' },
-  tag: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, alignSelf: 'flex-start' },
-  tagText: { fontFamily: fonts.mono, fontSize: 9, fontWeight: '700', letterSpacing: 0.4 },
-  brandDot: { width: 9, height: 9, borderRadius: 4.5, backgroundColor: colors.live },
+  liveText: { fontFamily: fonts.mono, color: colors.onAccent, fontSize: 10, letterSpacing: 0.6, textTransform: 'uppercase' },
+  tag: { backgroundColor: colors.chip, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, alignSelf: 'flex-start' },
+  tagText: { fontFamily: fonts.mono, color: '#3A3A38', fontSize: 9, letterSpacing: 0.4 },
+  brandDot: { width: 9, height: 9, borderRadius: 4.5, backgroundColor: colors.accent },
 });

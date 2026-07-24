@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -16,6 +17,7 @@ import {
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
+  Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import { colors, space, fonts } from './src/theme';
 import { NewsItem, NEWS } from './src/data';
@@ -23,6 +25,8 @@ import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { ProfileScreen } from './src/screens/StubScreens';
+
+const STORE_KEY = 'smr_state_v1';
 
 type TabKey = 'feed' | 'profile';
 
@@ -38,12 +42,8 @@ function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (
         const on = active === t.key;
         return (
           <TouchableOpacity key={t.key} style={styles.tab} activeOpacity={0.7} onPress={() => onChange(t.key)}>
-            <Ionicons
-              name={on ? t.icon : (`${t.icon}-outline` as any)}
-              size={23}
-              color={on ? colors.accent : colors.textFaint}
-            />
-            <Text style={[styles.tabLabel, { color: on ? colors.accent : colors.textFaint }]}>{t.label}</Text>
+            <Ionicons name={on ? t.icon : (`${t.icon}-outline` as any)} size={23} color={on ? colors.text : colors.textFaint} />
+            <Text style={[styles.tabLabel, { color: on ? colors.text : colors.textFaint }]}>{t.label}</Text>
           </TouchableOpacity>
         );
       })}
@@ -57,6 +57,8 @@ function AppInner() {
   const [onboarded, setOnboarded] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
+  const [read, setRead] = useState<string[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const framed = Platform.OS === 'web' && width > 500;
@@ -67,14 +69,44 @@ function AppInner() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    Inter_800ExtraBold,
   });
-  if (!fontsLoaded) {
+
+  // Загрузка сохранённого состояния
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORE_KEY);
+        if (raw) {
+          const s = JSON.parse(raw);
+          setOnboarded(!!s.onboarded);
+          setInterests(Array.isArray(s.interests) ? s.interests : []);
+          setSaved(Array.isArray(s.saved) ? s.saved : []);
+          setRead(Array.isArray(s.read) ? s.read : []);
+        }
+      } catch {}
+      setHydrated(true);
+    })();
+  }, []);
+
+  // Сохранение состояния
+  useEffect(() => {
+    if (!hydrated) return;
+    AsyncStorage.setItem(STORE_KEY, JSON.stringify({ onboarded, interests, saved, read })).catch(() => {});
+  }, [hydrated, onboarded, interests, saved, read]);
+
+  if (!fontsLoaded || !hydrated) {
     return <View style={[styles.root, { backgroundColor: colors.bg }]} />;
   }
 
   const toggleSave = (id: string) =>
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const savedItems = NEWS.filter((n) => saved.includes(n.id));
+
+  const openArticle = (item: NewsItem) => {
+    setArticle(item);
+    setRead((r) => (r.includes(item.id) ? r : [...r, item.id]));
+  };
 
   const app = (
     <View style={styles.app}>
@@ -94,9 +126,9 @@ function AppInner() {
             onToggleSave={() => toggleSave(article.id)}
           />
         ) : tab === 'feed' ? (
-          <FeedScreen onOpen={setArticle} interests={interests} saved={saved} onToggleSave={toggleSave} />
+          <FeedScreen onOpen={openArticle} interests={interests} saved={saved} onToggleSave={toggleSave} read={read} />
         ) : (
-          <ProfileScreen savedItems={savedItems} interestsCount={interests.length} onOpen={setArticle} />
+          <ProfileScreen savedItems={savedItems} interestsCount={interests.length} onOpen={openArticle} />
         )}
       </View>
 
@@ -129,7 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 44,
     overflow: 'hidden',
     borderWidth: 10,
-    borderColor: '#0A0A0A',
+    borderColor: '#111112',
     backgroundColor: colors.bg,
     shadowColor: '#000',
     shadowOpacity: 0.5,

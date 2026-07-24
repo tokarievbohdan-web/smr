@@ -20,6 +20,7 @@ export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]
           <Dot />
           <Text style={styles.logoText}>SMR</Text>
         </View>
+        <Text style={styles.tagline}>BUSINESS SPORT MEDIA</Text>
 
         <Text style={styles.eyebrow}>НАСТРОЙКА ЛЕНТЫ</Text>
         <Text style={styles.h}>Что тебе интересно в спортивном маркетинге?</Text>
@@ -31,7 +32,7 @@ export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]
             return (
               <Pressable key={t} onPress={() => toggle(t)} style={[styles.topic, on && styles.topicOn]}>
                 <Text style={[styles.topicText, on && styles.topicTextOn]}>{t}</Text>
-                {on && <Ionicons name="checkmark-circle" size={18} color="#fff" />}
+                {on && <Ionicons name="checkmark-circle" size={18} color={colors.onAccent} />}
               </Pressable>
             );
           })}
@@ -48,7 +49,7 @@ export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]
           <Text style={styles.ctaText}>
             {picked.length ? `Собрать ленту · ${picked.length}` : 'Выбери хотя бы одну тему'}
           </Text>
-          {picked.length > 0 && <Ionicons name="arrow-forward" size={18} color="#fff" />}
+          {picked.length > 0 && <Ionicons name="arrow-forward" size={18} color={colors.onAccent} />}
         </TouchableOpacity>
         <Text style={styles.skip} onPress={() => onDone([])}>
           Пропустить
@@ -59,10 +60,11 @@ export default function OnboardingScreen({ onDone }: { onDone: (picked: string[]
 }
 
 const styles = StyleSheet.create({
-  logo: { flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: space(8) },
-  logoText: { fontFamily: fonts.serif, color: colors.text, fontSize: 24, fontWeight: '700', letterSpacing: 0.5 },
-  eyebrow: { fontFamily: fonts.mono, color: colors.accent, fontSize: 11, fontWeight: '700', letterSpacing: 1.4, marginBottom: space(3) },
-  h: { fontFamily: fonts.serif, color: colors.text, fontSize: 30, fontWeight: '700', lineHeight: 37, letterSpacing: -0.6 },
+  logo: { flexDirection: 'row', alignItems: 'center', gap: 9 },
+  logoText: { fontFamily: fonts.black, color: colors.text, fontSize: 24, letterSpacing: 0.3 },
+  tagline: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 10, letterSpacing: 2, marginTop: 6, marginBottom: space(8) },
+  eyebrow: { fontFamily: fonts.mono, color: colors.text, fontSize: 11, letterSpacing: 1.4, marginBottom: space(3) },
+  h: { fontFamily: fonts.black, color: colors.text, fontSize: 30, lineHeight: 37, letterSpacing: -0.6 },
   sub: { fontFamily: fonts.body, color: colors.textDim, fontSize: 15, lineHeight: 22, marginTop: space(3) },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: space(6) },
   topic: {
@@ -77,8 +79,8 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   topicOn: { backgroundColor: colors.accent, borderColor: colors.accent },
-  topicText: { fontFamily: fonts.serif, color: colors.text, fontSize: 16, fontWeight: '700' },
-  topicTextOn: { color: '#fff' },
+  topicText: { fontFamily: fonts.serif, color: colors.text, fontSize: 16 },
+  topicTextOn: { color: colors.onAccent },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -90,6 +92,6 @@ const styles = StyleSheet.create({
     marginTop: space(6),
   },
   ctaOff: { backgroundColor: colors.textFaint },
-  ctaText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  ctaText: { fontFamily: fonts.semi, color: colors.onAccent, fontSize: 16 },
   skip: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 13, textAlign: 'center', paddingVertical: space(4) },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { colors, radius, space, fonts } from '../theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, radius, space, fonts, gradients } from '../theme';
 import { NewsItem } from '../data';
 import { LiveBadge, Avatar } from '../components';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,7 +26,7 @@ export default function ArticleScreen({
         <Text style={styles.appbarTitle}>{item.format.toUpperCase()}</Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity style={styles.iconBtn} onPress={onToggleSave}>
-            <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={17} color={saved ? colors.accent : colors.text} />
+            <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={17} color={colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn}>
             <Ionicons name="share-outline" size={18} color={colors.text} />
@@ -34,11 +35,16 @@ export default function ArticleScreen({
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space(10) }}>
-        {/* Hero */}
-        <View style={styles.hero}>
+        {/* Hero — фирменный градиент */}
+        <LinearGradient
+          colors={gradients.spectrum}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
           <Text style={styles.heroEmoji}>{item.emoji}</Text>
           {item.live && <LiveBadge label={item.format} />}
-        </View>
+        </LinearGradient>
 
         <View style={{ paddingHorizontal: space(4) }}>
           <Text style={styles.title}>{item.title}</Text>
@@ -116,15 +122,12 @@ const styles = StyleSheet.create({
     marginHorizontal: space(4),
     height: 170,
     borderRadius: radius.xl,
-    backgroundColor: colors.surfaceGrad1,
-    borderWidth: 1,
-    borderColor: colors.line,
     padding: space(4),
     justifyContent: 'space-between',
     marginBottom: space(4),
     overflow: 'hidden',
   },
-  heroEmoji: { fontSize: 60, alignSelf: 'flex-end', opacity: 0.9 },
+  heroEmoji: { fontSize: 60, alignSelf: 'flex-end' },
   title: { fontFamily: fonts.serif, color: colors.text, fontSize: 27, fontWeight: '700', lineHeight: 33, letterSpacing: -0.5 },
   byline: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: space(3), marginBottom: space(4) },
   bylineText: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 11 },
@@ -132,7 +135,7 @@ const styles = StyleSheet.create({
   body: { fontFamily: fonts.body, color: colors.textDim, fontSize: 15, lineHeight: 24, marginBottom: space(4) },
   stats: { flexDirection: 'row', gap: 8, marginBottom: space(4) },
   stat: { flex: 1, backgroundColor: colors.chip, borderRadius: radius.md, paddingVertical: 10, paddingHorizontal: 12 },
-  statValue: { fontFamily: fonts.serif, color: colors.accent, fontSize: 26, fontWeight: '700', letterSpacing: -0.5 },
+  statValue: { fontFamily: fonts.black, color: colors.text, fontSize: 26, letterSpacing: -0.5 },
   statLabel: { fontFamily: fonts.mono, color: colors.textFaint, fontSize: 9, letterSpacing: 0.5, marginTop: 3 },
   pull: { borderLeftWidth: 2, borderLeftColor: colors.text, paddingLeft: 14, marginBottom: space(4) },
   pullText: { fontFamily: fonts.serif, color: colors.text, fontSize: 18, lineHeight: 25, letterSpacing: -0.3 },
