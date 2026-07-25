@@ -12,6 +12,9 @@
       "buildNumber": "1",
       "config": {
         "usesNonExemptEncryption": false
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "android": {
@@ -36,6 +39,14 @@
           "backgroundColor": "#2F6BFF"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "97260775-b9a6-4a15-bf8b-146151588e92"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/97260775-b9a6-4a15-bf8b-146151588e92"
+    }
   }
 }
