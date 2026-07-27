@@ -4,7 +4,7 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemas'
 
 // projectId береться зі змінної оточення SANITY_STUDIO_PROJECT_ID (див. .env)
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'REPLACE_WITH_PROJECT_ID'
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || '1s3pj0dm'
 
 export default defineConfig({
   name: 'sport-market',
