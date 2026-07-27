@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, space, fonts } from './theme';
 import { Button, PrimaryCTA, SecondaryCTA, status } from './ui';
+import { useAuth as useAuthCore } from './AuthContext';
 
 type Tone = keyof typeof status;
 type Ctx = {
@@ -27,10 +28,11 @@ export const useAuth = () => useUI().auth;
 export function UIProvider({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
+  const core = useAuthCore();
+  const authedForActions = !!core.user && !core.isGuest;
   const [sheet, setSheet] = useState<React.ReactNode>(null);
   const [modal, setModal] = useState<React.ReactNode>(null);
   const [toastState, setToastState] = useState<{ msg: string; tone: Tone } | null>(null);
-  const [isAuthed, setAuthed] = useState(true);
 
   const sheetY = useRef(new Animated.Value(height)).current;
   const backdrop = useRef(new Animated.Value(0)).current;
@@ -82,24 +84,15 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     );
   }, [openModal, closeModal]);
 
-  const signIn = useCallback(() => { setAuthed(true); closeSheet(); toast('Вхід виконано', 'success'); }, [closeSheet, toast]);
-  const signOut = useCallback(() => setAuthed(false), []);
   const requireAuth = useCallback((fn: () => void) => {
-    if (isAuthed) return fn();
-    openSheet(
-      <View style={{ gap: 12 }}>
-        <View style={styles.authIcon}><Ionicons name="lock-closed-outline" size={22} color={colors.accent} /></View>
-        <Text style={styles.confirmTitle}>Потрібен вхід</Text>
-        <Text style={styles.confirmMsg}>Щоб виконати цю дію, увійдіть до Sport Market Review.</Text>
-        <View style={{ gap: 10, marginTop: 6 }}>
-          <PrimaryCTA label="Увійти" onPress={signIn} />
-          <SecondaryCTA label="Не зараз" onPress={() => closeSheet()} />
-        </View>
-      </View>
-    );
-  }, [isAuthed, openSheet, closeSheet, signIn]);
+    if (authedForActions) return fn();
+    core.promptSignIn();
+  }, [authedForActions, core]);
 
-  const value: Ctx = { toast, openSheet, closeSheet, openModal, closeModal, confirm, auth: { isAuthed, signIn, signOut, requireAuth } };
+  const value: Ctx = {
+    toast, openSheet, closeSheet, openModal, closeModal, confirm,
+    auth: { isAuthed: authedForActions, signIn: core.promptSignIn, signOut: core.signOut, requireAuth },
+  };
 
   return (
     <UICtx.Provider value={value}>

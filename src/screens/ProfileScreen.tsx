@@ -4,14 +4,26 @@ import { colors, radius, space, fonts } from '../theme';
 import { ME } from '../data';
 import { Photo } from '../components';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../AuthContext';
+import { useConfirm } from '../UIProvider';
 
 export default function ProfileScreen({ onOpenSaved, onOpenGallery }: { onOpenSaved: () => void; onOpenGallery?: () => void }) {
   const [tab, setTab] = useState<'comments' | 'saved'>('comments');
+  const { user, signOut } = useAuth();
+  const confirm = useConfirm();
+
+  const pr = user?.profile;
+  const name = [pr?.firstName, pr?.lastName].filter(Boolean).join(' ') || ME.name;
+  const role = [pr?.position, pr?.org].filter(Boolean).join(' · ') || ME.role;
+  const city = pr?.city || ME.city;
+  const bio = pr?.bio || ME.bio;
+  const tags = user?.directions?.length ? user.directions : ME.tags;
 
   const selectSaved = () => {
     setTab('saved');
     onOpenSaved();
   };
+  const logout = () => confirm({ title: 'Вийти з акаунта?', confirmLabel: 'Вийти', danger: true, onConfirm: () => signOut() });
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space(6) }}>
@@ -21,16 +33,16 @@ export default function ProfileScreen({ onOpenSaved, onOpenGallery }: { onOpenSa
             <Photo height={72} round={36} label="фото" />
           </View>
           <View style={{ flex: 1, gap: 3 }}>
-            <Text style={styles.name}>{ME.name}</Text>
-            <Text style={styles.role}>{ME.role}</Text>
-            <Text style={styles.city}>{ME.city}</Text>
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.role}>{role}</Text>
+            <Text style={styles.city}>{city}</Text>
           </View>
         </View>
 
-        <Text style={styles.bio}>{ME.bio}</Text>
+        <Text style={styles.bio}>{bio}</Text>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {ME.tags.map((t) => (
+          {tags.map((t) => (
             <View key={t} style={styles.tag}><Text style={styles.tagText}>{t}</Text></View>
           ))}
         </View>
@@ -64,6 +76,13 @@ export default function ProfileScreen({ onOpenSaved, onOpenGallery }: { onOpenSa
           <Text style={styles.linkRowText}>UI Kit · дизайн-система</Text>
           <Ionicons name="chevron-forward" size={16} color={colors.muted} style={{ marginLeft: 'auto' }} />
         </TouchableOpacity>
+
+        {user ? (
+          <TouchableOpacity style={styles.linkRow} activeOpacity={0.8} onPress={logout}>
+            <Ionicons name="log-out-outline" size={18} color="#B42318" />
+            <Text style={[styles.linkRowText, { color: '#B42318' }]}>Вийти</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </ScrollView>
   );

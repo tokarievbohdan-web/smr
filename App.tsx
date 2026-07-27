@@ -5,19 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  useFonts,
-  Manrope_400Regular,
-  Manrope_500Medium,
-  Manrope_600SemiBold,
-  Manrope_700Bold,
-  Manrope_800ExtraBold,
+  useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold,
 } from '@expo-google-fonts/manrope';
 import { colors, space, fonts } from './src/theme';
 import { Article } from './src/data';
 import { ContentProvider } from './src/ContentContext';
 import { UIProvider } from './src/UIProvider';
+import { AuthProvider, useAuth } from './src/AuthContext';
 import AnimatedScreen from './src/AnimatedScreen';
-import OnboardingScreen from './src/screens/OnboardingScreen';
 import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
 import NetworkScreen from './src/screens/NetworkScreen';
@@ -27,8 +22,11 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import GalleryScreen from './src/screens/GalleryScreen';
+import AuthFlow from './src/screens/auth/AuthFlow';
+import BlockedScreen from './src/screens/auth/BlockedScreen';
+import OnboardingFlow from './src/screens/onboarding/OnboardingFlow';
 
-const STORE_KEY = 'smc_state_v1';
+const SAVED_KEY = 'smr_saved_v1';
 
 type TabKey = 'review' | 'network' | 'opportunities' | 'events' | 'profile';
 
@@ -57,55 +55,38 @@ function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (
 }
 
 function AppInner() {
+  const auth = useAuth();
   const [tab, setTab] = useState<TabKey>('review');
   const [article, setArticle] = useState<Article | null>(null);
   const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | null>(null);
-  const [onboarded, setOnboarded] = useState(false);
-  const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [savedHydrated, setSavedHydrated] = useState(false);
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const framed = Platform.OS === 'web' && width > 500;
   const topPad = Math.max(insets.top, framed ? 14 : 10);
 
-  const [fontsLoaded] = useFonts({
-    Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold,
-  });
+  const [fontsLoaded] = useFonts({ Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold });
 
   useEffect(() => {
     (async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORE_KEY);
-        if (raw) {
-          const st = JSON.parse(raw);
-          setOnboarded(!!st.onboarded);
-          setInterests(Array.isArray(st.interests) ? st.interests : []);
-          setSaved(Array.isArray(st.saved) ? st.saved : []);
-        }
-      } catch {}
-      setHydrated(true);
+      try { const raw = await AsyncStorage.getItem(SAVED_KEY); if (raw) setSaved(JSON.parse(raw)); } catch {}
+      setSavedHydrated(true);
     })();
   }, []);
+  useEffect(() => { if (savedHydrated) AsyncStorage.setItem(SAVED_KEY, JSON.stringify(saved)).catch(() => {}); }, [saved, savedHydrated]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    AsyncStorage.setItem(STORE_KEY, JSON.stringify({ onboarded, interests, saved })).catch(() => {});
-  }, [hydrated, onboarded, interests, saved]);
-
-  if (!fontsLoaded || !hydrated) {
+  if (!fontsLoaded || auth.loading || !savedHydrated) {
     return <View style={[styles.root, { backgroundColor: colors.bg }]} />;
   }
 
   const toggleSave = (id: string) => setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const openArticle = (a: Article) => setArticle(a);
-  const goTab = (k: TabKey) => {
-    setTab(k);
-    setArticle(null);
-    setOverlay(null);
-  };
+  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setOverlay(null); };
 
-  // Усі таби змонтовані — стан і позиція списків зберігаються при перемиканні
+  // ── Root gate ──
+  const isMain = auth.user ? (!auth.suspended && !auth.needsOnboarding) : auth.isGuest;
+
   const tabScreens: { key: TabKey; node: React.ReactNode }[] = [
     { key: 'review', node: <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} saved={saved} onToggleSave={toggleSave} /> },
     { key: 'network', node: <NetworkScreen /> },
@@ -114,44 +95,39 @@ function AppInner() {
     { key: 'profile', node: <ProfileScreen onOpenSaved={() => setOverlay('saved')} onOpenGallery={() => setOverlay('gallery')} /> },
   ];
 
-  const showTabs = onboarded && !article && !overlay;
+  let gate: React.ReactNode;
+  if (!auth.user && !auth.isGuest) {
+    gate = <AuthFlow />;
+  } else if (auth.user && auth.suspended) {
+    gate = <BlockedScreen />;
+  } else if (auth.user && auth.needsOnboarding) {
+    gate = <OnboardingFlow />;
+  } else {
+    gate = (
+      <>
+        {tabScreens.map((t) => (
+          <View key={t.key} style={{ flex: 1, display: tab === t.key ? 'flex' : 'none' }}>{t.node}</View>
+        ))}
+        {overlay === 'search' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SearchScreen onCancel={close} onOpen={openArticle} />}</AnimatedScreen>}
+        {overlay === 'saved' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}</AnimatedScreen>}
+        {overlay === 'gallery' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <GalleryScreen onBack={close} />}</AnimatedScreen>}
+        {article && <AnimatedScreen onClose={() => setArticle(null)}>{(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} />}</AnimatedScreen>}
+      </>
+    );
+  }
+
+  const showTabs = isMain && !article && !overlay;
 
   const app = (
     <View style={styles.app}>
       <UIProvider>
-        <View style={{ flex: 1, paddingTop: topPad }}>
-          {!onboarded ? (
-            <OnboardingScreen onDone={(picked) => { setInterests(picked); setOnboarded(true); }} />
-          ) : (
-            <>
-              {tabScreens.map((t) => (
-                <View key={t.key} style={{ flex: 1, display: tab === t.key ? 'flex' : 'none' }}>{t.node}</View>
-              ))}
-
-              {overlay === 'search' && (
-                <AnimatedScreen onClose={() => setOverlay(null)}>
-                  {(close) => <SearchScreen onCancel={close} onOpen={openArticle} />}
-                </AnimatedScreen>
-              )}
-              {overlay === 'saved' && (
-                <AnimatedScreen onClose={() => setOverlay(null)}>
-                  {(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}
-                </AnimatedScreen>
-              )}
-              {overlay === 'gallery' && (
-                <AnimatedScreen onClose={() => setOverlay(null)}>
-                  {(close) => <GalleryScreen onBack={close} />}
-                </AnimatedScreen>
-              )}
-              {article && (
-                <AnimatedScreen onClose={() => setArticle(null)}>
-                  {(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} />}
-                </AnimatedScreen>
-              )}
-            </>
-          )}
-        </View>
+        <View style={{ flex: 1, paddingTop: topPad }}>{gate}</View>
         {showTabs && <TabBar active={tab} onChange={goTab} bottomInset={insets.bottom} />}
+        {auth.authPrompt && (
+          <AnimatedScreen onClose={auth.dismissPrompt}>
+            {(close) => <AuthFlow modal onClose={close} />}
+          </AnimatedScreen>
+        )}
       </UIProvider>
     </View>
   );
@@ -168,7 +144,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ContentProvider>
-        <AppInner />
+        <AuthProvider>
+          <AppInner />
+        </AuthProvider>
       </ContentProvider>
     </SafeAreaProvider>
   );
@@ -182,10 +160,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 60, shadowOffset: { width: 0, height: 30 },
   },
   app: { flex: 1, width: '100%', backgroundColor: colors.bg },
-  tabbar: {
-    flexDirection: 'row', justifyContent: 'space-around', paddingTop: space(2.5),
-    borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: '#fff',
-  },
+  tabbar: { flexDirection: 'row', justifyContent: 'space-around', paddingTop: space(2.5), borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: '#fff' },
   tab: { alignItems: 'center', gap: 4, flex: 1, paddingHorizontal: 2 },
   tabLabel: { fontFamily: fonts.semi, fontSize: 9.5 },
 });
