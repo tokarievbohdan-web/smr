@@ -10,6 +10,7 @@ import {
 import { colors, space, fonts } from './src/theme';
 import { Article, Person } from './src/data';
 import { OrgItem, OpportunityItem, EventItem } from './src/shellData';
+import { NetworkActions, IntroTarget } from './src/networkStore';
 import { ContentProvider } from './src/ContentContext';
 import { UIProvider } from './src/UIProvider';
 import { AuthProvider, useAuth } from './src/AuthContext';
@@ -26,6 +27,8 @@ import CreateOpportunityScreen from './src/screens/CreateOpportunityScreen';
 import EventsScreen from './src/screens/EventsScreen';
 import EventDetailScreen from './src/screens/EventDetailScreen';
 import CreateEventScreen from './src/screens/CreateEventScreen';
+import IntroRequestScreen from './src/screens/IntroRequestScreen';
+import IntroHistoryScreen from './src/screens/IntroHistoryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import SavedScreen from './src/screens/SavedScreen';
@@ -77,6 +80,8 @@ function AppInner() {
   const [evt, setEvt] = useState<EventItem | null>(null);
   const [createEvt, setCreateEvt] = useState(false);
   const [evtReload, setEvtReload] = useState(0);
+  const [introTarget, setIntroTarget] = useState<IntroTarget | null>(null);
+  const [showIntros, setShowIntros] = useState(false);
   const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | 'review' | null>(null);
   const [reviewCat, setReviewCat] = useState<string | undefined>(undefined);
   const [saved, setSaved] = useState<string[]>([]);
@@ -97,6 +102,7 @@ function AppInner() {
       try { const rawN = await AsyncStorage.getItem(SAVED_NET_KEY); if (rawN) setSavedNet(JSON.parse(rawN)); } catch {}
       try { const rawO = await AsyncStorage.getItem(SAVED_OPP_KEY); if (rawO) setSavedOpp(JSON.parse(rawO)); } catch {}
       try { const rawE = await AsyncStorage.getItem(SAVED_EVT_KEY); if (rawE) setSavedEvt(JSON.parse(rawE)); } catch {}
+      NetworkActions.seedDemoIntros().catch(() => {});
       setSavedHydrated(true);
     })();
   }, []);
@@ -118,7 +124,8 @@ function AppInner() {
   const openOrg = (o: OrgItem) => setOrg(o);
   const openOpp = (o: OpportunityItem) => setOpp(o);
   const openEvent = (e: EventItem) => setEvt(e);
-  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setPerson(null); setOrg(null); setOpp(null); setCreateOpp(false); setEvt(null); setCreateEvt(false); setOverlay(null); };
+  const openIntro = (t: IntroTarget) => setIntroTarget(t);
+  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setPerson(null); setOrg(null); setOpp(null); setCreateOpp(false); setEvt(null); setCreateEvt(false); setIntroTarget(null); setShowIntros(false); setOverlay(null); };
 
   // ── Root gate ──
   const isMain = auth.user ? (!auth.suspended && !auth.needsOnboarding) : auth.isGuest;
@@ -128,7 +135,7 @@ function AppInner() {
     { key: 'network', node: <NetworkScreen onOpenPerson={openPerson} onOpenOrg={openOrg} saved={savedNet} onToggleSave={toggleSaveNet} /> },
     { key: 'opportunities', node: <OpportunitiesScreen onOpen={openOpp} onCreate={() => setCreateOpp(true)} saved={savedOpp} onToggleSave={toggleSaveOpp} reloadKey={oppReload} /> },
     { key: 'events', node: <EventsScreen onOpen={openEvent} onCreate={() => setCreateEvt(true)} saved={savedEvt} onToggleSave={toggleSaveEvt} reloadKey={evtReload} /> },
-    { key: 'profile', node: <ProfileScreen onOpenSaved={() => setOverlay('saved')} onOpenGallery={() => setOverlay('gallery')} /> },
+    { key: 'profile', node: <ProfileScreen onOpenSaved={() => setOverlay('saved')} onOpenGallery={() => setOverlay('gallery')} onOpenIntros={() => setShowIntros(true)} /> },
   ];
 
   let gate: React.ReactNode;
@@ -149,17 +156,19 @@ function AppInner() {
         {overlay === 'gallery' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <GalleryScreen onBack={close} />}</AnimatedScreen>}
         {overlay === 'review' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <ReviewFeedScreen onBack={close} onOpen={openArticle} saved={saved} onToggleSave={toggleSave} initialCategory={reviewCat} />}</AnimatedScreen>}
         {article && <AnimatedScreen onClose={() => setArticle(null)}>{(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} onOpen={openArticle} onGoTab={goTab} onOpenPerson={openPerson} onOpenOrg={openOrg} onOpenOpportunity={openOpp} onOpenEvent={openEvent} />}</AnimatedScreen>}
-        {person && <AnimatedScreen onClose={() => setPerson(null)}>{(close) => <PersonProfileScreen person={person} onBack={close} saved={savedNet.includes(person.id)} onToggleSave={() => toggleSaveNet(person.id)} onOpenArticle={openArticle} onOpenOrg={openOrg} />}</AnimatedScreen>}
-        {org && <AnimatedScreen onClose={() => setOrg(null)}>{(close) => <OrganizationProfileScreen org={org} onBack={close} saved={savedNet.includes(org.id)} onToggleSave={() => toggleSaveNet(org.id)} onOpenArticle={openArticle} onOpenPerson={openPerson} onGoTab={goTab} onOpenOpportunity={openOpp} onOpenEvent={openEvent} />}</AnimatedScreen>}
-        {opp && <AnimatedScreen onClose={() => setOpp(null)}>{(close) => <OpportunityDetailScreen opp={opp} onBack={close} saved={savedOpp.includes(opp.id)} onToggleSave={() => toggleSaveOpp(opp.id)} onOpenOrg={openOrg} onOpenPerson={openPerson} />}</AnimatedScreen>}
+        {person && <AnimatedScreen onClose={() => setPerson(null)}>{(close) => <PersonProfileScreen person={person} onBack={close} saved={savedNet.includes(person.id)} onToggleSave={() => toggleSaveNet(person.id)} onOpenArticle={openArticle} onOpenOrg={openOrg} onOpenIntro={openIntro} />}</AnimatedScreen>}
+        {org && <AnimatedScreen onClose={() => setOrg(null)}>{(close) => <OrganizationProfileScreen org={org} onBack={close} saved={savedNet.includes(org.id)} onToggleSave={() => toggleSaveNet(org.id)} onOpenArticle={openArticle} onOpenPerson={openPerson} onGoTab={goTab} onOpenOpportunity={openOpp} onOpenEvent={openEvent} onOpenIntro={openIntro} />}</AnimatedScreen>}
+        {opp && <AnimatedScreen onClose={() => setOpp(null)}>{(close) => <OpportunityDetailScreen opp={opp} onBack={close} saved={savedOpp.includes(opp.id)} onToggleSave={() => toggleSaveOpp(opp.id)} onOpenOrg={openOrg} onOpenPerson={openPerson} onOpenIntro={openIntro} />}</AnimatedScreen>}
         {createOpp && <AnimatedScreen onClose={() => setCreateOpp(false)}>{(close) => <CreateOpportunityScreen onBack={close} onCreated={() => { setOppReload((n) => n + 1); close(); goTab('opportunities'); }} />}</AnimatedScreen>}
-        {evt && <AnimatedScreen onClose={() => setEvt(null)}>{(close) => <EventDetailScreen event={evt} onBack={close} saved={savedEvt.includes(evt.id)} onToggleSave={() => toggleSaveEvt(evt.id)} onOpenOrg={openOrg} onOpenPerson={openPerson} onOpenArticle={openArticle} />}</AnimatedScreen>}
+        {evt && <AnimatedScreen onClose={() => setEvt(null)}>{(close) => <EventDetailScreen event={evt} onBack={close} saved={savedEvt.includes(evt.id)} onToggleSave={() => toggleSaveEvt(evt.id)} onOpenOrg={openOrg} onOpenPerson={openPerson} onOpenArticle={openArticle} onOpenIntro={openIntro} />}</AnimatedScreen>}
         {createEvt && <AnimatedScreen onClose={() => setCreateEvt(false)}>{(close) => <CreateEventScreen onBack={close} onCreated={() => { setEvtReload((n) => n + 1); close(); goTab('events'); }} />}</AnimatedScreen>}
+        {introTarget && <AnimatedScreen onClose={() => setIntroTarget(null)}>{(close) => <IntroRequestScreen target={introTarget} onBack={close} onCreated={() => { close(); setShowIntros(true); }} />}</AnimatedScreen>}
+        {showIntros && <AnimatedScreen onClose={() => setShowIntros(false)}>{(close) => <IntroHistoryScreen onBack={close} onOpenPerson={openPerson} onOpenOrg={openOrg} />}</AnimatedScreen>}
       </>
     );
   }
 
-  const showTabs = isMain && !article && !person && !org && !opp && !createOpp && !evt && !createEvt && !overlay;
+  const showTabs = isMain && !article && !person && !org && !opp && !createOpp && !evt && !createEvt && !introTarget && !showIntros && !overlay;
 
   const app = (
     <View style={styles.app}>

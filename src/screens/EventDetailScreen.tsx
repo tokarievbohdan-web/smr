@@ -8,9 +8,10 @@ import { useContent } from '../ContentContext';
 import { useToast, useConfirm, useAuth } from '../UIProvider';
 import { Photo, Avatar, StatusBadge, VerificationBadge, Tag, SectionHeader, PrimaryCTA, SecondaryCTA, Button } from '../ui';
 import { EventStore } from '../eventStore';
+import { IntroTarget } from '../networkStore';
 
 export default function EventDetailScreen({
-  event, onBack, saved, onToggleSave, onOpenOrg, onOpenPerson, onOpenArticle,
+  event, onBack, saved, onToggleSave, onOpenOrg, onOpenPerson, onOpenArticle, onOpenIntro,
 }: {
   event: EventItem;
   onBack: () => void;
@@ -19,6 +20,7 @@ export default function EventDetailScreen({
   onOpenOrg: (o: OrgItem) => void;
   onOpenPerson: (p: Person) => void;
   onOpenArticle: (a: Article) => void;
+  onOpenIntro: (t: IntroTarget) => void;
 }) {
   const { articles } = useContent();
   const toast = useToast();
@@ -73,6 +75,10 @@ export default function EventDetailScreen({
   });
 
   const openSpeaker = (name: string) => { const p = PEOPLE.find((x) => x.name === name); if (p) onOpenPerson(p); else toast('Профіль недоступний', 'neutral'); };
+  const introWithOrganizer = () => requireAuth(() => onOpenIntro({
+    targetType: 'organization', targetId: orgMatch?.id || event.id, targetName: orgMatch?.name || event.organizer || 'Організатор', targetRole: 'Організатор події',
+    relatedType: 'event', relatedId: event.id, relatedLabel: event.title,
+  }));
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -148,6 +154,7 @@ export default function EventDetailScreen({
                 <SecondaryCTA label="У календар" icon="calendar-outline" onPress={addToCalendar} />
               </View>
             )}
+            <SecondaryCTA label="Знайомство з організатором" icon="person-add-outline" onPress={introWithOrganizer} />
           </View>
         </View>
 

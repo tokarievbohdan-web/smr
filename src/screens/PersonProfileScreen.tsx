@@ -6,8 +6,8 @@ import { Article, Person, ContactLink, ContactType, findArticle } from '../data'
 import { ORGANIZATIONS, OrgItem } from '../shellData';
 import { useContent } from '../ContentContext';
 import { useSheet, useToast, useConfirm, useAuth } from '../UIProvider';
-import { Avatar, VerificationBadge, Tag, SectionHeader, PrimaryCTA, SecondaryCTA, Button, FormInput } from '../ui';
-import { NetworkActions } from '../networkStore';
+import { Avatar, VerificationBadge, Tag, SectionHeader, PrimaryCTA, SecondaryCTA, Button } from '../ui';
+import { NetworkActions, IntroTarget } from '../networkStore';
 
 const REPORT_REASONS = ['Спам або реклама', 'Фейковий профіль', 'Некоректна поведінка', 'Порушення правил', 'Інше'];
 
@@ -22,7 +22,7 @@ const contactUrl = (c: ContactLink) => {
 };
 
 export default function PersonProfileScreen({
-  person, onBack, saved, onToggleSave, onOpenArticle, onOpenOrg,
+  person, onBack, saved, onToggleSave, onOpenArticle, onOpenOrg, onOpenIntro,
 }: {
   person: Person;
   onBack: () => void;
@@ -30,6 +30,7 @@ export default function PersonProfileScreen({
   onToggleSave: () => void;
   onOpenArticle: (a: Article) => void;
   onOpenOrg: (o: OrgItem) => void;
+  onOpenIntro: (t: IntroTarget) => void;
 }) {
   const { articles } = useContent();
   const sheet = useSheet();
@@ -38,7 +39,7 @@ export default function PersonProfileScreen({
   const { requireAuth } = useAuth();
   const [introSent, setIntroSent] = useState(false);
 
-  useEffect(() => { NetworkActions.introSentIds().then((ids) => setIntroSent(ids.includes(person.id))); }, [person.id]);
+  useEffect(() => { NetworkActions.introTargetIds().then((ids) => setIntroSent(ids.includes(person.id))); }, [person.id]);
 
   const orgMatch = person.org ? ORGANIZATIONS.find((o) => o.name === person.org) : undefined;
   const related = (person.relatedArticles || [])
@@ -68,22 +69,7 @@ export default function PersonProfileScreen({
     );
   };
 
-  const doIntro = () => requireAuth(() => {
-    let note = '';
-    sheet.open(
-      <View style={{ gap: 12, paddingBottom: 8 }}>
-        <Text style={s.sheetTitle}>Запит на знайомство</Text>
-        <Text style={s.body}>Коротко представтесь — це підвищить шанс на відповідь.</Text>
-        <FormInput label="Повідомлення (необовʼязково)" value={note} onChange={(v) => (note = v)} placeholder="Вітаю! Хочу обговорити партнерство…" multiline />
-        <PrimaryCTA label="Надіслати запит" onPress={async () => {
-          sheet.close();
-          await NetworkActions.requestIntro(person.id, person.name, note.trim() || undefined);
-          setIntroSent(true);
-          toast('Запит на знайомство надіслано', 'success');
-        }} />
-      </View>
-    );
-  });
+  const doIntro = () => requireAuth(() => onOpenIntro({ targetType: 'person', targetId: person.id, targetName: person.name, targetRole: person.role }));
 
   const doReport = () => requireAuth(() => {
     sheet.open(

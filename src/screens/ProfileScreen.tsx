@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
 import { ME } from '../data';
@@ -6,11 +6,15 @@ import { Photo } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../AuthContext';
 import { useConfirm } from '../UIProvider';
+import { NetworkActions } from '../networkStore';
 
-export default function ProfileScreen({ onOpenSaved, onOpenGallery }: { onOpenSaved: () => void; onOpenGallery?: () => void }) {
+export default function ProfileScreen({ onOpenSaved, onOpenGallery, onOpenIntros }: { onOpenSaved: () => void; onOpenGallery?: () => void; onOpenIntros?: () => void }) {
   const [tab, setTab] = useState<'comments' | 'saved'>('comments');
   const { user, signOut } = useAuth();
   const confirm = useConfirm();
+  const [introCount, setIntroCount] = useState(0);
+
+  useEffect(() => { NetworkActions.actionableIntroCount().then(setIntroCount); }, [user]);
 
   const pr = user?.profile;
   const name = [pr?.firstName, pr?.lastName].filter(Boolean).join(' ') || ME.name;
@@ -71,6 +75,13 @@ export default function ProfileScreen({ onOpenSaved, onOpenGallery }: { onOpenSa
           </View>
         ))}
 
+        <TouchableOpacity style={styles.linkRow} activeOpacity={0.8} onPress={onOpenIntros}>
+          <Ionicons name="people-outline" size={18} color={colors.dim} />
+          <Text style={styles.linkRowText}>Запити на знайомство</Text>
+          {introCount > 0 && <View style={[styles.countBadge, { marginLeft: 'auto' }]}><Text style={styles.countText}>{introCount}</Text></View>}
+          <Ionicons name="chevron-forward" size={16} color={colors.muted} style={{ marginLeft: introCount > 0 ? 8 : 'auto' }} />
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.linkRow} activeOpacity={0.8} onPress={onOpenGallery}>
           <Ionicons name="color-palette-outline" size={18} color={colors.dim} />
           <Text style={styles.linkRowText}>UI Kit · дизайн-система</Text>
@@ -110,5 +121,7 @@ const styles = StyleSheet.create({
   actHelpful: { fontFamily: fonts.bold, color: colors.accent, fontSize: 12 },
   linkRow: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: colors.line, borderRadius: radius.lg, paddingHorizontal: 14, paddingVertical: 14, marginTop: space(2) },
   linkRowText: { fontFamily: fonts.semi, color: colors.ink, fontSize: 14 },
+  countBadge: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: '#8A5A00', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  countText: { fontFamily: fonts.bold, color: '#fff', fontSize: 11 },
 });
 

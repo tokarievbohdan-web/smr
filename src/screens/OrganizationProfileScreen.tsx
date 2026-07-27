@@ -10,7 +10,7 @@ import {
   Photo, VerificationBadge, Tag, StatusBadge, SectionHeader, PersonCard, OpportunityCard, EventCard,
   PrimaryCTA, SecondaryCTA, Button,
 } from '../ui';
-import { NetworkActions } from '../networkStore';
+import { NetworkActions, IntroTarget } from '../networkStore';
 
 const REPORT_REASONS = ['Недостовірна інформація', 'Дублікат організації', 'Спам або реклама', 'Порушення правил', 'Інше'];
 
@@ -25,7 +25,7 @@ const contactUrl = (c: ContactLink) => {
 };
 
 export default function OrganizationProfileScreen({
-  org, onBack, saved, onToggleSave, onOpenArticle, onOpenPerson, onGoTab, onOpenOpportunity, onOpenEvent,
+  org, onBack, saved, onToggleSave, onOpenArticle, onOpenPerson, onGoTab, onOpenOpportunity, onOpenEvent, onOpenIntro,
 }: {
   org: OrgItem;
   onBack: () => void;
@@ -36,6 +36,7 @@ export default function OrganizationProfileScreen({
   onGoTab: (t: 'opportunities' | 'events') => void;
   onOpenOpportunity: (o: OpportunityItem) => void;
   onOpenEvent: (e: EventItem) => void;
+  onOpenIntro: (t: IntroTarget) => void;
 }) {
   const { articles } = useContent();
   const sheet = useSheet();
@@ -46,7 +47,7 @@ export default function OrganizationProfileScreen({
   const [accessSent, setAccessSent] = useState(false);
 
   useEffect(() => {
-    NetworkActions.introSentIds().then((ids) => setIntroSent(ids.includes(org.id)));
+    NetworkActions.introTargetIds().then((ids) => setIntroSent(ids.includes(org.id)));
     NetworkActions.orgAccessIds().then((ids) => setAccessSent(ids.includes(org.id)));
   }, [org.id]);
 
@@ -84,12 +85,7 @@ export default function OrganizationProfileScreen({
     );
   };
 
-  const doIntro = () => requireAuth(() => {
-    confirm({
-      title: 'Запит на партнерство?', message: `Ми надішлемо запит на знайомство до «${org.name}».`, confirmLabel: 'Надіслати',
-      onConfirm: async () => { await NetworkActions.requestIntro(org.id, org.name); setIntroSent(true); toast('Запит надіслано', 'success'); },
-    });
-  });
+  const doIntro = () => requireAuth(() => onOpenIntro({ targetType: 'organization', targetId: org.id, targetName: org.name, targetRole: org.type }));
 
   const doOrgAccess = () => requireAuth(() => {
     confirm({

@@ -306,6 +306,19 @@ export const REGISTRATION_STATUSES: { key: string; label: string; tone: Tone }[]
   { key: 'noshow', label: 'Не прийшов', tone: 'danger' },
 ];
 export const regStatus = (key: string) => REGISTRATION_STATUSES.find((s) => s.key === key) || REGISTRATION_STATUSES[0];
+
+// ── Довідники Запитів на знайомство (PROMPT 09) ──
+export const INTRO_STATUSES: { key: string; label: string; tone: Tone }[] = [
+  { key: 'new', label: 'Новий', tone: 'info' },
+  { key: 'review', label: 'На розгляді', tone: 'warning' },
+  { key: 'moreinfo', label: 'Потрібно більше інформації', tone: 'warning' },
+  { key: 'approved', label: 'Схвалено', tone: 'success' },
+  { key: 'sent', label: 'Знайомство надіслано', tone: 'success' },
+  { key: 'declined', label: 'Відхилено', tone: 'danger' },
+  { key: 'closed', label: 'Закрито', tone: 'neutral' },
+];
+export const introStatus = (key: string) => INTRO_STATUSES.find((s) => s.key === key) || INTRO_STATUSES[0];
+export const INTRO_REASONS = ['Партнерство', 'Співпраця', 'Спонсорство', 'Найм', 'Інвестиції', 'Обмін досвідом', 'Спікерство', 'Інше'];
 export const NETWORK_TABS = ['Люди', 'Організації'];
 
 // ── Довідники Мережі (керовані значення для фільтрів) ──

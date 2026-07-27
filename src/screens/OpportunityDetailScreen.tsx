@@ -11,9 +11,10 @@ import { useAuth as useAccount } from '../AuthContext';
 import { useSheet, useToast, useConfirm, useAuth } from '../UIProvider';
 import { Avatar, StatusBadge, VerificationBadge, Tag, SectionHeader, PrimaryCTA, SecondaryCTA, Button, FormInput, FileUpload } from '../ui';
 import { OpportunityStore } from '../opportunityStore';
+import { IntroTarget } from '../networkStore';
 
 export default function OpportunityDetailScreen({
-  opp, onBack, saved, onToggleSave, onOpenOrg, onOpenPerson,
+  opp, onBack, saved, onToggleSave, onOpenOrg, onOpenPerson, onOpenIntro,
 }: {
   opp: OpportunityItem;
   onBack: () => void;
@@ -21,6 +22,7 @@ export default function OpportunityDetailScreen({
   onToggleSave: () => void;
   onOpenOrg: (o: OrgItem) => void;
   onOpenPerson: (p: Person) => void;
+  onOpenIntro: (t: IntroTarget) => void;
 }) {
   const account = useAccount();
   const sheet = useSheet();
@@ -77,6 +79,11 @@ export default function OpportunityDetailScreen({
     title: 'Відкликати відгук?', confirmLabel: 'Відкликати', danger: true,
     onConfirm: async () => { await OpportunityStore.withdraw(opp.id); setApplied({ status: 'withdrawn' }); toast('Відгук відкликано', 'neutral'); },
   });
+
+  const introWithAuthor = () => requireAuth(() => onOpenIntro({
+    targetType: 'organization', targetId: orgMatch?.id || opp.id, targetName: opp.org, targetRole: `${opp.type} · автор можливості`,
+    relatedType: 'opportunity', relatedId: opp.id, relatedLabel: opp.title,
+  }));
 
   // ── Автор ──
   const changeApplicantStatus = (a: Applicant) => {
@@ -209,7 +216,7 @@ export default function OpportunityDetailScreen({
             }) : <Text style={s.dim}>Відгуків поки немає.</Text>}
           </View>
         ) : (
-          <View style={{ marginTop: space(2) }}>
+          <View style={{ marginTop: space(2), gap: 10 }}>
             {closedOrPaused ? (
               <Button full label={effectiveStatus.label} variant="secondary" disabled />
             ) : applied ? (
@@ -227,6 +234,7 @@ export default function OpportunityDetailScreen({
             ) : (
               <PrimaryCTA label="Відгукнутися" icon="paper-plane-outline" onPress={doApply} />
             )}
+            <SecondaryCTA label="Знайомство з організатором" icon="person-add-outline" onPress={introWithAuthor} />
           </View>
         )}
       </ScrollView>
