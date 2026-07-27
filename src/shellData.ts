@@ -213,15 +213,99 @@ export const APPLICATION_STATUSES: { key: string; label: string; tone: Tone }[] 
 ];
 export const appStatus = (key: string) => APPLICATION_STATUSES.find((s) => s.key === key) || APPLICATION_STATUSES[0];
 
+export interface EventSpeaker { name: string; role: string; initials: string; shade?: number }
 export interface EventItem {
   id: string; title: string; date: string; city: string; format: string;
+  // Розширені поля (PROMPT 08)
+  type?: string; organizer?: string; org?: string; time?: string; timezone?: string;
+  venue?: string; cost?: string; isPaid?: boolean; ticketUrl?: string;
+  seatsTotal?: number; seatsLeft?: number; regDeadline?: string;
+  shortDesc?: string; fullDesc?: string; cover?: string;
+  speakers?: EventSpeaker[]; partners?: string[]; tags?: string[]; relatedArticles?: string[];
+  featured?: boolean; thisWeek?: boolean; status?: { label: string; tone: Tone };
 }
 export const EVENTS: EventItem[] = [
-  { id: 'e1', title: 'Sport Business Forum Ukraine 2026', date: '12 вересня', city: 'Київ', format: 'Офлайн' },
-  { id: 'e2', title: 'Спонсорство у спорті: практикум для клубів', date: '24 вересня', city: 'Онлайн', format: 'Онлайн' },
-  { id: 'e3', title: 'Медіаправа та OTT: круглий стіл', date: '03 жовтня', city: 'Львів', format: 'Офлайн' },
+  {
+    id: 'e1', title: 'Sport Business Forum Ukraine 2026', type: 'Форум', date: '12 вересня', city: 'Київ',
+    format: 'Офлайн', organizer: 'Sport Market Review', org: 'o4', time: '10:00', timezone: 'EET (UTC+2)',
+    venue: 'Parkovy Convention Center, Київ', cost: '₴2 500', isPaid: true, ticketUrl: 'concert.ua/smr-forum',
+    seatsTotal: 400, seatsLeft: 58, regDeadline: '08 вересня', featured: true,
+    shortDesc: 'Головна щорічна подія спортивного бізнесу України.',
+    fullDesc: 'Форум збирає клуби, ліги, бренди й агенції для обговорення комерціалізації спорту: спонсорство, медіаправа, інфраструктура, інвестиції. Панелі, кейси й нетворкінг-сесії.',
+    speakers: [
+      { name: 'Олена Ковальчук', role: 'Head of Sponsorship · ФК «Динамо»', initials: 'ОК', shade: 0 },
+      { name: 'Ірина Савченко', role: 'Commercial Director · УАФ', initials: 'ІС', shade: 2 },
+      { name: 'Андрій Мельник', role: 'CMO · MEGOGO Sport', initials: 'АМ', shade: 1 },
+    ],
+    partners: ['MEGOGO Sport', 'Favbet', 'Українська Прем’єр-ліга'],
+    tags: ['Спонсорство', 'Медіа', 'Інвестиції'], relatedArticles: ['a1', 'a3'],
+  },
+  {
+    id: 'e2', title: 'Спонсорство у спорті: практикум для клубів', type: 'Воркшоп', date: '24 вересня', city: 'Україна',
+    format: 'Онлайн', organizer: 'Agency 8848', org: 'o5', time: '18:00', timezone: 'EET (UTC+2)',
+    cost: 'Безкоштовно', isPaid: false, seatsTotal: 200, seatsLeft: 0, regDeadline: '23 вересня', thisWeek: true,
+    shortDesc: 'Практичний вебінар про побудову спонсорських пакетів.',
+    fullDesc: 'Розбираємо, як клубу зібрати комерційну пропозицію, оцінити інвентар і вести перемовини з брендами. З прикладами та шаблонами.',
+    speakers: [{ name: 'Данило Бондар', role: 'Sponsorship Manager', initials: 'ДБ', shade: 0 }],
+    partners: [], tags: ['Спонсорство', 'Практикум'], relatedArticles: ['a2'],
+  },
+  {
+    id: 'e3', title: 'Медіаправа та OTT: круглий стіл', type: 'Конференція', date: '03 жовтня', city: 'Львів',
+    format: 'Гібрид', organizer: 'MEGOGO Sport', org: 'o4', time: '12:00', timezone: 'EET (UTC+2)',
+    venue: 'Lviv Media Hub', cost: '₴900', isPaid: true, ticketUrl: 'megogo.net/roundtable',
+    seatsTotal: 120, seatsLeft: 34, regDeadline: '01 жовтня',
+    shortDesc: 'Дискусія про монетизацію медіаправ і власні OTT-платформи.',
+    fullDesc: 'Мовники, клуби та ліги обговорюють майбутнє медіаправ: D2C проти класичного продажу прав, утримання аудиторії, рекламний інвентар.',
+    speakers: [{ name: 'Андрій Мельник', role: 'CMO · MEGOGO Sport', initials: 'АМ', shade: 1 }],
+    partners: ['MEGOGO Sport'], tags: ['Медіа', 'OTT'], relatedArticles: ['a4'],
+  },
+  {
+    id: 'e4', title: 'Sport Business Networking Night', type: 'Нетворкінг', date: '18 вересня', city: 'Київ',
+    format: 'Офлайн', organizer: 'Sport Market Review', time: '19:00', timezone: 'EET (UTC+2)',
+    venue: 'Roof Bar, Київ', cost: '₴500', isPaid: true, ticketUrl: 'concert.ua/smr-night',
+    seatsTotal: 150, seatsLeft: 12, regDeadline: '17 вересня', thisWeek: true,
+    shortDesc: 'Вечір знайомств для професіоналів спортивної індустрії.',
+    fullDesc: 'Неформальний нетворкінг для клубів, брендів, агенцій і медіа. Формат коротких знайомств і вільного спілкування.',
+    speakers: [], partners: ['Favbet'], tags: ['Нетворкінг'], relatedArticles: [],
+  },
+  {
+    id: 'e5', title: 'Sport Marketing Awards 2026', type: 'Премія', date: '25 жовтня', city: 'Київ',
+    format: 'Офлайн', organizer: 'Sport Market Review', time: '18:30', timezone: 'EET (UTC+2)',
+    venue: 'Fairmont Grand Hotel, Київ', cost: 'від ₴1 800', isPaid: true, ticketUrl: 'concert.ua/sma2026',
+    seatsTotal: 300, seatsLeft: 140, regDeadline: '20 жовтня', featured: true,
+    shortDesc: 'Щорічна премія за найкращі кейси спортивного маркетингу.',
+    fullDesc: 'Урочиста церемонія нагородження найкращих спонсорських і маркетингових кейсів року. Понад 12 номінацій.',
+    speakers: [], partners: ['MEGOGO Sport', 'Українська Прем’єр-ліга'], tags: ['Маркетинг', 'Кейси'], relatedArticles: ['a6'],
+  },
+  {
+    id: 'e6', title: 'Дедлайн подання на грант розвитку клубів', type: 'Дедлайн', date: '30 вересня', city: 'Онлайн',
+    format: 'Онлайн', organizer: 'Українська асоціація футболу', org: 'o2', time: '23:59', timezone: 'EET (UTC+2)',
+    cost: 'Безкоштовно', isPaid: false, regDeadline: '30 вересня',
+    shortDesc: 'Останній день подання заявок на грантову програму.',
+    fullDesc: 'Дедлайн подання заявок на програму грантів для розвитку інфраструктури клубів. Подання — через сайт організатора.',
+    speakers: [], partners: [], tags: ['Грант', 'Дедлайн'], ticketUrl: 'uaf.ua/grants', relatedArticles: [],
+  },
 ];
+export const findEvent = (id: string) => EVENTS.find((e) => e.id === id);
+
+// ── Довідники Подій (PROMPT 08) ──
+export const EVENT_TYPE_LABELS = [
+  'Конференція', 'Форум', 'Вебінар', 'Нетворкінг', 'Воркшоп', 'Презентація', 'Премія',
+  'Спортивно-діловий івент', 'Спільнотна подія', 'Освітня програма', 'Дедлайн', 'Інше',
+];
+export const EVENT_TYPES = ['Усі', ...EVENT_TYPE_LABELS];
+export const EVENT_FORMATS = ['Онлайн', 'Офлайн', 'Гібрид'];
 export const EVENT_FILTERS = ['Усі', 'Найближчі', 'Онлайн', 'Офлайн'];
+
+// Статуси реєстрації на подію
+export const REGISTRATION_STATUSES: { key: string; label: string; tone: Tone }[] = [
+  { key: 'registered', label: 'Зареєстровано', tone: 'success' },
+  { key: 'waitlist', label: 'Список очікування', tone: 'warning' },
+  { key: 'cancelled', label: 'Скасовано', tone: 'neutral' },
+  { key: 'attended', label: 'Відвідав', tone: 'info' },
+  { key: 'noshow', label: 'Не прийшов', tone: 'danger' },
+];
+export const regStatus = (key: string) => REGISTRATION_STATUSES.find((s) => s.key === key) || REGISTRATION_STATUSES[0];
 export const NETWORK_TABS = ['Люди', 'Організації'];
 
 // ── Довідники Мережі (керовані значення для фільтрів) ──

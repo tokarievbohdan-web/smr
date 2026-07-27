@@ -253,19 +253,31 @@ export function OpportunityCard({ title, type, org, city, budget, deadline, stat
   );
 }
 
-export function EventCard({ title, date, city, format, cover, onPress }: {
+export function EventCard({ title, date, city, format, cover, onPress, type, organizer, cost, seatsLeft, time, saved, onSave, statusLabel }: {
   title: string; date: string; city?: string; format?: string; cover?: string; onPress?: () => void;
+  type?: string; organizer?: string; cost?: string; seatsLeft?: number; time?: string;
+  saved?: boolean; onSave?: () => void; statusLabel?: { label: string; tone: keyof typeof status };
 }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [s.card, pressed && s.pressed]}>
-      <Photo height={130} round={0} uri={cover} label="обкладинка події" />
+      <Photo height={130} round={0} uri={cover} label="обкладинка події">
+        {onSave && <View style={{ position: 'absolute', top: 10, right: 10 }}><SaveButton saved={!!saved} onPress={onSave} /></View>}
+        {statusLabel && <View style={{ position: 'absolute', top: 12, left: 12 }}><StatusBadge label={statusLabel.label} tone={statusLabel.tone} /></View>}
+      </Photo>
       <View style={{ padding: 14, gap: 6 }}>
-        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-          <View style={s.dateChip}><Ionicons name="calendar-outline" size={12} color={colors.accent} /><Text style={s.dateChipText}>{date}</Text></View>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <View style={s.dateChip}><Ionicons name="calendar-outline" size={12} color={colors.accent} /><Text style={s.dateChipText}>{date}{time ? ` · ${time}` : ''}</Text></View>
+          {type ? <StatusBadge label={type} tone="info" /> : null}
           {format ? <StatusBadge label={format} tone="neutral" /> : null}
         </View>
         <Text style={s.cardTitle}>{title}</Text>
-        {city ? <Text style={s.role}>{city}</Text> : null}
+        {(organizer || city) ? <Text style={s.role}>{[organizer, city].filter(Boolean).join(' · ')}</Text> : null}
+        {(cost || typeof seatsLeft === 'number') && (
+          <View style={{ flexDirection: 'row', gap: 16, marginTop: 2 }}>
+            {cost ? <Text style={s.metaStrong}><Ionicons name="pricetag-outline" size={12} color={colors.dim} /> {cost}</Text> : null}
+            {typeof seatsLeft === 'number' ? <Text style={s.meta}><Ionicons name="people-outline" size={12} color={colors.muted} /> {seatsLeft > 0 ? `${seatsLeft} місць` : 'немає місць'}</Text> : null}
+          </View>
+        )}
       </View>
     </Pressable>
   );

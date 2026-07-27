@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Share,
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, space, fonts } from '../theme';
 import { Article, Person, ContactLink, ContactType, PEOPLE, findArticle } from '../data';
-import { OrgItem, OpportunityItem, OPPORTUNITIES, EVENTS } from '../shellData';
+import { OrgItem, OpportunityItem, EventItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import { useContent } from '../ContentContext';
 import { useSheet, useToast, useConfirm, useAuth } from '../UIProvider';
 import {
@@ -25,7 +25,7 @@ const contactUrl = (c: ContactLink) => {
 };
 
 export default function OrganizationProfileScreen({
-  org, onBack, saved, onToggleSave, onOpenArticle, onOpenPerson, onGoTab, onOpenOpportunity,
+  org, onBack, saved, onToggleSave, onOpenArticle, onOpenPerson, onGoTab, onOpenOpportunity, onOpenEvent,
 }: {
   org: OrgItem;
   onBack: () => void;
@@ -35,6 +35,7 @@ export default function OrganizationProfileScreen({
   onOpenPerson: (p: Person) => void;
   onGoTab: (t: 'opportunities' | 'events') => void;
   onOpenOpportunity: (o: OpportunityItem) => void;
+  onOpenEvent: (e: EventItem) => void;
 }) {
   const { articles } = useContent();
   const sheet = useSheet();
@@ -207,7 +208,7 @@ export default function OrganizationProfileScreen({
         {events.length > 0 && (
           <View style={s.section}>
             <SectionHeader title="Події" />
-            {events.map((e) => <EventCard key={e.id} title={e.title} date={e.date} city={e.city} format={e.format} onPress={() => onGoTab('events')} />)}
+            {events.map((e) => <EventCard key={e.id} title={e.title} date={e.date} time={e.time} city={e.city} format={e.format} type={e.type} organizer={e.organizer} cost={e.cost} seatsLeft={e.seatsLeft} onPress={() => onOpenEvent(e)} />)}
           </View>
         )}
 

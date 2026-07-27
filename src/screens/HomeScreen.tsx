@@ -4,7 +4,7 @@ import { colors, radius, space, fonts } from '../theme';
 import { useContent } from '../ContentContext';
 import { useAuth } from '../AuthContext';
 import { Article, Person, typeLabel } from '../data';
-import { ORGANIZATIONS, OrgItem, OpportunityItem, OPPORTUNITIES, EVENTS } from '../shellData';
+import { ORGANIZATIONS, OrgItem, OpportunityItem, EventItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import {
   SectionHeader, ContentCard, PersonCard, OrganizationCard, OpportunityCard, EventCard,
   Photo, StatusBadge, SkeletonCard, FilterChips,
@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 type TabKey = 'review' | 'network' | 'opportunities' | 'events' | 'profile';
 
 export default function HomeScreen({
-  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave, onOpenPerson, onOpenOrg, onOpenOpportunity,
+  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave, onOpenPerson, onOpenOrg, onOpenOpportunity, onOpenEvent,
 }: {
   onOpen: (a: Article) => void;
   onOpenSearch: () => void;
@@ -26,6 +26,7 @@ export default function HomeScreen({
   onOpenPerson: (p: Person) => void;
   onOpenOrg: (o: OrgItem) => void;
   onOpenOpportunity: (o: OpportunityItem) => void;
+  onOpenEvent: (e: EventItem) => void;
 }) {
   const { articles, people, categories, loading } = useContent();
   const { user } = useAuth();
@@ -89,8 +90,8 @@ export default function HomeScreen({
       <SectionHeader title="Найближчі події" action="Усі" onAction={() => onGoTab('events')} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
         {EVENTS.slice(0, 3).map((e) => (
-          <View key={e.id} style={{ width: 260 }}>
-            <EventCard title={e.title} date={e.date} city={e.city} format={e.format} onPress={() => onGoTab('events')} />
+          <View key={e.id} style={{ width: 280 }}>
+            <EventCard title={e.title} date={e.date} time={e.time} city={e.city} format={e.format} type={e.type} organizer={e.organizer} cost={e.cost} seatsLeft={e.seatsLeft} onPress={() => onOpenEvent(e)} />
           </View>
         ))}
       </ScrollView>

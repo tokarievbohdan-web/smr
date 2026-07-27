@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
 import { Article, BodyBlock, Comment, Person, typeLabel, ME, findPerson, PEOPLE } from '../data';
-import { ORGANIZATIONS, OrgItem, OpportunityItem, OPPORTUNITIES, EVENTS } from '../shellData';
+import { ORGANIZATIONS, OrgItem, OpportunityItem, EventItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import { useContent } from '../ContentContext';
 import { useSheet, useToast, useAuth } from '../UIProvider';
 import {
@@ -35,7 +35,7 @@ function Block({ block }: { block: BodyBlock }) {
 }
 
 export default function ArticleScreen({
-  item, onBack, saved, onToggleSave, onOpen, onGoTab, onOpenPerson, onOpenOrg, onOpenOpportunity,
+  item, onBack, saved, onToggleSave, onOpen, onGoTab, onOpenPerson, onOpenOrg, onOpenOpportunity, onOpenEvent,
 }: {
   item: Article;
   onBack: () => void;
@@ -46,6 +46,7 @@ export default function ArticleScreen({
   onOpenPerson: (p: Person) => void;
   onOpenOrg: (o: OrgItem) => void;
   onOpenOpportunity: (o: OpportunityItem) => void;
+  onOpenEvent: (e: EventItem) => void;
 }) {
   const { articles, people } = useContent();
   const sheet = useSheet();
@@ -181,7 +182,7 @@ export default function ArticleScreen({
           <View style={s.relSection}><SectionHeader title="Повʼязані можливості" />{relOpps.map((o) => <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budgetVisibility === 'Публічний' ? o.budget : undefined} deadline={o.deadline} statusLabel={o.status} sport={o.sport} format={o.format} verified={o.verified} onPress={() => onOpenOpportunity(o)} />)}</View>
         )}
         {relEvents.length > 0 && (
-          <View style={s.relSection}><SectionHeader title="Повʼязані події" />{relEvents.map((e) => <EventCard key={e.id} title={e.title} date={e.date} city={e.city} format={e.format} onPress={() => onGoTab('events')} />)}</View>
+          <View style={s.relSection}><SectionHeader title="Повʼязані події" />{relEvents.map((e) => <EventCard key={e.id} title={e.title} date={e.date} time={e.time} city={e.city} format={e.format} type={e.type} organizer={e.organizer} cost={e.cost} seatsLeft={e.seatsLeft} onPress={() => onOpenEvent(e)} />)}</View>
         )}
         {similar.length > 0 && (
           <View style={s.relSection}><SectionHeader title="Схожі матеріали" />{similar.map((a) => (
