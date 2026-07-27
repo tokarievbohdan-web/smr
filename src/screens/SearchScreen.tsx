@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, TextInput } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { ARTICLES, PEOPLE, DISCUSSIONS, SEARCH_TAGS, Article, Discussion } from '../data';
+import { SEARCH_TAGS, Article, Discussion } from '../data';
+import { useContent } from '../ContentContext';
 import { Photo, Avatar } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,6 +15,7 @@ export default function SearchScreen({
   onOpen: (a: Article) => void;
   onOpenDiscussion: (d: Discussion) => void;
 }) {
+  const { articles: ARTICLES, people: PEOPLE, discussions: DISCUSSIONS } = useContent();
   const [query, setQuery] = useState('спонсорство');
   const q = query.trim().toLowerCase();
   const match = (s: string) => !q || s.toLowerCase().includes(q);

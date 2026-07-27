@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { PEOPLE } from '../data';
+import { useContent } from '../ContentContext';
 import { Avatar, Chip } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -9,6 +9,7 @@ const FILTERS = ['Усі', 'Спонсорство', 'Клуби', 'Київ'];
 
 export default function CommunityScreen() {
   const [filter, setFilter] = useState('Усі');
+  const { people: PEOPLE } = useContent();
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: space(5), paddingTop: space(2), gap: 14 }}>

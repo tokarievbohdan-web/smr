@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { ARTICLES, Article } from '../data';
+import { Article } from '../data';
+import { useContent } from '../ContentContext';
 import { Photo, CategoryText } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -16,7 +17,8 @@ export default function SavedScreen({
   onOpen: (a: Article) => void;
   onToggleSave: (id: string) => void;
 }) {
-  const items = ARTICLES.filter((a) => saved.includes(a.id));
+  const { articles } = useContent();
+  const items = articles.filter((a) => saved.includes(a.id));
 
   return (
     <View style={{ flex: 1 }}>

@@ -14,6 +14,7 @@ import {
 } from '@expo-google-fonts/manrope';
 import { colors, space, fonts } from './src/theme';
 import { Article, Discussion } from './src/data';
+import { ContentProvider } from './src/ContentContext';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
@@ -148,7 +149,9 @@ function AppInner() {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <AppInner />
+      <ContentProvider>
+        <AppInner />
+      </ContentProvider>
     </SafeAreaProvider>
   );
 }

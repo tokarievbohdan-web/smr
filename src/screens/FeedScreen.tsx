@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { ARTICLES, FEED_FILTERS, DISCUSSIONS, Article, Discussion } from '../data';
+import { FEED_FILTERS, Article, Discussion } from '../data';
+import { useContent } from '../ContentContext';
 import { Photo, CategoryText, ImageBadge, Chip, Logo } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -31,8 +32,9 @@ export default function FeedScreen({
 }) {
   const [filter, setFilter] = useState('Усе');
   const [subscribed, setSubscribed] = useState(false);
-  const top = ARTICLES.filter((a) => a.topToday);
-  const feed = ARTICLES.filter((a) => filter === 'Усе' || a.category === filter);
+  const { articles, discussions } = useContent();
+  const top = articles.filter((a) => a.topToday);
+  const feed = articles.filter((a) => filter === 'Усе' || a.category === filter);
 
   return (
     <View style={{ flex: 1 }}>
@@ -95,7 +97,7 @@ export default function FeedScreen({
             <Text style={styles.h2}>Найактивніші обговорення</Text>
             <Text style={styles.link} onPress={onGoDiscussions}>Усі</Text>
           </View>
-          {DISCUSSIONS.slice(0, 2).map((d) => (
+          {discussions.slice(0, 2).map((d) => (
             <Pressable key={d.id} style={({ pressed }) => [styles.discRow, pressed && { opacity: 0.7 }]} onPress={() => onOpenDiscussion(d)}>
               <View style={{ flex: 1, gap: 4 }}>
                 <Text style={styles.discTitle}>{d.title}</Text>

@@ -21,6 +21,7 @@ export async function fetchArticles(): Promise<Article[]> {
         "topToday": topToday, facts, why, conclusion, source
       }`
     );
+    if (!rows.length) return ARTICLES;
     return rows.map((r) => ({
       id: r.id,
       category: r.category,
@@ -53,6 +54,7 @@ export async function fetchDiscussions(): Promise<Discussion[]> {
         author, authorRole, authorInitials, "body": body
       }`
     );
+    if (!rows.length) return DISCUSSIONS;
     return rows.map((r) => ({
       id: r.id,
       badge: r.badge,
@@ -76,6 +78,7 @@ export async function fetchPeople(): Promise<Person[]> {
   if (!client) return PEOPLE;
   try {
     const rows = await client.fetch<any[]>(`*[_type == "person"]{ "id": _id, name, initials, role, tags }`);
+    if (!rows.length) return PEOPLE;
     return rows.map((r, i) => ({
       id: r.id,
       name: r.name,

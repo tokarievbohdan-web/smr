@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { DISCUSSIONS, Discussion } from '../data';
+import { Discussion } from '../data';
+import { useContent } from '../ContentContext';
 import { Chip } from '../components';
 
 const FILTERS = ['Популярні', 'Нові', 'Питання', 'Тема тижня'];
@@ -20,6 +21,7 @@ function AvatarStack({ items }: { items: string[] }) {
 
 export default function DiscussionsScreen({ onOpen }: { onOpen: (d: Discussion) => void }) {
   const [filter, setFilter] = useState('Популярні');
+  const { discussions } = useContent();
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: space(5), paddingTop: space(2), gap: 14 }}>
@@ -32,7 +34,7 @@ export default function DiscussionsScreen({ onOpen }: { onOpen: (d: Discussion) 
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: space(5), gap: 12, paddingBottom: space(6) }}>
-        {DISCUSSIONS.map((d) => (
+        {discussions.map((d) => (
           <Pressable key={d.id} style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]} onPress={() => onOpen(d)}>
             {d.badge ? (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>

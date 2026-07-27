@@ -2,7 +2,7 @@
 // Встав сюди projectId свого Sanity-проєкту після `sanity init`.
 // Поки projectId порожній — застосунок працює на демо-даних із data.ts.
 export const CMS = {
-  projectId: '', // напр. 'abcd1234'
+  projectId: '1s3pj0dm',
   dataset: 'production',
   apiVersion: '2024-01-01',
 };
