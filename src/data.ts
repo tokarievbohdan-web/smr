@@ -18,6 +18,7 @@ export interface Article {
   title: string;
   excerpt: string;
   photo: string; // подпись плейсхолдера
+  imageUrl?: string; // реальне фото з CMS (Sanity)
   date: string;
   readMin: number;
   commentsCount: number;
