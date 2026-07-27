@@ -15,6 +15,8 @@ import {
 import { colors, space, fonts } from './src/theme';
 import { Article, Discussion } from './src/data';
 import { ContentProvider } from './src/ContentContext';
+import AnimatedScreen from './src/AnimatedScreen';
+import FadeView from './src/FadeView';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
@@ -108,32 +110,51 @@ function AppInner() {
     setOverlay(null);
   };
 
-  let content: React.ReactNode;
-  if (!onboarded) {
-    content = <OnboardingScreen onDone={(picked) => { setInterests(picked); setOnboarded(true); }} />;
-  } else if (article) {
-    content = <ArticleScreen item={article} onBack={() => setArticle(null)} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} />;
-  } else if (discussion) {
-    content = <DiscussionDetailScreen item={discussion} onBack={() => setDiscussion(null)} />;
-  } else if (overlay === 'search') {
-    content = <SearchScreen onCancel={() => setOverlay(null)} onOpen={openArticle} onOpenDiscussion={openDiscussion} />;
-  } else if (overlay === 'saved') {
-    content = <SavedScreen saved={saved} onBack={() => setOverlay(null)} onOpen={openArticle} onToggleSave={toggleSave} />;
-  } else if (tab === 'home') {
-    content = <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoDiscussions={() => setTab('discussions')} onOpenDiscussion={openDiscussion} saved={saved} onToggleSave={toggleSave} />;
-  } else if (tab === 'discussions') {
-    content = <DiscussionsScreen onOpen={openDiscussion} />;
-  } else if (tab === 'community') {
-    content = <CommunityScreen />;
-  } else {
-    content = <ProfileScreen onOpenSaved={() => setOverlay('saved')} />;
-  }
+  const baseTab =
+    tab === 'home' ? (
+      <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoDiscussions={() => setTab('discussions')} onOpenDiscussion={openDiscussion} saved={saved} onToggleSave={toggleSave} />
+    ) : tab === 'discussions' ? (
+      <DiscussionsScreen onOpen={openDiscussion} />
+    ) : tab === 'community' ? (
+      <CommunityScreen />
+    ) : (
+      <ProfileScreen onOpenSaved={() => setOverlay('saved')} />
+    );
 
   const showTabs = onboarded && !article && !discussion && !overlay;
 
   const app = (
     <View style={styles.app}>
-      <View style={{ flex: 1, paddingTop: topPad }}>{content}</View>
+      <View style={{ flex: 1, paddingTop: topPad }}>
+        {!onboarded ? (
+          <OnboardingScreen onDone={(picked) => { setInterests(picked); setOnboarded(true); }} />
+        ) : (
+          <>
+            <FadeView dep={tab}>{baseTab}</FadeView>
+
+            {overlay === 'search' && (
+              <AnimatedScreen onClose={() => setOverlay(null)}>
+                {(close) => <SearchScreen onCancel={close} onOpen={openArticle} onOpenDiscussion={openDiscussion} />}
+              </AnimatedScreen>
+            )}
+            {overlay === 'saved' && (
+              <AnimatedScreen onClose={() => setOverlay(null)}>
+                {(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}
+              </AnimatedScreen>
+            )}
+            {discussion && (
+              <AnimatedScreen onClose={() => setDiscussion(null)}>
+                {(close) => <DiscussionDetailScreen item={discussion} onBack={close} />}
+              </AnimatedScreen>
+            )}
+            {article && (
+              <AnimatedScreen onClose={() => setArticle(null)}>
+                {(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} />}
+              </AnimatedScreen>
+            )}
+          </>
+        )}
+      </View>
       {showTabs && <TabBar active={tab} onChange={goTab} bottomInset={insets.bottom} />}
     </View>
   );
