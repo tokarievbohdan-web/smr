@@ -55,7 +55,7 @@ export default function FeedScreen({
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.topRow}>
           {top.map((a) => (
             <Pressable key={a.id} style={styles.topCard} onPress={() => onOpen(a)}>
-              <Photo label={a.photo} height={110} round={0} />
+              <Photo label={a.photo} uri={a.imageUrl} height={110} round={0} />
               <View style={{ padding: 12, gap: 6 }}>
                 <CategoryText text={a.category} />
                 <Text style={styles.topTitle} numberOfLines={3}>{a.title}</Text>
@@ -73,7 +73,7 @@ export default function FeedScreen({
         <View style={{ paddingHorizontal: space(5), gap: 16, paddingTop: space(3) }}>
           {feed.map((a) => (
             <Pressable key={a.id} style={styles.card} onPress={() => onOpen(a)}>
-              <Photo label={a.photo} height={180} round={0}>
+              <Photo label={a.photo} uri={a.imageUrl} height={180} round={0}>
                 <ImageBadge text={`${a.category} · ${a.kind}`} />
               </Photo>
               <View style={{ padding: 16, gap: 8 }}>

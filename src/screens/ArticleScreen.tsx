@@ -51,7 +51,7 @@ export default function ArticleScreen({
           <Text style={styles.meta}>{item.date} · {item.readMin} хв читання</Text>
         </View>
 
-        <Photo label="ключовий візуал кампанії" height={190} style={{ marginHorizontal: space(5), marginTop: space(3) }} />
+        <Photo label="ключовий візуал кампанії" uri={item.imageUrl} height={190} style={{ marginHorizontal: space(5), marginTop: space(3) }} />
 
         <View style={{ paddingHorizontal: space(5), paddingTop: space(4), gap: 14 }}>
           <Text style={styles.body}>{item.excerpt}</Text>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ViewStyle, StyleProp } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ViewStyle, StyleProp } from 'react-native';
 import { colors, radius, fonts } from './theme';
 import { Comment } from './data';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,12 +7,14 @@ import { Ionicons } from '@expo/vector-icons';
 // Плейсхолдер під фото (смугаста поверхня в дизайні → нейтральний блок з підписом)
 export function Photo({
   label,
+  uri,
   height,
   round = radius.card,
   style,
   children,
 }: {
   label?: string;
+  uri?: string;
   height: number;
   round?: number;
   style?: StyleProp<ViewStyle>;
@@ -20,7 +22,11 @@ export function Photo({
 }) {
   return (
     <View style={[{ height, borderRadius: round, backgroundColor: colors.stripe, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }, style]}>
-      {label ? <Text style={styles.photoLabel}>{label}</Text> : null}
+      {uri ? (
+        <Image source={{ uri }} style={{ position: 'absolute', width: '100%', height: '100%' }} resizeMode="cover" />
+      ) : label ? (
+        <Text style={styles.photoLabel}>{label}</Text>
+      ) : null}
       {children}
     </View>
   );
