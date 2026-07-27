@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { colors, radius, space, fonts } from '../theme';
 import { ME } from '../data';
 import { Photo } from '../components';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function ProfileScreen({ onOpenSaved }: { onOpenSaved: () => void }) {
+export default function ProfileScreen({ onOpenSaved, onOpenGallery }: { onOpenSaved: () => void; onOpenGallery?: () => void }) {
   const [tab, setTab] = useState<'comments' | 'saved'>('comments');
 
   const selectSaved = () => {
@@ -57,6 +58,12 @@ export default function ProfileScreen({ onOpenSaved }: { onOpenSaved: () => void
             <Text style={styles.actHelpful}>Корисно · {a.helpful}</Text>
           </View>
         ))}
+
+        <TouchableOpacity style={styles.linkRow} activeOpacity={0.8} onPress={onOpenGallery}>
+          <Ionicons name="color-palette-outline" size={18} color={colors.dim} />
+          <Text style={styles.linkRowText}>UI Kit · дизайн-система</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.muted} style={{ marginLeft: 'auto' }} />
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -82,4 +89,7 @@ const styles = StyleSheet.create({
   actContext: { fontFamily: fonts.semi, color: colors.muted, fontSize: 11 },
   actText: { fontFamily: fonts.med, color: colors.body, fontSize: 13, lineHeight: 19 },
   actHelpful: { fontFamily: fonts.bold, color: colors.accent, fontSize: 12 },
+  linkRow: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: colors.line, borderRadius: radius.lg, paddingHorizontal: 14, paddingVertical: 14, marginTop: space(2) },
+  linkRowText: { fontFamily: fonts.semi, color: colors.ink, fontSize: 14 },
 });
+
