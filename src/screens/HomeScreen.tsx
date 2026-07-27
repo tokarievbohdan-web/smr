@@ -4,7 +4,7 @@ import { colors, radius, space, fonts } from '../theme';
 import { useContent } from '../ContentContext';
 import { useAuth } from '../AuthContext';
 import { Article, Person, typeLabel } from '../data';
-import { ORGANIZATIONS, OrgItem, OPPORTUNITIES, EVENTS } from '../shellData';
+import { ORGANIZATIONS, OrgItem, OpportunityItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import {
   SectionHeader, ContentCard, PersonCard, OrganizationCard, OpportunityCard, EventCard,
   Photo, StatusBadge, SkeletonCard, FilterChips,
@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 type TabKey = 'review' | 'network' | 'opportunities' | 'events' | 'profile';
 
 export default function HomeScreen({
-  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave, onOpenPerson, onOpenOrg,
+  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave, onOpenPerson, onOpenOrg, onOpenOpportunity,
 }: {
   onOpen: (a: Article) => void;
   onOpenSearch: () => void;
@@ -25,6 +25,7 @@ export default function HomeScreen({
   onToggleSave: (id: string) => void;
   onOpenPerson: (p: Person) => void;
   onOpenOrg: (o: OrgItem) => void;
+  onOpenOpportunity: (o: OpportunityItem) => void;
 }) {
   const { articles, people, categories, loading } = useContent();
   const { user } = useAuth();
@@ -78,7 +79,7 @@ export default function HomeScreen({
     <View key="opportunities" style={{ gap: 12 }}>
       <SectionHeader title="Нові можливості" action="Усі" onAction={() => onGoTab('opportunities')} />
       {OPPORTUNITIES.slice(0, 2).map((o) => (
-        <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budget} deadline={o.deadline} statusLabel={o.status} onPress={() => onGoTab('opportunities')} />
+        <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budgetVisibility === 'Публічний' ? o.budget : undefined} deadline={o.deadline} statusLabel={o.status} sport={o.sport} format={o.format} verified={o.verified} onPress={() => onOpenOpportunity(o)} />
       ))}
     </View>
   );

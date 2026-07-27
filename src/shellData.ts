@@ -93,16 +93,125 @@ export const ORGANIZATIONS: OrgItem[] = [
 ];
 export const findOrg = (id: string) => ORGANIZATIONS.find((o) => o.id === id);
 
+export type Tone = 'info' | 'success' | 'warning' | 'neutral' | 'danger';
+export type BudgetVisibility = 'Публічний' | 'За запитом' | 'Не вказаний';
+
+export interface Applicant {
+  id: string; name: string; role: string; initials: string; shade?: number;
+  message: string; portfolio?: string; status: string; // ключ зі статусів відгуку
+}
 export interface OpportunityItem {
-  id: string; title: string; type: string; org: string; city: string; budget?: string; deadline?: string; status: { label: string; tone: 'info' | 'success' | 'warning' | 'neutral' };
+  id: string; title: string; type: string; org: string; city: string;
+  budget?: string; deadline?: string; status: { label: string; tone: Tone };
+  // Розширені поля (PROMPT 07)
+  sport?: string; geography?: string; format?: string; professionalCategory?: string;
+  budgetVisibility?: BudgetVisibility; budgetFrom?: number; budgetTo?: number; currency?: string;
+  publishedAt?: string; expiresAt?: string; shortDesc?: string; fullDesc?: string;
+  contactMethod?: string; externalLink?: string; tags?: string[];
+  applicationsCount?: number; verified?: boolean; featured?: boolean; recommended?: boolean;
+  applicants?: Applicant[];
 }
 export const OPPORTUNITIES: OpportunityItem[] = [
-  { id: 'op1', title: 'Head of Sponsorship у футбольний клуб', type: 'Вакансія', org: 'ФК «Динамо» Київ', city: 'Київ', deadline: '15 серпня', status: { label: 'Відкрито', tone: 'success' } },
-  { id: 'op2', title: 'Титульне партнерство ліги на сезон 2026/27', type: 'Партнерство', org: 'Українська Прем’єр-ліга', city: 'Україна', budget: '€ обговорюється', deadline: '01 вересня', status: { label: 'Відкрито', tone: 'success' } },
-  { id: 'op3', title: 'Тендер: продакшн матчевих трансляцій', type: 'Тендер', org: 'MEGOGO Sport', city: 'Київ', budget: '₴2–3 млн', deadline: '20 серпня', status: { label: 'Дедлайн близько', tone: 'warning' } },
-  { id: 'op4', title: 'Послуги: діджитал-активації на матчдей', type: 'Послуга', org: 'Agency 8848', city: 'Львів', status: { label: 'Відкрито', tone: 'success' } },
+  {
+    id: 'op1', title: 'Head of Sponsorship у футбольний клуб', type: 'Вакансія', org: 'ФК «Динамо» Київ', city: 'Київ',
+    sport: 'Футбол', geography: 'Київ', format: 'Офлайн', professionalCategory: 'Спонсорство',
+    budgetVisibility: 'За запитом', deadline: '15 серпня', publishedAt: '18 липня 2026', expiresAt: '15 серпня 2026',
+    shortDesc: 'Шукаємо керівника напряму спонсорства для розвитку партнерських програм клубу.',
+    fullDesc: 'ФК «Динамо» Київ шукає Head of Sponsorship. Ви відповідатимете за пошук категорійних брендів, пакетування прав, переговори й активації на матчдей. Досвід у спортивній або медійній комерції від 3 років.',
+    contactMethod: 'Через застосунок', tags: ['Спонсорство', 'Партнерства', 'B2B'], applicationsCount: 3, verified: true, recommended: true,
+    status: { label: 'Опубліковано', tone: 'success' },
+    applicants: [
+      { id: 'ap1', name: 'Данило Бондар', role: 'Sponsorship Manager · Варшава', initials: 'ДБ', shade: 0, message: 'Маю 4 роки у спонсорських активаціях, готовий обговорити деталі.', portfolio: 'linkedin.com/in/dbondar', status: 'shortlisted' },
+      { id: 'ap2', name: 'Марія Ткаченко', role: 'Спортивний менеджмент · Київ', initials: 'МТ', shade: 1, message: 'Шукаю першу роль у спонсорстві, сильна аналітика ринку.', portfolio: 'maria.pdf', status: 'new' },
+      { id: 'ap3', name: 'Андрій Мельник', role: 'CMO · медіаплатформа · Львів', initials: 'АМ', shade: 2, message: 'Цікавить напрям, маю релевантний медіадосвід.', status: 'viewed' },
+    ],
+  },
+  {
+    id: 'op2', title: 'Титульне партнерство ліги на сезон 2026/27', type: 'Партнерство', org: 'Українська Прем’єр-ліга', city: 'Україна',
+    sport: 'Футбол', geography: 'Україна', format: 'Гібрид', professionalCategory: 'Комерція',
+    budgetVisibility: 'За запитом', budget: '€ обговорюється', deadline: '01 вересня', publishedAt: '20 липня 2026', expiresAt: '01 вересня 2026',
+    shortDesc: 'Ліга відкриває категорію титульного партнера на новий сезон.',
+    fullDesc: 'Пропонуємо права титульного партнера турніру: нейминг, медіапокриття, digital-активації та кешбек абонементникам. Пріоритет — категорії fintech, telecom, retail.',
+    contactMethod: 'Email', externalLink: 'upl.ua/partners', tags: ['Титульне', 'Медіа', 'Fintech'], applicationsCount: 5, verified: true, featured: true,
+    status: { label: 'Опубліковано', tone: 'success' },
+  },
+  {
+    id: 'op3', title: 'Тендер: продакшн матчевих трансляцій', type: 'Тендер', org: 'MEGOGO Sport', city: 'Львів',
+    sport: 'Мультиспорт', geography: 'Львів', format: 'Офлайн', professionalCategory: 'Продакшн',
+    budgetVisibility: 'Публічний', budget: '₴2–3 млн', budgetFrom: 2000000, budgetTo: 3000000, currency: '₴',
+    deadline: '20 серпня', publishedAt: '19 липня 2026', expiresAt: '20 серпня 2026',
+    shortDesc: 'Оголошуємо тендер на продакшн матчевих трансляцій сезону.',
+    fullDesc: 'Потрібен підрядник для продакшну матчевих трансляцій: багатокамерна зйомка, графіка, режисура, доставлення сигналу. Обовʼязковий досвід спортивного продакшну.',
+    contactMethod: 'Email', tags: ['Продакшн', 'OTT', 'Трансляції'], applicationsCount: 2, verified: true,
+    status: { label: 'Дедлайн близько', tone: 'warning' },
+  },
+  {
+    id: 'op4', title: 'Послуги: діджитал-активації на матчдей', type: 'Послуга', org: 'Agency 8848', city: 'Львів',
+    sport: 'Мультиспорт', geography: 'Львів', format: 'Гібрид', professionalCategory: 'Маркетинг',
+    budgetVisibility: 'Не вказаний', publishedAt: '17 липня 2026',
+    shortDesc: 'Пропонуємо послуги діджитал-активацій та матчдей-досвіду для клубів.',
+    fullDesc: 'Агенція пропонує діджитал-активації, соціальні механіки й контент для матчдею. Портфоліо кампаній із вимірюваним залученням.',
+    contactMethod: 'Через застосунок', tags: ['Активації', 'Контент'], applicationsCount: 0,
+    status: { label: 'Опубліковано', tone: 'success' },
+  },
+  {
+    id: 'op5', title: 'Спонсорський пакет жіночої команди', type: 'Спонсорство', org: 'ФК «Динамо» Київ', city: 'Київ',
+    sport: 'Футбол', geography: 'Київ', format: 'Офлайн', professionalCategory: 'Спонсорство',
+    budgetVisibility: 'Публічний', budget: 'від ₴500 тис', budgetFrom: 500000, currency: '₴',
+    deadline: '10 вересня', publishedAt: '24 липня 2026', expiresAt: '10 вересня 2026',
+    shortDesc: 'Відкриваємо категорійні пакети для партнерів жіночої команди.',
+    fullDesc: 'Пропонуємо спонсорські пакети навколо жіночої футбольної команди: джерсі, контент-серіал, соціальні активації. Окрема комерційна пропозиція на запит.',
+    contactMethod: 'Через застосунок', tags: ['Жіночий спорт', 'Спонсорство'], applicationsCount: 1, verified: true, featured: true, recommended: true,
+    status: { label: 'Опубліковано', tone: 'success' },
+  },
+  {
+    id: 'op6', title: 'Пошук інвестицій для sports-tech стартапу', type: 'Інвестиція', org: 'Sportech UA', city: 'Київ',
+    sport: 'Мультиспорт', geography: 'Європа', format: 'Віддалено', professionalCategory: 'Технології',
+    budgetVisibility: 'За запитом', deadline: '30 вересня', publishedAt: '23 липня 2026', expiresAt: '30 вересня 2026',
+    shortDesc: 'Стартап у сфері аналітики матчів шукає seed-інвестиції.',
+    fullDesc: 'Sports-tech стартап (аналітика матчевих даних) залучає seed-раунд. Є MVP і перші пілоти з клубами. Шукаємо профільного інвестора або фонд.',
+    contactMethod: 'Email', externalLink: 'sportech.ua', tags: ['SportsTech', 'Seed', 'Аналітика'], applicationsCount: 4,
+    status: { label: 'Опубліковано', tone: 'success' },
+  },
 ];
-export const OPPORTUNITY_TYPES = ['Усі', 'Вакансія', 'Партнерство', 'Тендер', 'Послуга', 'Інвестиція'];
+export const findOpportunity = (id: string) => OPPORTUNITIES.find((o) => o.id === id);
+
+// ── Довідники Можливостей (PROMPT 07) ──
+export const OPPORTUNITY_TYPE_LABELS = [
+  'Спонсорство', 'Партнерство', 'Вакансія', 'Проєктна робота', 'Тендер', 'Послуга', 'Інвестиція',
+  'Грант', 'Медіапартнерство', 'Пошук амбасадора', 'Пошук майданчика', 'Пошук спікера', 'Волонтерство', 'Інше',
+];
+export const OPPORTUNITY_TYPES = ['Усі', ...OPPORTUNITY_TYPE_LABELS];
+export const WORK_FORMATS = ['Офлайн', 'Віддалено', 'Гібрид'];
+export const BUDGET_VISIBILITY: BudgetVisibility[] = ['Публічний', 'За запитом', 'Не вказаний'];
+export const CURRENCIES = ['₴', '€', '$'];
+export const GEO_LIST = ['Україна', 'Київ', 'Львів', 'Харків', 'Дніпро', 'Одеса', 'Європа', 'Віддалено'];
+
+// Статуси публікації можливості
+export const OPP_STATUSES: { key: string; label: string; tone: Tone }[] = [
+  { key: 'draft', label: 'Чернетка', tone: 'neutral' },
+  { key: 'pending', label: 'На модерації', tone: 'warning' },
+  { key: 'published', label: 'Опубліковано', tone: 'success' },
+  { key: 'changes', label: 'Потрібні правки', tone: 'warning' },
+  { key: 'paused', label: 'Призупинено', tone: 'neutral' },
+  { key: 'closed', label: 'Закрито', tone: 'neutral' },
+  { key: 'rejected', label: 'Відхилено', tone: 'danger' },
+  { key: 'expired', label: 'Прострочено', tone: 'neutral' },
+  { key: 'archived', label: 'Архів', tone: 'neutral' },
+];
+export const oppStatus = (key: string) => OPP_STATUSES.find((s) => s.key === key) || OPP_STATUSES[0];
+
+// Статуси відгуку
+export const APPLICATION_STATUSES: { key: string; label: string; tone: Tone }[] = [
+  { key: 'new', label: 'Новий', tone: 'info' },
+  { key: 'viewed', label: 'Переглянуто', tone: 'neutral' },
+  { key: 'shortlisted', label: 'Шорт-ліст', tone: 'success' },
+  { key: 'contacted', label: 'Звʼязалися', tone: 'info' },
+  { key: 'accepted', label: 'Прийнято', tone: 'success' },
+  { key: 'rejected', label: 'Відхилено', tone: 'danger' },
+  { key: 'withdrawn', label: 'Відкликано', tone: 'neutral' },
+];
+export const appStatus = (key: string) => APPLICATION_STATUSES.find((s) => s.key === key) || APPLICATION_STATUSES[0];
 
 export interface EventItem {
   id: string; title: string; date: string; city: string; format: string;

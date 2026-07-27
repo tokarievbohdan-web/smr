@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
 import { Article, BodyBlock, Comment, Person, typeLabel, ME, findPerson, PEOPLE } from '../data';
-import { ORGANIZATIONS, OrgItem, OPPORTUNITIES, EVENTS } from '../shellData';
+import { ORGANIZATIONS, OrgItem, OpportunityItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import { useContent } from '../ContentContext';
 import { useSheet, useToast, useAuth } from '../UIProvider';
 import {
@@ -35,7 +35,7 @@ function Block({ block }: { block: BodyBlock }) {
 }
 
 export default function ArticleScreen({
-  item, onBack, saved, onToggleSave, onOpen, onGoTab, onOpenPerson, onOpenOrg,
+  item, onBack, saved, onToggleSave, onOpen, onGoTab, onOpenPerson, onOpenOrg, onOpenOpportunity,
 }: {
   item: Article;
   onBack: () => void;
@@ -45,6 +45,7 @@ export default function ArticleScreen({
   onGoTab: (t: TabKey) => void;
   onOpenPerson: (p: Person) => void;
   onOpenOrg: (o: OrgItem) => void;
+  onOpenOpportunity: (o: OpportunityItem) => void;
 }) {
   const { articles, people } = useContent();
   const sheet = useSheet();
@@ -177,7 +178,7 @@ export default function ArticleScreen({
           <View style={s.relSection}><SectionHeader title="Повʼязані люди" />{relPeople.map((p) => <PersonCard key={p.id} name={p.name} role={p.role} initials={p.initials} tags={p.tags} shade={p.shade} verified={p.verified} onPress={() => onOpenPerson(p)} />)}</View>
         )}
         {relOpps.length > 0 && (
-          <View style={s.relSection}><SectionHeader title="Повʼязані можливості" />{relOpps.map((o) => <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budget} deadline={o.deadline} statusLabel={o.status} onPress={() => onGoTab('opportunities')} />)}</View>
+          <View style={s.relSection}><SectionHeader title="Повʼязані можливості" />{relOpps.map((o) => <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budgetVisibility === 'Публічний' ? o.budget : undefined} deadline={o.deadline} statusLabel={o.status} sport={o.sport} format={o.format} verified={o.verified} onPress={() => onOpenOpportunity(o)} />)}</View>
         )}
         {relEvents.length > 0 && (
           <View style={s.relSection}><SectionHeader title="Повʼязані події" />{relEvents.map((e) => <EventCard key={e.id} title={e.title} date={e.date} city={e.city} format={e.format} onPress={() => onGoTab('events')} />)}</View>

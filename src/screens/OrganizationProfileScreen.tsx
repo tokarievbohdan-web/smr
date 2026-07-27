@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Share,
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, space, fonts } from '../theme';
 import { Article, Person, ContactLink, ContactType, PEOPLE, findArticle } from '../data';
-import { OrgItem, OPPORTUNITIES, EVENTS } from '../shellData';
+import { OrgItem, OpportunityItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import { useContent } from '../ContentContext';
 import { useSheet, useToast, useConfirm, useAuth } from '../UIProvider';
 import {
@@ -25,7 +25,7 @@ const contactUrl = (c: ContactLink) => {
 };
 
 export default function OrganizationProfileScreen({
-  org, onBack, saved, onToggleSave, onOpenArticle, onOpenPerson, onGoTab,
+  org, onBack, saved, onToggleSave, onOpenArticle, onOpenPerson, onGoTab, onOpenOpportunity,
 }: {
   org: OrgItem;
   onBack: () => void;
@@ -34,6 +34,7 @@ export default function OrganizationProfileScreen({
   onOpenArticle: (a: Article) => void;
   onOpenPerson: (p: Person) => void;
   onGoTab: (t: 'opportunities' | 'events') => void;
+  onOpenOpportunity: (o: OpportunityItem) => void;
 }) {
   const { articles } = useContent();
   const sheet = useSheet();
@@ -198,7 +199,7 @@ export default function OrganizationProfileScreen({
         {opps.length > 0 && (
           <View style={s.section}>
             <SectionHeader title="Активні можливості" />
-            {opps.map((o) => <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budget} deadline={o.deadline} statusLabel={o.status} onPress={() => onGoTab('opportunities')} />)}
+            {opps.map((o) => <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budgetVisibility === 'Публічний' ? o.budget : undefined} deadline={o.deadline} statusLabel={o.status} sport={o.sport} format={o.format} verified={o.verified} onPress={() => onOpenOpportunity(o)} />)}
           </View>
         )}
 

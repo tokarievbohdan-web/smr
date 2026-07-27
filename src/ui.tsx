@@ -222,20 +222,32 @@ export function OrganizationCard({ name, type, city, sports = [], verified, onPr
   );
 }
 
-export function OpportunityCard({ title, type, org, city, budget, deadline, statusLabel, onPress }: {
+export function OpportunityCard({ title, type, org, city, budget, deadline, statusLabel, onPress, sport, format, applications, verified, saved, onSave }: {
   title: string; type: string; org?: string; city?: string; budget?: string; deadline?: string; statusLabel?: { label: string; tone: keyof typeof status }; onPress?: () => void;
+  sport?: string; format?: string; applications?: number; verified?: boolean; saved?: boolean; onSave?: () => void;
 }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [s.oppCard, pressed && s.pressed]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
         <StatusBadge label={type} tone="info" />
         {statusLabel && <StatusBadge label={statusLabel.label} tone={statusLabel.tone} />}
+        {onSave && <View style={{ marginLeft: 'auto' }}><SaveButton saved={!!saved} onPress={onSave} /></View>}
       </View>
       <Text style={s.oppTitle}>{title}</Text>
-      <Text style={s.role}>{[org, city].filter(Boolean).join(' · ')}</Text>
-      <View style={{ flexDirection: 'row', gap: 16, marginTop: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+        <Text style={s.role}>{[org, city].filter(Boolean).join(' · ')}</Text>
+        {verified && <VerificationBadge size={13} />}
+      </View>
+      {(sport || format) && (
+        <View style={{ flexDirection: 'row', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+          {sport ? <Tag label={sport} /> : null}
+          {format ? <Tag label={format} /> : null}
+        </View>
+      )}
+      <View style={{ flexDirection: 'row', gap: 16, marginTop: 8, alignItems: 'center' }}>
         {budget ? <Text style={s.metaStrong}><Ionicons name="cash-outline" size={12} color={colors.dim} /> {budget}</Text> : null}
         {deadline ? <Text style={s.meta}><Ionicons name="time-outline" size={12} color={colors.muted} /> до {deadline}</Text> : null}
+        {typeof applications === 'number' ? <Text style={s.meta}><Ionicons name="people-outline" size={12} color={colors.muted} /> {applications}</Text> : null}
       </View>
     </Pressable>
   );
