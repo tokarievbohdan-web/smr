@@ -303,13 +303,119 @@ export const ARTICLES: Article[] = [
 
 export const findArticle = (id: string) => ARTICLES.find((a) => a.id === id);
 
-export interface Person { id: string; name: string; initials: string; role: string; tags: string[]; shade: number }
+// ── Мережа: спільні типи (люди й організації) ─────────
+export interface WorkItem { role: string; org: string; period: string }
+export interface ProjectItem { title: string; desc: string }
+export interface LinkItem { label: string; url: string }
+export type ContactType = 'email' | 'phone' | 'website' | 'linkedin' | 'telegram' | 'instagram' | 'facebook' | 'youtube';
+export interface ContactLink { type: ContactType; label: string; value: string }
+export interface TeamMember { name: string; role: string; initials: string }
+
+export interface Person {
+  id: string; name: string; initials: string; role: string; tags: string[]; shade: number;
+  headline?: string; position?: string; org?: string; city?: string; country?: string; bio?: string;
+  sports?: string[]; competencies?: string[]; skills?: string[];
+  experience?: WorkItem[]; projects?: ProjectItem[]; portfolio?: LinkItem[];
+  languages?: string[]; contacts?: ContactLink[]; availability?: string[];
+  verified?: boolean; relatedArticles?: string[];
+}
+
 export const PEOPLE: Person[] = [
-  { id: 'p1', name: 'Олена Ковальчук', initials: 'ОК', role: 'Head of Sponsorship · ФК «Динамо» · Київ', tags: ['Спонсорство', 'Партнерства'], shade: 0 },
-  { id: 'p2', name: 'Андрій Мельник', initials: 'АМ', role: 'CMO · спортивна медіаплатформа · Львів', tags: ['Маркетинг', 'Медіа'], shade: 1 },
-  { id: 'p3', name: 'Ірина Савченко', initials: 'ІС', role: 'Commercial Director · федерація · Київ', tags: ['Комерція', 'Events'], shade: 2 },
-  { id: 'p4', name: 'Данило Бондар', initials: 'ДБ', role: 'Sponsorship Manager · betting-платформа · Варшава', tags: ['iGaming', 'Спонсорство'], shade: 0 },
-  { id: 'p5', name: 'Марія Ткаченко', initials: 'МТ', role: 'Студентка · спортивний менеджмент · Київ', tags: ['Research'], shade: 1 },
+  {
+    id: 'p1', name: 'Олена Ковальчук', initials: 'ОК', shade: 0,
+    role: 'Head of Sponsorship · ФК «Динамо» · Київ', tags: ['Спонсорство', 'Партнерства'],
+    headline: 'Будую спонсорські партнерства для футбольного клубу', verified: true,
+    position: 'Head of Sponsorship', org: 'ФК «Динамо» Київ', city: 'Київ', country: 'Україна',
+    bio: '10 років у спортивній комерції. Веду спонсорські партнерства клубу — від пошуку категорійних брендів до активацій на матчдей. Відкрита до партнерських запитів.',
+    sports: ['Футбол'], competencies: ['Спонсорство', 'Комерція', 'Партнерства'],
+    skills: ['Переговори', 'Sponsorship sales', 'Активації', 'Оцінка ROI'],
+    experience: [
+      { role: 'Head of Sponsorship', org: 'ФК «Динамо» Київ', period: '2021 — зараз' },
+      { role: 'Sponsorship Manager', org: 'Українська Прем’єр-ліга', period: '2017 — 2021' },
+    ],
+    projects: [
+      { title: 'Титульний партнер сезону 2024/25', desc: 'Угода з fintech-брендом на 3 сезони з перформанс-KPI.' },
+      { title: 'Реферальна програма матчдею', desc: 'Перетворення білетів на вимірюваний канал для спонсора.' },
+    ],
+    portfolio: [{ label: 'Комерційна презентація клубу', url: 'dynamo.ua/partners' }],
+    languages: ['Українська', 'Англійська'],
+    contacts: [
+      { type: 'email', label: 'Email', value: 'olena@club.ua' },
+      { type: 'linkedin', label: 'LinkedIn', value: 'linkedin.com/in/okovalchuk' },
+    ],
+    availability: ['Шукаю партнерів', 'Готовий бути спікером'],
+    relatedArticles: ['a2', 'a1'],
+  },
+  {
+    id: 'p2', name: 'Андрій Мельник', initials: 'АМ', shade: 1,
+    role: 'CMO · спортивна медіаплатформа · Львів', tags: ['Маркетинг', 'Медіа'],
+    headline: 'Маркетинг і медіапродукти у спорті', verified: true,
+    position: 'Chief Marketing Officer', org: 'MEGOGO Sport', city: 'Львів', country: 'Україна',
+    bio: 'Відповідаю за маркетинг і продуктовий розвиток спортивної медіаплатформи. Фокус — утримання аудиторії, OTT та рекламний інвентар.',
+    sports: ['Мультиспорт'], competencies: ['Маркетинг', 'Медіа', 'Технології'],
+    skills: ['Performance-маркетинг', 'Медіапланування', 'OTT', 'Аналітика аудиторії'],
+    experience: [
+      { role: 'CMO', org: 'MEGOGO Sport', period: '2020 — зараз' },
+      { role: 'Head of Growth', org: 'Digital-агенція', period: '2016 — 2020' },
+    ],
+    projects: [{ title: 'Запуск клубного OTT', desc: 'D2C-платформа з прямим володінням аудиторією та даними.' }],
+    portfolio: [{ label: 'Кейси зростання', url: 'behance.net/amelnyk' }],
+    languages: ['Українська', 'Англійська', 'Польська'],
+    contacts: [
+      { type: 'email', label: 'Email', value: 'andrii@media.ua' },
+      { type: 'telegram', label: 'Telegram', value: '@amelnyk' },
+    ],
+    availability: ['Відкритий до проєктів', 'Готовий бути спікером'],
+    relatedArticles: ['a4', 'a5'],
+  },
+  {
+    id: 'p3', name: 'Ірина Савченко', initials: 'ІС', shade: 2,
+    role: 'Commercial Director · федерація · Київ', tags: ['Комерція', 'Events'],
+    headline: 'Комерційна модель федерації та робота з брендами', verified: true,
+    position: 'Commercial Director', org: 'Українська асоціація футболу', city: 'Київ', country: 'Україна',
+    bio: 'Перебудовую комерційну модель федерації: централізація прав, єдиний стандарт пакетів для брендів, підготовка до нового циклу.',
+    sports: ['Футбол'], competencies: ['Комерція', 'Управління', 'Івенти'],
+    skills: ['Централізація прав', 'Пакетування', 'B2B-продажі', 'Партнерства'],
+    experience: [{ role: 'Commercial Director', org: 'Українська асоціація футболу', period: '2019 — зараз' }],
+    projects: [{ title: 'Єдиний стандарт спонсорських пакетів', desc: 'Прозоре пакетування прав для брендів-партнерів.' }],
+    portfolio: [],
+    languages: ['Українська', 'Англійська'],
+    contacts: [{ type: 'email', label: 'Email', value: 'iryna@federation.ua' }],
+    availability: ['Шукаю партнерів'],
+    relatedArticles: ['a7'],
+  },
+  {
+    id: 'p4', name: 'Данило Бондар', initials: 'ДБ', shade: 0,
+    role: 'Sponsorship Manager · betting-платформа · Варшава', tags: ['iGaming', 'Спонсорство'],
+    headline: 'Спонсорські активації у категорії iGaming', verified: false,
+    position: 'Sponsorship Manager', org: 'Betting-платформа', city: 'Варшава', country: 'Польща',
+    bio: 'Керую спонсорськими розміщеннями бренду у спорті. Спеціалізуюсь на відповідальних активаціях і чистій атрибуції.',
+    sports: ['Футбол', 'Кіберспорт'], competencies: ['iGaming', 'Спонсорство', 'Маркетинг'],
+    skills: ['Джерсі-розміщення', 'Атрибуція', 'Комплаєнс', 'Активації'],
+    experience: [{ role: 'Sponsorship Manager', org: 'Betting-платформа', period: '2022 — зараз' }],
+    projects: [{ title: 'Відповідальні активації на матчдей', desc: 'Стандарт розміщень із прозорими правилами гри.' }],
+    portfolio: [],
+    languages: ['Українська', 'Англійська', 'Польська'],
+    contacts: [{ type: 'telegram', label: 'Telegram', value: '@dbondar' }],
+    availability: ['Відкритий до роботи', 'Відкритий до проєктів'],
+    relatedArticles: ['a8', 'a3'],
+  },
+  {
+    id: 'p5', name: 'Марія Ткаченко', initials: 'МТ', shade: 1,
+    role: 'Студентка · спортивний менеджмент · Київ', tags: ['Research'],
+    headline: 'Спортивний менеджмент · дослідження ринку', verified: false,
+    position: 'Студентка спортивного менеджменту', org: 'НУФВСУ', city: 'Київ', country: 'Україна',
+    bio: 'Досліджую комерціалізацію спорту в Україні. Шукаю першу роль в аналітиці чи спонсорстві.',
+    sports: ['Мультиспорт'], competencies: ['Аналітика', 'Research'],
+    skills: ['Дослідження ринку', 'Excel', 'Презентації'],
+    experience: [{ role: 'Стажерка', org: 'Спортивна агенція', period: 'Літо 2025' }],
+    projects: [{ title: 'Дослідження ринку спонсорства', desc: 'Огляд категорій і бюджетів у футболі України.' }],
+    portfolio: [],
+    languages: ['Українська', 'Англійська'],
+    contacts: [{ type: 'email', label: 'Email', value: 'maria@student.ua' }],
+    availability: ['Відкритий до роботи'],
+    relatedArticles: [],
+  },
 ];
 export const findPerson = (id: string) => PEOPLE.find((p) => p.id === id);
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { Article, BodyBlock, Comment, typeLabel, ME, findPerson } from '../data';
-import { ORGANIZATIONS, OPPORTUNITIES, EVENTS } from '../shellData';
+import { Article, BodyBlock, Comment, Person, typeLabel, ME, findPerson, PEOPLE } from '../data';
+import { ORGANIZATIONS, OrgItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import { useContent } from '../ContentContext';
 import { useSheet, useToast, useAuth } from '../UIProvider';
 import {
@@ -35,7 +35,7 @@ function Block({ block }: { block: BodyBlock }) {
 }
 
 export default function ArticleScreen({
-  item, onBack, saved, onToggleSave, onOpen, onGoTab,
+  item, onBack, saved, onToggleSave, onOpen, onGoTab, onOpenPerson, onOpenOrg,
 }: {
   item: Article;
   onBack: () => void;
@@ -43,6 +43,8 @@ export default function ArticleScreen({
   onToggleSave: () => void;
   onOpen: (a: Article) => void;
   onGoTab: (t: TabKey) => void;
+  onOpenPerson: (p: Person) => void;
+  onOpenOrg: (o: OrgItem) => void;
 }) {
   const { articles, people } = useContent();
   const sheet = useSheet();
@@ -70,7 +72,7 @@ export default function ArticleScreen({
         <Avatar initials={item.author.initials} size={48} />
         <View><Text style={s.sheetName}>{item.author.name}</Text><Text style={s.role}>{item.author.role}</Text></View>
       </View>
-      <PrimaryCTA label="Відкрити профіль" onPress={() => { sheet.close(); onGoTab('network'); }} />
+      <PrimaryCTA label="Відкрити профіль" onPress={() => { sheet.close(); const p = PEOPLE.find((x) => x.name === item.author.name); p ? onOpenPerson(p) : onGoTab('network'); }} />
       <SecondaryCTA label="Запит на знайомство" onPress={() => { sheet.close(); requireAuth(() => toast('Запит надіслано', 'success')); }} />
     </View>
   );
@@ -169,10 +171,10 @@ export default function ArticleScreen({
 
         {/* Related */}
         {relOrgs.length > 0 && (
-          <View style={s.relSection}><SectionHeader title="Повʼязані організації" />{relOrgs.map((o) => <OrganizationCard key={o.id} name={o.name} type={o.type} city={o.city} sports={o.sports} verified={o.verified} onPress={() => onGoTab('network')} />)}</View>
+          <View style={s.relSection}><SectionHeader title="Повʼязані організації" />{relOrgs.map((o) => <OrganizationCard key={o.id} name={o.name} type={o.type} city={o.city} sports={o.sports} verified={o.verified} onPress={() => onOpenOrg(o)} />)}</View>
         )}
         {relPeople.length > 0 && (
-          <View style={s.relSection}><SectionHeader title="Повʼязані люди" />{relPeople.map((p) => <PersonCard key={p.id} name={p.name} role={p.role} initials={p.initials} tags={p.tags} shade={p.shade} onPress={() => onGoTab('network')} />)}</View>
+          <View style={s.relSection}><SectionHeader title="Повʼязані люди" />{relPeople.map((p) => <PersonCard key={p.id} name={p.name} role={p.role} initials={p.initials} tags={p.tags} shade={p.shade} verified={p.verified} onPress={() => onOpenPerson(p)} />)}</View>
         )}
         {relOpps.length > 0 && (
           <View style={s.relSection}><SectionHeader title="Повʼязані можливості" />{relOpps.map((o) => <OpportunityCard key={o.id} title={o.title} type={o.type} org={o.org} city={o.city} budget={o.budget} deadline={o.deadline} statusLabel={o.status} onPress={() => onGoTab('opportunities')} />)}</View>
@@ -250,4 +252,5 @@ const s = StyleSheet.create({
   headRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   h3b: { fontFamily: fonts.extra, color: colors.ink, fontSize: 16, letterSpacing: -0.2 },
   count: { fontFamily: fonts.semi, color: colors.muted, fontSize: 12 },
+  sheetName: { fontFamily: fonts.extra, color: colors.ink, fontSize: 18, letterSpacing: -0.3 },
 });

@@ -154,10 +154,11 @@ export function Avatar({ initials, size = 44, shade = 0, uri, verified }: { init
 }
 
 /* ─── Photo placeholder ──────────────────────────────── */
-export function Photo({ label, uri, height, round = radius.card, style }: { label?: string; uri?: string; height: number; round?: number; style?: StyleProp<ViewStyle> }) {
+export function Photo({ label, uri, height, round = radius.card, style, children }: { label?: string; uri?: string; height: number; round?: number; style?: StyleProp<ViewStyle>; children?: React.ReactNode }) {
   return (
     <View style={[{ height, borderRadius: round, backgroundColor: colors.stripe, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }, style]}>
       {uri ? <Image source={{ uri }} style={StyleSheet.absoluteFill as any} resizeMode="cover" /> : label ? <Text style={{ fontFamily: fonts.med, color: colors.muted, fontSize: 10 }}>{label}</Text> : null}
+      {children}
     </View>
   );
 }

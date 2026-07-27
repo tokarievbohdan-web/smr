@@ -3,8 +3,8 @@ import { View, Text, ScrollView, StyleSheet, Pressable, TouchableOpacity } from 
 import { colors, radius, space, fonts } from '../theme';
 import { useContent } from '../ContentContext';
 import { useAuth } from '../AuthContext';
-import { Article, typeLabel } from '../data';
-import { ORGANIZATIONS, OPPORTUNITIES, EVENTS } from '../shellData';
+import { Article, Person, typeLabel } from '../data';
+import { ORGANIZATIONS, OrgItem, OPPORTUNITIES, EVENTS } from '../shellData';
 import {
   SectionHeader, ContentCard, PersonCard, OrganizationCard, OpportunityCard, EventCard,
   Photo, StatusBadge, SkeletonCard, FilterChips,
@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 type TabKey = 'review' | 'network' | 'opportunities' | 'events' | 'profile';
 
 export default function HomeScreen({
-  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave,
+  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave, onOpenPerson, onOpenOrg,
 }: {
   onOpen: (a: Article) => void;
   onOpenSearch: () => void;
@@ -23,6 +23,8 @@ export default function HomeScreen({
   onOpenReviewFeed: (category?: string) => void;
   saved: string[];
   onToggleSave: (id: string) => void;
+  onOpenPerson: (p: Person) => void;
+  onOpenOrg: (o: OrgItem) => void;
 }) {
   const { articles, people, categories, loading } = useContent();
   const { user } = useAuth();
@@ -98,7 +100,7 @@ export default function HomeScreen({
     <View key="specialists" style={{ gap: 12 }}>
       <SectionHeader title="Рекомендовані фахівці" action="Мережа" onAction={() => onGoTab('network')} />
       {people.slice(0, 3).map((p) => (
-        <PersonCard key={p.id} name={p.name} role={p.role} initials={p.initials} tags={p.tags} shade={p.shade} verified={p.id === 'p1'} onPress={() => onGoTab('network')} />
+        <PersonCard key={p.id} name={p.name} role={p.role} initials={p.initials} tags={p.tags} shade={p.shade} verified={p.verified} onPress={() => onOpenPerson(p)} />
       ))}
     </View>
   );
@@ -107,7 +109,7 @@ export default function HomeScreen({
     <View key="organizations" style={{ gap: 12 }}>
       <SectionHeader title="Рекомендовані організації" action="Мережа" onAction={() => onGoTab('network')} />
       {ORGANIZATIONS.slice(0, 2).map((o) => (
-        <OrganizationCard key={o.id} name={o.name} type={o.type} city={o.city} sports={o.sports} verified={o.verified} onPress={() => onGoTab('network')} />
+        <OrganizationCard key={o.id} name={o.name} type={o.type} city={o.city} sports={o.sports} verified={o.verified} onPress={() => onOpenOrg(o)} />
       ))}
     </View>
   );

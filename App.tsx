@@ -8,7 +8,8 @@ import {
   useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold,
 } from '@expo-google-fonts/manrope';
 import { colors, space, fonts } from './src/theme';
-import { Article } from './src/data';
+import { Article, Person } from './src/data';
+import { OrgItem } from './src/shellData';
 import { ContentProvider } from './src/ContentContext';
 import { UIProvider } from './src/UIProvider';
 import { AuthProvider, useAuth } from './src/AuthContext';
@@ -17,6 +18,8 @@ import HomeScreen from './src/screens/HomeScreen';
 import ReviewFeedScreen from './src/screens/ReviewFeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
 import NetworkScreen from './src/screens/NetworkScreen';
+import PersonProfileScreen from './src/screens/PersonProfileScreen';
+import OrganizationProfileScreen from './src/screens/OrganizationProfileScreen';
 import OpportunitiesScreen from './src/screens/OpportunitiesScreen';
 import EventsScreen from './src/screens/EventsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
@@ -28,6 +31,7 @@ import BlockedScreen from './src/screens/auth/BlockedScreen';
 import OnboardingFlow from './src/screens/onboarding/OnboardingFlow';
 
 const SAVED_KEY = 'smr_saved_v1';
+const SAVED_NET_KEY = 'smr_saved_net_v1';
 
 type TabKey = 'review' | 'network' | 'opportunities' | 'events' | 'profile';
 
@@ -59,9 +63,12 @@ function AppInner() {
   const auth = useAuth();
   const [tab, setTab] = useState<TabKey>('review');
   const [article, setArticle] = useState<Article | null>(null);
+  const [person, setPerson] = useState<Person | null>(null);
+  const [org, setOrg] = useState<OrgItem | null>(null);
   const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | 'review' | null>(null);
   const [reviewCat, setReviewCat] = useState<string | undefined>(undefined);
   const [saved, setSaved] = useState<string[]>([]);
+  const [savedNet, setSavedNet] = useState<string[]>([]);
   const [savedHydrated, setSavedHydrated] = useState(false);
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -73,25 +80,30 @@ function AppInner() {
   useEffect(() => {
     (async () => {
       try { const raw = await AsyncStorage.getItem(SAVED_KEY); if (raw) setSaved(JSON.parse(raw)); } catch {}
+      try { const rawN = await AsyncStorage.getItem(SAVED_NET_KEY); if (rawN) setSavedNet(JSON.parse(rawN)); } catch {}
       setSavedHydrated(true);
     })();
   }, []);
   useEffect(() => { if (savedHydrated) AsyncStorage.setItem(SAVED_KEY, JSON.stringify(saved)).catch(() => {}); }, [saved, savedHydrated]);
+  useEffect(() => { if (savedHydrated) AsyncStorage.setItem(SAVED_NET_KEY, JSON.stringify(savedNet)).catch(() => {}); }, [savedNet, savedHydrated]);
 
   if (!fontsLoaded || auth.loading || !savedHydrated) {
     return <View style={[styles.root, { backgroundColor: colors.bg }]} />;
   }
 
   const toggleSave = (id: string) => setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const toggleSaveNet = (id: string) => setSavedNet((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const openArticle = (a: Article) => setArticle(a);
-  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setOverlay(null); };
+  const openPerson = (p: Person) => setPerson(p);
+  const openOrg = (o: OrgItem) => setOrg(o);
+  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setPerson(null); setOrg(null); setOverlay(null); };
 
   // ── Root gate ──
   const isMain = auth.user ? (!auth.suspended && !auth.needsOnboarding) : auth.isGuest;
 
   const tabScreens: { key: TabKey; node: React.ReactNode }[] = [
-    { key: 'review', node: <HomeScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoTab={goTab} onOpenReviewFeed={(cat) => { setReviewCat(cat); setOverlay('review'); }} saved={saved} onToggleSave={toggleSave} /> },
-    { key: 'network', node: <NetworkScreen /> },
+    { key: 'review', node: <HomeScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoTab={goTab} onOpenReviewFeed={(cat) => { setReviewCat(cat); setOverlay('review'); }} saved={saved} onToggleSave={toggleSave} onOpenPerson={openPerson} onOpenOrg={openOrg} /> },
+    { key: 'network', node: <NetworkScreen onOpenPerson={openPerson} onOpenOrg={openOrg} saved={savedNet} onToggleSave={toggleSaveNet} /> },
     { key: 'opportunities', node: <OpportunitiesScreen /> },
     { key: 'events', node: <EventsScreen /> },
     { key: 'profile', node: <ProfileScreen onOpenSaved={() => setOverlay('saved')} onOpenGallery={() => setOverlay('gallery')} /> },
@@ -114,12 +126,14 @@ function AppInner() {
         {overlay === 'saved' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}</AnimatedScreen>}
         {overlay === 'gallery' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <GalleryScreen onBack={close} />}</AnimatedScreen>}
         {overlay === 'review' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <ReviewFeedScreen onBack={close} onOpen={openArticle} saved={saved} onToggleSave={toggleSave} initialCategory={reviewCat} />}</AnimatedScreen>}
-        {article && <AnimatedScreen onClose={() => setArticle(null)}>{(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} onOpen={openArticle} onGoTab={goTab} />}</AnimatedScreen>}
+        {article && <AnimatedScreen onClose={() => setArticle(null)}>{(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} onOpen={openArticle} onGoTab={goTab} onOpenPerson={openPerson} onOpenOrg={openOrg} />}</AnimatedScreen>}
+        {person && <AnimatedScreen onClose={() => setPerson(null)}>{(close) => <PersonProfileScreen person={person} onBack={close} saved={savedNet.includes(person.id)} onToggleSave={() => toggleSaveNet(person.id)} onOpenArticle={openArticle} onOpenOrg={openOrg} />}</AnimatedScreen>}
+        {org && <AnimatedScreen onClose={() => setOrg(null)}>{(close) => <OrganizationProfileScreen org={org} onBack={close} saved={savedNet.includes(org.id)} onToggleSave={() => toggleSaveNet(org.id)} onOpenArticle={openArticle} onOpenPerson={openPerson} onGoTab={goTab} />}</AnimatedScreen>}
       </>
     );
   }
 
-  const showTabs = isMain && !article && !overlay;
+  const showTabs = isMain && !article && !person && !org && !overlay;
 
   const app = (
     <View style={styles.app}>
