@@ -13,7 +13,8 @@ import { ContentProvider } from './src/ContentContext';
 import { UIProvider } from './src/UIProvider';
 import { AuthProvider, useAuth } from './src/AuthContext';
 import AnimatedScreen from './src/AnimatedScreen';
-import FeedScreen from './src/screens/FeedScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import ReviewFeedScreen from './src/screens/ReviewFeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
 import NetworkScreen from './src/screens/NetworkScreen';
 import OpportunitiesScreen from './src/screens/OpportunitiesScreen';
@@ -58,7 +59,8 @@ function AppInner() {
   const auth = useAuth();
   const [tab, setTab] = useState<TabKey>('review');
   const [article, setArticle] = useState<Article | null>(null);
-  const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | null>(null);
+  const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | 'review' | null>(null);
+  const [reviewCat, setReviewCat] = useState<string | undefined>(undefined);
   const [saved, setSaved] = useState<string[]>([]);
   const [savedHydrated, setSavedHydrated] = useState(false);
   const { width } = useWindowDimensions();
@@ -88,7 +90,7 @@ function AppInner() {
   const isMain = auth.user ? (!auth.suspended && !auth.needsOnboarding) : auth.isGuest;
 
   const tabScreens: { key: TabKey; node: React.ReactNode }[] = [
-    { key: 'review', node: <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} saved={saved} onToggleSave={toggleSave} /> },
+    { key: 'review', node: <HomeScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoTab={goTab} onOpenReviewFeed={(cat) => { setReviewCat(cat); setOverlay('review'); }} saved={saved} onToggleSave={toggleSave} /> },
     { key: 'network', node: <NetworkScreen /> },
     { key: 'opportunities', node: <OpportunitiesScreen /> },
     { key: 'events', node: <EventsScreen /> },
@@ -111,7 +113,8 @@ function AppInner() {
         {overlay === 'search' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SearchScreen onCancel={close} onOpen={openArticle} />}</AnimatedScreen>}
         {overlay === 'saved' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}</AnimatedScreen>}
         {overlay === 'gallery' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <GalleryScreen onBack={close} />}</AnimatedScreen>}
-        {article && <AnimatedScreen onClose={() => setArticle(null)}>{(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} />}</AnimatedScreen>}
+        {overlay === 'review' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <ReviewFeedScreen onBack={close} onOpen={openArticle} saved={saved} onToggleSave={toggleSave} initialCategory={reviewCat} />}</AnimatedScreen>}
+        {article && <AnimatedScreen onClose={() => setArticle(null)}>{(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} onOpen={openArticle} onGoTab={goTab} />}</AnimatedScreen>}
       </>
     );
   }

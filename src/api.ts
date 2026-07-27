@@ -1,76 +1,51 @@
-// Шар даних: якщо CMS підключена (cms.ts projectId) — тягне з Sanity,
-// інакше повертає демо-дані з data.ts. Екрани не залежать від джерела.
+// Шар даних: CMS (Sanity) з фолбэком на демо-дані data.ts. Екрани не залежать від джерела.
 import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import { CMS, cmsEnabled } from './cms';
-import { ARTICLES, DISCUSSIONS, PEOPLE, Article, Discussion, Person } from './data';
+import { ARTICLES, PEOPLE, Article, Person, Category, DEFAULT_CATEGORIES } from './data';
 
 const client = cmsEnabled()
   ? createClient({ projectId: CMS.projectId, dataset: CMS.dataset, apiVersion: CMS.apiVersion, useCdn: true })
   : null;
-
 const builder = client ? imageUrlBuilder(client) : null;
-const imgUrl = (src: any, w = 800) => (builder && src ? builder.image(src).width(w).url() : undefined);
+const imgUrl = (src: any, w = 900) => (builder && src ? builder.image(src).width(w).url() : undefined);
+
+const REDACTION = { name: 'Редакція SMR', role: 'Sport Market Review', initials: 'SM' };
 
 export async function fetchArticles(): Promise<Article[]> {
   if (!client) return ARTICLES;
   try {
     const rows = await client.fetch<any[]>(
       `*[_type == "article"] | order(date desc){
-        "id": _id, category, kind, title, excerpt, image, date, readMin, commentsCount,
-        "topToday": topToday, facts, why, conclusion, source
+        "id": _id, category, kind, title, subtitle, excerpt, image, date, readMin, commentsCount,
+        "topToday": topToday, facts, why, conclusion, source, caseStudy
       }`
     );
     if (!rows.length) return ARTICLES;
-    return rows.map((r) => ({
+    return rows.map((r): Article => ({
       id: r.id,
-      category: r.category,
-      kind: r.kind || 'News',
+      type: r.kind || 'News',
+      category: r.category || 'Індустрія',
       title: r.title,
+      subtitle: r.subtitle,
       excerpt: r.excerpt || '',
       photo: '',
       imageUrl: imgUrl(r.image),
+      author: REDACTION,
       date: r.date ? new Date(r.date).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
       readMin: r.readMin || 3,
       commentsCount: r.commentsCount || 0,
       topToday: !!r.topToday,
+      body: r.excerpt ? [{ type: 'text', text: r.excerpt }] : [],
       facts: r.facts || [],
       why: r.why || '',
       conclusion: r.conclusion || '',
       source: r.source || '',
+      caseStudy: r.caseStudy,
       comments: [],
-    })) as Article[];
-  } catch (e) {
+    }));
+  } catch {
     return ARTICLES;
-  }
-}
-
-export async function fetchDiscussions(): Promise<Discussion[]> {
-  if (!client) return DISCUSSIONS;
-  try {
-    const rows = await client.fetch<any[]>(
-      `*[_type == "discussion"]{
-        "id": _id, badge, category, title, "preview": body, meta, hot,
-        author, authorRole, authorInitials, "body": body
-      }`
-    );
-    if (!rows.length) return DISCUSSIONS;
-    return rows.map((r) => ({
-      id: r.id,
-      badge: r.badge,
-      category: r.category || '',
-      title: r.title,
-      preview: r.preview,
-      meta: r.meta || '',
-      hot: !!r.hot,
-      author: r.author || '',
-      authorRole: r.authorRole || '',
-      authorInitials: r.authorInitials || '',
-      body: r.body || '',
-      thread: [],
-    })) as Discussion[];
-  } catch (e) {
-    return DISCUSSIONS;
   }
 }
 
@@ -87,7 +62,17 @@ export async function fetchPeople(): Promise<Person[]> {
       tags: r.tags || [],
       shade: i % 3,
     })) as Person[];
-  } catch (e) {
+  } catch {
     return PEOPLE;
+  }
+}
+
+export async function fetchCategories(): Promise<Category[]> {
+  if (!client) return DEFAULT_CATEGORIES;
+  try {
+    const rows = await client.fetch<any[]>(`*[_type == "articleCategory"] | order(order asc){ "id": _id, title }`);
+    return rows.length ? rows.map((r) => ({ id: r.id, title: r.title })) : DEFAULT_CATEGORIES;
+  } catch {
+    return DEFAULT_CATEGORIES;
   }
 }

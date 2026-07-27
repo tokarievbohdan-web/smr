@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { Article } from '../data';
+import { Article, typeLabel } from '../data';
 import { useContent } from '../ContentContext';
 import { Photo, CategoryText } from '../components';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,7 +41,7 @@ export default function SavedScreen({
             <Pressable key={a.id} style={styles.card} onPress={() => onOpen(a)}>
               <Photo height={72} round={radius.md} style={{ width: 72 }} />
               <View style={{ flex: 1, gap: 4 }}>
-                <CategoryText text={`${a.category} · ${a.kind}`} />
+                <CategoryText text={`${a.category} · ${typeLabel(a.type)}`} />
                 <Text style={styles.cTitle}>{a.title}</Text>
                 <Text style={styles.cNote}>{a.savedNote || 'збережено'}</Text>
               </View>

@@ -1,48 +1,51 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Article, Discussion, Person, ARTICLES, DISCUSSIONS, PEOPLE } from './data';
-import { fetchArticles, fetchDiscussions, fetchPeople } from './api';
+import { Article, Person, Category, ARTICLES, PEOPLE, DEFAULT_CATEGORIES } from './data';
+import { fetchArticles, fetchPeople, fetchCategories } from './api';
 
 type ContentValue = {
   articles: Article[];
-  discussions: Discussion[];
   people: Person[];
+  categories: Category[];
   loading: boolean;
+  error: boolean;
   refresh: () => void;
 };
 
 const Ctx = createContext<ContentValue>({
   articles: ARTICLES,
-  discussions: DISCUSSIONS,
   people: PEOPLE,
+  categories: DEFAULT_CATEGORIES,
   loading: false,
+  error: false,
   refresh: () => {},
 });
 
 export const useContent = () => useContext(Ctx);
 
 export function ContentProvider({ children }: { children: React.ReactNode }) {
-  // Стартуємо з демо-даних — застосунок одразу наповнений; потім підміняємо контентом з CMS
   const [articles, setArticles] = useState<Article[]>(ARTICLES);
-  const [discussions, setDiscussions] = useState<Discussion[]>(DISCUSSIONS);
   const [people, setPeople] = useState<Person[]>(PEOPLE);
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const load = async () => {
     setLoading(true);
+    setError(false);
     try {
-      const [a, d, p] = await Promise.all([fetchArticles(), fetchDiscussions(), fetchPeople()]);
+      const [a, p, c] = await Promise.all([fetchArticles(), fetchPeople(), fetchCategories()]);
       setArticles(a);
-      setDiscussions(d);
       setPeople(p);
-    } catch {}
+      setCategories(c);
+    } catch {
+      setError(true);
+    }
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   return (
-    <Ctx.Provider value={{ articles, discussions, people, loading, refresh: load }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ articles, people, categories, loading, error, refresh: load }}>{children}</Ctx.Provider>
   );
 }
