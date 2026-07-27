@@ -14,6 +14,7 @@ export default defineType({
     defineField({name: 'image', title: 'Головне фото', type: 'image', options: {hotspot: true}}),
     defineField({name: 'date', title: 'Дата публікації', type: 'datetime', initialValue: () => new Date().toISOString()}),
     defineField({name: 'readMin', title: 'Час читання (хв)', type: 'number', initialValue: 4}),
+    defineField({name: 'commentsCount', title: 'Кількість коментарів (для «Найобговорюваніші»)', type: 'number', initialValue: 0}),
     defineField({name: 'topToday', title: 'У блок «Головне сьогодні»', type: 'boolean', initialValue: false}),
     defineField({name: 'facts', title: 'Основні факти', type: 'array', of: [{type: 'string'}]}),
     defineField({name: 'why', title: 'Чому це важливо', type: 'text', rows: 3}),

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { FEED_FILTERS, Article, Discussion } from '../data';
+import { FEED_FILTERS, Article } from '../data';
 import { useContent } from '../ContentContext';
 import { Photo, CategoryText, ImageBadge, Chip, Logo } from '../components';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,23 +18,20 @@ function IconBtn({ name, onPress, dot }: { name: any; onPress?: () => void; dot?
 export default function FeedScreen({
   onOpen,
   onOpenSearch,
-  onGoDiscussions,
-  onOpenDiscussion,
   saved,
   onToggleSave,
 }: {
   onOpen: (a: Article) => void;
   onOpenSearch: () => void;
-  onGoDiscussions: () => void;
-  onOpenDiscussion: (d: Discussion) => void;
   saved: string[];
   onToggleSave: (id: string) => void;
 }) {
   const [filter, setFilter] = useState('Усе');
   const [subscribed, setSubscribed] = useState(false);
-  const { articles, discussions } = useContent();
+  const { articles } = useContent();
   const top = articles.filter((a) => a.topToday);
   const feed = articles.filter((a) => filter === 'Усе' || a.category === filter);
+  const mostDiscussed = [...articles].filter((a) => a.commentsCount > 0).sort((a, b) => b.commentsCount - a.commentsCount).slice(0, 3);
 
   return (
     <View style={{ flex: 1 }}>
@@ -93,21 +90,25 @@ export default function FeedScreen({
             </Pressable>
           ))}
 
-          <View style={styles.rowHead}>
-            <Text style={styles.h2}>Найактивніші обговорення</Text>
-            <Text style={styles.link} onPress={onGoDiscussions}>Усі</Text>
-          </View>
-          {discussions.slice(0, 2).map((d) => (
-            <Pressable key={d.id} style={({ pressed }) => [styles.discRow, pressed && { opacity: 0.7 }]} onPress={() => onOpenDiscussion(d)}>
-              <View style={{ flex: 1, gap: 4 }}>
-                <Text style={styles.discTitle}>{d.title}</Text>
-                <Text style={styles.discMeta}>{d.category} · {d.meta.split(' · ')[0]}</Text>
+          {mostDiscussed.length > 0 && (
+            <>
+              <View style={styles.rowHead}>
+                <Text style={styles.h2}>Найобговорюваніші</Text>
               </View>
-              {d.hot ? (
-                <View style={styles.hot}><Text style={styles.hotText}>Гаряче</Text></View>
-              ) : null}
-            </Pressable>
-          ))}
+              {mostDiscussed.map((a) => (
+                <Pressable key={a.id} style={({ pressed }) => [styles.discRow, pressed && { opacity: 0.7 }]} onPress={() => onOpen(a)}>
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <Text style={styles.discTitle} numberOfLines={2}>{a.title}</Text>
+                    <Text style={styles.discMeta}>{a.category} · {a.commentsCount} коментарів</Text>
+                  </View>
+                  <View style={styles.commentPill}>
+                    <Ionicons name="chatbubble-outline" size={12} color={colors.accent} />
+                    <Text style={styles.commentPillText}>{a.commentsCount}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </>
+          )}
 
           <View style={styles.digest}>
             <Text style={styles.digestEyebrow}>ЩОТИЖНЕВИЙ ДАЙДЖЕСТ</Text>
@@ -152,6 +153,8 @@ const styles = StyleSheet.create({
   discMeta: { fontFamily: fonts.semi, color: colors.muted, fontSize: 11.5 },
   hot: { backgroundColor: colors.accentSoft, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 6 },
   hotText: { fontFamily: fonts.bold, color: colors.accent, fontSize: 11 },
+  commentPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.accentSoft, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 6 },
+  commentPillText: { fontFamily: fonts.bold, color: colors.accent, fontSize: 12 },
 
   digest: { backgroundColor: colors.dark, borderRadius: radius.card, padding: 18, gap: 8, marginTop: space(1) },
   digestEyebrow: { fontFamily: fonts.bold, color: colors.onDarkDim, fontSize: 10, letterSpacing: 1 },

@@ -17,7 +17,7 @@ export async function fetchArticles(): Promise<Article[]> {
   try {
     const rows = await client.fetch<any[]>(
       `*[_type == "article"] | order(date desc){
-        "id": _id, category, kind, title, excerpt, image, date, readMin,
+        "id": _id, category, kind, title, excerpt, image, date, readMin, commentsCount,
         "topToday": topToday, facts, why, conclusion, source
       }`
     );
@@ -32,7 +32,7 @@ export async function fetchArticles(): Promise<Article[]> {
       imageUrl: imgUrl(r.image),
       date: r.date ? new Date(r.date).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
       readMin: r.readMin || 3,
-      commentsCount: 0,
+      commentsCount: r.commentsCount || 0,
       topToday: !!r.topToday,
       facts: r.facts || [],
       why: r.why || '',

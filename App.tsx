@@ -13,15 +13,13 @@ import {
   Manrope_800ExtraBold,
 } from '@expo-google-fonts/manrope';
 import { colors, space, fonts } from './src/theme';
-import { Article, Discussion } from './src/data';
+import { Article } from './src/data';
 import { ContentProvider } from './src/ContentContext';
 import AnimatedScreen from './src/AnimatedScreen';
 import FadeView from './src/FadeView';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import FeedScreen from './src/screens/FeedScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
-import DiscussionsScreen from './src/screens/DiscussionsScreen';
-import DiscussionDetailScreen from './src/screens/DiscussionDetailScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SearchScreen from './src/screens/SearchScreen';
@@ -29,11 +27,10 @@ import SavedScreen from './src/screens/SavedScreen';
 
 const STORE_KEY = 'smc_state_v1';
 
-type TabKey = 'home' | 'discussions' | 'community' | 'profile';
+type TabKey = 'home' | 'community' | 'profile';
 
 const TABS: { key: TabKey; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { key: 'home', label: 'Головна', icon: 'home' },
-  { key: 'discussions', label: 'Обговорення', icon: 'chatbubble-ellipses' },
   { key: 'community', label: 'Спільнота', icon: 'people' },
   { key: 'profile', label: 'Профіль', icon: 'person' },
 ];
@@ -57,7 +54,6 @@ function TabBar({ active, onChange, bottomInset }: { active: TabKey; onChange: (
 function AppInner() {
   const [tab, setTab] = useState<TabKey>('home');
   const [article, setArticle] = useState<Article | null>(null);
-  const [discussion, setDiscussion] = useState<Discussion | null>(null);
   const [overlay, setOverlay] = useState<'search' | 'saved' | null>(null);
   const [onboarded, setOnboarded] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
@@ -102,26 +98,22 @@ function AppInner() {
 
   const toggleSave = (id: string) => setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const openArticle = (a: Article) => setArticle(a);
-  const openDiscussion = (d: Discussion) => setDiscussion(d);
   const goTab = (k: TabKey) => {
     setTab(k);
     setArticle(null);
-    setDiscussion(null);
     setOverlay(null);
   };
 
   const baseTab =
     tab === 'home' ? (
-      <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoDiscussions={() => setTab('discussions')} onOpenDiscussion={openDiscussion} saved={saved} onToggleSave={toggleSave} />
-    ) : tab === 'discussions' ? (
-      <DiscussionsScreen onOpen={openDiscussion} />
+      <FeedScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} saved={saved} onToggleSave={toggleSave} />
     ) : tab === 'community' ? (
       <CommunityScreen />
     ) : (
       <ProfileScreen onOpenSaved={() => setOverlay('saved')} />
     );
 
-  const showTabs = onboarded && !article && !discussion && !overlay;
+  const showTabs = onboarded && !article && !overlay;
 
   const app = (
     <View style={styles.app}>
@@ -140,11 +132,6 @@ function AppInner() {
             {overlay === 'saved' && (
               <AnimatedScreen onClose={() => setOverlay(null)}>
                 {(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}
-              </AnimatedScreen>
-            )}
-            {discussion && (
-              <AnimatedScreen onClose={() => setDiscussion(null)}>
-                {(close) => <DiscussionDetailScreen item={discussion} onBack={close} />}
               </AnimatedScreen>
             )}
             {article && (

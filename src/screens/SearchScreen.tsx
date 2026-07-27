@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, TextInput } from 'react-native';
 import { colors, radius, space, fonts } from '../theme';
-import { SEARCH_TAGS, Article, Discussion } from '../data';
+import { SEARCH_TAGS, Article } from '../data';
 import { useContent } from '../ContentContext';
 import { Photo, Avatar } from '../components';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,21 +9,18 @@ import { Ionicons } from '@expo/vector-icons';
 export default function SearchScreen({
   onCancel,
   onOpen,
-  onOpenDiscussion,
 }: {
   onCancel: () => void;
   onOpen: (a: Article) => void;
-  onOpenDiscussion: (d: Discussion) => void;
 }) {
-  const { articles: ARTICLES, people: PEOPLE, discussions: DISCUSSIONS } = useContent();
+  const { articles: ARTICLES, people: PEOPLE } = useContent();
   const [query, setQuery] = useState('спонсорство');
   const q = query.trim().toLowerCase();
   const match = (s: string) => !q || s.toLowerCase().includes(q);
 
   const materials = ARTICLES.filter((a) => match(a.title) || match(a.category));
-  const discussions = DISCUSSIONS.filter((d) => match(d.title) || match(d.category));
   const people = PEOPLE.filter((p) => match(p.name) || match(p.role));
-  const empty = materials.length === 0 && discussions.length === 0 && people.length === 0;
+  const empty = materials.length === 0 && people.length === 0;
 
   return (
     <View style={{ flex: 1 }}>
@@ -58,18 +55,6 @@ export default function SearchScreen({
                   <Text style={styles.mTitle}>{a.title}</Text>
                   <Text style={styles.mMeta}>{a.category} · {a.readMin} хв</Text>
                 </View>
-              </Pressable>
-            ))}
-          </View>
-        )}
-
-        {discussions.length > 0 && (
-          <View style={{ gap: 10 }}>
-            <Text style={styles.group}>ОБГОВОРЕННЯ</Text>
-            {discussions.map((d) => (
-              <Pressable key={d.id} style={styles.dRow} onPress={() => onOpenDiscussion(d)}>
-                <Text style={styles.mTitle}>{d.title}</Text>
-                <Text style={styles.mMeta}>{d.category} · {d.meta.split(' · ')[0]}</Text>
               </Pressable>
             ))}
           </View>
