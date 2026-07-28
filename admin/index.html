@@ -189,7 +189,7 @@
     <input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
     <div class="err" id="li-err"></div>
     <button class="btn" onclick="doLogin()">Увійти</button>
-    <div class="quick"><div class="q-title">ДЕМО-АКАУНТИ (пароль: smr2026)</div><div class="grid" id="quick-grid"></div></div>
+    <div class="quick"><div class="q-title">ДЕМО-АКАУНТИ · dev</div><div class="grid" id="quick-grid"></div></div>
   </div>
 </div>
 
@@ -218,7 +218,11 @@ const ACCOUNTS={
   'moderator@smr.ua':{name:'Марія Модератор',role:'moderator'},'partner@smr.ua':{name:'Данило Партнер',role:'partnership_manager'},
   'events@smr.ua':{name:'Катерина Івенти',role:'event_manager'},'analyst@smr.ua':{name:'Андрій Аналітик',role:'analyst'},
 };
-const PASSWORD='smr2026';
+// ⚠ DEMO-ONLY клієнтська авторизація (небезпечна — обходиться у браузері).
+// Реальна авторизація адмінів = Supabase Auth + таблиця admin_users + server-side
+// перевірка ролей (Milestone 1). До того часу єдиний справжній захист — HTTP Basic
+// Auth на nginx. Цей пароль вважати демонстраційним і скомпрометованим.
+const PASSWORD = (typeof window !== 'undefined' && window.SMR_DEMO_PASSWORD) || 'demo';
 const ROLE_LABEL={super_admin:'Super Admin',editor:'Editor',moderator:'Moderator',partnership_manager:'Partnership Manager',event_manager:'Event Manager',analyst:'Analyst'};
 const PERMS={
   super_admin:['dashboard','users','organizations','articles','opportunities','events','registrations','introductions','reports','taxonomies','analytics','email','audit','settings'],

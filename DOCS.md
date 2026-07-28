@@ -53,7 +53,7 @@ workflow публікації, ревізії, preview, SEO, featured, сорт�
 - `blocked@smr.ua` — заблокований акаунт (перевірка BlockedScreen)
 - будь-який новий email — сценарій реєстрації + onboarding
 
-**Адмінпанель** (`admin/index.html`, пароль `smr2026`):
+**Адмінпанель** (`admin/index.html`, демо-логіни; пароль не публікується — задається локально, замінюється серверною авторизацією Supabase):
 `super@smr.ua` (Super Admin), `editor@smr.ua` (Editor), `moderator@smr.ua`
 (Moderator), `partner@smr.ua` (Partnership Manager), `events@smr.ua`
 (Event Manager), `analyst@smr.ua` (Analyst).

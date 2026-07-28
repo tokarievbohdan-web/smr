@@ -27,10 +27,16 @@ cd admin && python3 -m http.server 8090
 # відкрити http://localhost:8090
 ```
 
-## Демо-акаунти (пароль: `smr2026`)
+## Демо-акаунти
 
 `super@smr.ua`, `editor@smr.ua`, `moderator@smr.ua`, `partner@smr.ua`,
 `events@smr.ua`, `analyst@smr.ua`
+
+> Демо-пароль не публікується у репозиторії. За замовчуванням у коді — `demo`;
+> для власного значення задайте `window.SMR_DEMO_PASSWORD` через некомічений
+> `config.local.js` або nginx. Це **тимчасова клієнтська** автентифікація —
+> замінюється серверною (Supabase Auth + `admin_users`) у Milestone 1; поки що
+> справжній захист — HTTP Basic Auth на nginx (ротуйте пароль після демо).
 
 ## Наступні кроки
 
