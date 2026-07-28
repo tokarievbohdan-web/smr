@@ -74,8 +74,7 @@ create policy "orgs: read published" on public.organizations
     (deleted_at is null and (status = 'published' or verified))
     or owner_id = auth.uid()
     or public.is_admin()
-    or exists (select 1 from public.organization_members m
-               where m.org_id = id and m.user_id = auth.uid())
+    or public.is_org_member(id)     -- SECURITY DEFINER helper: без рекурсії RLS
   );
 drop policy if exists "orgs: owner/admin write" on public.organizations;
 create policy "orgs: owner/admin write" on public.organizations
@@ -84,14 +83,11 @@ create policy "orgs: owner/admin write" on public.organizations
 
 drop policy if exists "org_members: read" on public.organization_members;
 create policy "org_members: read" on public.organization_members
-  for select using (user_id = auth.uid() or public.is_admin()
-    or exists (select 1 from public.organizations o where o.id = org_id and o.owner_id = auth.uid()));
+  for select using (user_id = auth.uid() or public.is_admin() or public.is_org_owner(org_id));
 drop policy if exists "org_members: owner/admin write" on public.organization_members;
 create policy "org_members: owner/admin write" on public.organization_members
-  for all using (public.is_admin()
-    or exists (select 1 from public.organizations o where o.id = org_id and o.owner_id = auth.uid()))
-  with check (public.is_admin()
-    or exists (select 1 from public.organizations o where o.id = org_id and o.owner_id = auth.uid()));
+  for all using (public.is_admin() or public.is_org_owner(org_id))
+  with check (public.is_admin() or public.is_org_owner(org_id));
 
 drop policy if exists "access_req: own/admin" on public.access_requests;
 create policy "access_req: own/admin" on public.access_requests

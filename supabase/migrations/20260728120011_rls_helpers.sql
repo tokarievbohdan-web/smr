@@ -62,6 +62,25 @@ grant execute on function public.is_admin() to anon, authenticated, service_role
 grant execute on function public.has_admin_role(admin_role) to anon, authenticated, service_role;
 grant execute on function public.current_admin_role() to authenticated, service_role;
 
+-- ---------- org membership helpers (розривають рекурсію RLS) ----------
+-- orgs-політика перевіряє членство, а members-політика — власника org.
+-- Взаємне посилання таблиць у політиках → нескінченна рекурсія. Ці
+-- SECURITY DEFINER хелпери читають в обхід RLS, тож циклу немає.
+create or replace function public.is_org_member(p_org uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.organization_members m
+                 where m.org_id = p_org and m.user_id = auth.uid());
+$$;
+create or replace function public.is_org_owner(p_org uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.organizations o
+                 where o.id = p_org and o.owner_id = auth.uid());
+$$;
+revoke all on function public.is_org_member(uuid) from public;
+revoke all on function public.is_org_owner(uuid) from public;
+grant execute on function public.is_org_member(uuid) to anon, authenticated, service_role;
+grant execute on function public.is_org_owner(uuid) to anon, authenticated, service_role;
+
 -- ---------- updated_at trigger ----------
 create or replace function public.touch_updated_at()
 returns trigger language plpgsql
