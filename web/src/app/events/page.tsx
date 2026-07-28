@@ -5,22 +5,22 @@ const CHIPS = ["Усі", "Цього тижня", "Онлайн", "Офлайн"
 
 export default function EventsPage() {
   return (
-    <div className="mx-auto w-full max-w-[1240px] px-4 pb-16 pt-6 md:px-8">
+    <div className="mx-auto w-full max-w-[1280px] px-6 pb-24 pt-10 md:px-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-[26px] font-extrabold tracking-tight">Події</h1>
-          <p className="mt-1 text-[13.5px] font-medium text-dim">Форуми, воркшопи та нетворкінг спортивного бізнесу</p>
+          <h1 className="text-[34px] font-extrabold leading-none tracking-tight">Події</h1>
+          <p className="mt-3 text-[15px] font-medium text-dim">Форуми, воркшопи та нетворкінг спортивного бізнесу</p>
         </div>
-        <button className="rounded-[10px] bg-accent px-4.5 py-2.5 text-[13px] font-bold text-white">+ Створити подію</button>
+        <button className="rounded-xl bg-accent px-5 py-3 text-[13px] font-bold text-white transition hover:opacity-90">+ Створити подію</button>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="mt-8 flex flex-wrap gap-2">
         {CHIPS.map((c, i) => (
-          <span key={c} className={`rounded-full border px-3.5 py-2 text-[12.5px] font-semibold ${i === 0 ? "border-ink bg-ink text-ground" : "border-line2 bg-card text-ink"}`}>{c}</span>
+          <span key={c} className={`rounded-full px-4 py-2.5 text-[12.5px] font-semibold ${i === 0 ? "bg-ink text-ground" : "bg-panel text-dim"}`}>{c}</span>
         ))}
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-[18px] sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
         {EVENTS.map((e) => <EventCard key={e.id} e={e} />)}
       </div>
     </div>
