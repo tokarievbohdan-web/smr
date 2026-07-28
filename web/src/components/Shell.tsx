@@ -41,7 +41,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             const on = isActive(n.href);
             return (
               <Link key={n.href} href={n.href} onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-semibold ${on ? "bg-accent text-white" : "text-dim hover:bg-panel2 hover:text-ink"}`}>
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-semibold transition ${on ? "bg-white text-[#16181D] shadow-sm" : "text-dim hover:bg-panel2 hover:text-ink"}`}>
                 <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" className="shrink-0">
                   {ICONS[n.href]}
                 </svg>
