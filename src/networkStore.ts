@@ -32,10 +32,12 @@ export interface IntroTarget {
 export interface ReportRecord { id: string; targetId: string; targetName: string; reason: string; at: number }
 export interface OrgAccessRequest { id: string; orgId: string; orgName: string; role?: string; at: number }
 
-interface NetworkStore { intros: IntroRequest[]; reports: ReportRecord[]; orgAccess: OrgAccessRequest[]; seededIntros?: boolean }
+export interface ReceivedIntro { id: string; fromName: string; fromRole: string; reason: string; context: string; status: string; at: number }
+
+interface NetworkStore { intros: IntroRequest[]; received: ReceivedIntro[]; reports: ReportRecord[]; orgAccess: OrgAccessRequest[]; seededIntros?: boolean }
 
 const KEY = 'smr_network_actions_v1';
-const empty: NetworkStore = { intros: [], reports: [], orgAccess: [] };
+const empty: NetworkStore = { intros: [], received: [], reports: [], orgAccess: [] };
 
 const load = async (): Promise<NetworkStore> => {
   try { return { ...empty, ...JSON.parse((await AsyncStorage.getItem(KEY)) || '{}') }; }
@@ -95,10 +97,16 @@ export const NetworkActions = {
   async seedDemoIntros(): Promise<void> {
     const s = await load();
     if (s.seededIntros) return;
+    const now = Date.now(); const day = 86400000;
     s.intros = [...s.intros, ...demoIntros()];
+    s.received = [
+      { id: 'ri1', fromName: 'Данило Бондар', fromRole: 'Sponsorship Manager · Варшава', reason: 'Партнерство', context: 'Хочу обговорити спільні активації iGaming-бренду з клубом.', status: 'review', at: now - day * 1 },
+      { id: 'ri2', fromName: 'Марія Ткаченко', fromRole: 'Спортивний менеджмент · Київ', reason: 'Обмін досвідом', context: 'Готую дослідження ринку спонсорства, буду вдячна за коротку розмову.', status: 'sent', at: now - day * 4 },
+    ];
     s.seededIntros = true;
     await save(s);
   },
+  async listReceived(): Promise<ReceivedIntro[]> { return (await load()).received.slice().sort((a, b) => b.at - a.at); },
 
   async createIntro(payload: Omit<IntroRequest, 'id' | 'status' | 'history' | 'createdAt' | 'updatedAt'>): Promise<IntroRequest> {
     const s = await load();

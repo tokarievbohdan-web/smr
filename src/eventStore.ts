@@ -34,6 +34,7 @@ export const EventStore = {
   async listRegistrations(): Promise<Registration[]> {
     return (await load()).registrations.filter((r) => r.status === 'registered' || r.status === 'waitlist');
   },
+  async allRegistrations(): Promise<Registration[]> { return (await load()).registrations; },
   async createEvent(data: EventItem): Promise<EventItem> {
     const s = await load();
     const rec = { ...data, id: data.id || uid('ev') };

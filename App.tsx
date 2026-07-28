@@ -29,6 +29,13 @@ import EventDetailScreen from './src/screens/EventDetailScreen';
 import CreateEventScreen from './src/screens/CreateEventScreen';
 import IntroRequestScreen from './src/screens/IntroRequestScreen';
 import IntroHistoryScreen from './src/screens/IntroHistoryScreen';
+import EditProfileScreen from './src/screens/profile/EditProfileScreen';
+import SavedHubScreen from './src/screens/profile/SavedHubScreen';
+import MyOpportunitiesScreen from './src/screens/profile/MyOpportunitiesScreen';
+import MyApplicationsScreen from './src/screens/profile/MyApplicationsScreen';
+import MyEventsScreen from './src/screens/profile/MyEventsScreen';
+import MyOrganizationsScreen from './src/screens/profile/MyOrganizationsScreen';
+import SettingsScreen from './src/screens/profile/SettingsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import SavedScreen from './src/screens/SavedScreen';
@@ -82,6 +89,7 @@ function AppInner() {
   const [evtReload, setEvtReload] = useState(0);
   const [introTarget, setIntroTarget] = useState<IntroTarget | null>(null);
   const [showIntros, setShowIntros] = useState(false);
+  const [profileSub, setProfileSub] = useState<'edit' | 'saved' | 'opps' | 'apps' | 'events' | 'orgs' | 'settings' | null>(null);
   const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | 'review' | null>(null);
   const [reviewCat, setReviewCat] = useState<string | undefined>(undefined);
   const [saved, setSaved] = useState<string[]>([]);
@@ -125,7 +133,7 @@ function AppInner() {
   const openOpp = (o: OpportunityItem) => setOpp(o);
   const openEvent = (e: EventItem) => setEvt(e);
   const openIntro = (t: IntroTarget) => setIntroTarget(t);
-  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setPerson(null); setOrg(null); setOpp(null); setCreateOpp(false); setEvt(null); setCreateEvt(false); setIntroTarget(null); setShowIntros(false); setOverlay(null); };
+  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setPerson(null); setOrg(null); setOpp(null); setCreateOpp(false); setEvt(null); setCreateEvt(false); setIntroTarget(null); setShowIntros(false); setProfileSub(null); setOverlay(null); };
 
   // ── Root gate ──
   const isMain = auth.user ? (!auth.suspended && !auth.needsOnboarding) : auth.isGuest;
@@ -135,7 +143,7 @@ function AppInner() {
     { key: 'network', node: <NetworkScreen onOpenPerson={openPerson} onOpenOrg={openOrg} saved={savedNet} onToggleSave={toggleSaveNet} /> },
     { key: 'opportunities', node: <OpportunitiesScreen onOpen={openOpp} onCreate={() => setCreateOpp(true)} saved={savedOpp} onToggleSave={toggleSaveOpp} reloadKey={oppReload} /> },
     { key: 'events', node: <EventsScreen onOpen={openEvent} onCreate={() => setCreateEvt(true)} saved={savedEvt} onToggleSave={toggleSaveEvt} reloadKey={evtReload} /> },
-    { key: 'profile', node: <ProfileScreen onOpenSaved={() => setOverlay('saved')} onOpenGallery={() => setOverlay('gallery')} onOpenIntros={() => setShowIntros(true)} /> },
+    { key: 'profile', node: <ProfileScreen onOpenSub={(sub) => setProfileSub(sub)} onOpenGallery={() => setOverlay('gallery')} onOpenIntros={() => setShowIntros(true)} /> },
   ];
 
   let gate: React.ReactNode;
@@ -164,11 +172,24 @@ function AppInner() {
         {createEvt && <AnimatedScreen onClose={() => setCreateEvt(false)}>{(close) => <CreateEventScreen onBack={close} onCreated={() => { setEvtReload((n) => n + 1); close(); goTab('events'); }} />}</AnimatedScreen>}
         {introTarget && <AnimatedScreen onClose={() => setIntroTarget(null)}>{(close) => <IntroRequestScreen target={introTarget} onBack={close} onCreated={() => { close(); setShowIntros(true); }} />}</AnimatedScreen>}
         {showIntros && <AnimatedScreen onClose={() => setShowIntros(false)}>{(close) => <IntroHistoryScreen onBack={close} onOpenPerson={openPerson} onOpenOrg={openOrg} />}</AnimatedScreen>}
+        {profileSub && (
+          <AnimatedScreen onClose={() => setProfileSub(null)}>
+            {(close) => (
+              profileSub === 'edit' ? <EditProfileScreen onBack={close} />
+              : profileSub === 'saved' ? <SavedHubScreen onBack={close} saved={saved} savedNet={savedNet} savedOpp={savedOpp} savedEvt={savedEvt} onToggleSave={toggleSave} onToggleSaveNet={toggleSaveNet} onToggleSaveOpp={toggleSaveOpp} onToggleSaveEvt={toggleSaveEvt} onOpenArticle={openArticle} onOpenPerson={openPerson} onOpenOrg={openOrg} onOpenOpportunity={openOpp} onOpenEvent={openEvent} />
+              : profileSub === 'opps' ? <MyOpportunitiesScreen onBack={close} onOpen={openOpp} onCreate={() => { setProfileSub(null); setCreateOpp(true); }} />
+              : profileSub === 'apps' ? <MyApplicationsScreen onBack={close} onOpen={openOpp} />
+              : profileSub === 'events' ? <MyEventsScreen onBack={close} onOpen={openEvent} />
+              : profileSub === 'orgs' ? <MyOrganizationsScreen onBack={close} onOpen={openOrg} />
+              : <SettingsScreen onBack={close} />
+            )}
+          </AnimatedScreen>
+        )}
       </>
     );
   }
 
-  const showTabs = isMain && !article && !person && !org && !opp && !createOpp && !evt && !createEvt && !introTarget && !showIntros && !overlay;
+  const showTabs = isMain && !article && !person && !org && !opp && !createOpp && !evt && !createEvt && !introTarget && !showIntros && !profileSub && !overlay;
 
   const app = (
     <View style={styles.app}>

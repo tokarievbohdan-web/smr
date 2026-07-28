@@ -5,7 +5,7 @@ import { colors, radius, space, fonts } from '../theme';
 import { Person, PEOPLE } from '../data';
 import { OrgItem, ORGANIZATIONS, INTRO_STATUSES, introStatus } from '../shellData';
 import { useToast } from '../UIProvider';
-import { NetworkActions, IntroRequest } from '../networkStore';
+import { NetworkActions, IntroRequest, ReceivedIntro } from '../networkStore';
 import { StatusBadge, Avatar, FormInput, PrimaryCTA, EmptyState } from '../ui';
 
 const relTime = (ts: number) => {
@@ -23,10 +23,12 @@ export default function IntroHistoryScreen({ onBack, onOpenPerson, onOpenOrg }: 
 }) {
   const toast = useToast();
   const [list, setList] = useState<IntroRequest[]>([]);
+  const [received, setReceived] = useState<ReceivedIntro[]>([]);
+  const [tab, setTab] = useState<'sent' | 'received'>('sent');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [response, setResponse] = useState('');
 
-  const reload = () => NetworkActions.listIntros().then(setList);
+  const reload = () => { NetworkActions.listIntros().then(setList); NetworkActions.listReceived().then(setReceived); };
   useEffect(() => { reload(); }, []);
 
   const selected = list.find((i) => i.id === selectedId) || null;
@@ -133,21 +135,42 @@ export default function IntroHistoryScreen({ onBack, onOpenPerson, onOpenOrg }: 
         <View style={{ width: 38 }} />
       </View>
 
+      <View style={s.segment}>
+        <Text onPress={() => setTab('sent')} style={[s.seg, tab === 'sent' && s.segOn]}>Надіслані{list.length ? ` · ${list.length}` : ''}</Text>
+        <Text onPress={() => setTab('received')} style={[s.seg, tab === 'received' && s.segOn]}>Отримані{received.length ? ` · ${received.length}` : ''}</Text>
+      </View>
+
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: space(5), gap: 10 }}>
-        {list.length ? list.map((r) => {
-          const st = introStatus(r.status);
-          return (
-            <TouchableOpacity key={r.id} style={s.row} activeOpacity={0.85} onPress={() => setSelectedId(r.id)}>
-              <View style={{ flex: 1, gap: 4 }}>
-                <Text style={s.rowName}>{r.targetName}</Text>
-                <Text style={s.rowMeta}>{r.reason} · оновлено {relTime(r.updatedAt)}</Text>
-                <View style={{ flexDirection: 'row', marginTop: 2 }}><StatusBadge label={st.label} tone={st.tone} /></View>
+        {tab === 'sent' ? (
+          list.length ? list.map((r) => {
+            const st = introStatus(r.status);
+            return (
+              <TouchableOpacity key={r.id} style={s.row} activeOpacity={0.85} onPress={() => setSelectedId(r.id)}>
+                <View style={{ flex: 1, gap: 4 }}>
+                  <Text style={s.rowName}>{r.targetName}</Text>
+                  <Text style={s.rowMeta}>{r.reason} · оновлено {relTime(r.updatedAt)}</Text>
+                  <View style={{ flexDirection: 'row', marginTop: 2 }}><StatusBadge label={st.label} tone={st.tone} /></View>
+                </View>
+                {r.status === 'moreinfo' && <View style={s.attn}><Text style={s.attnText}>Дія</Text></View>}
+                <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+              </TouchableOpacity>
+            );
+          }) : <EmptyState icon="people-outline" title="Немає запитів" subtitle="Ваші запити на знайомство зʼявляться тут." />
+        ) : (
+          received.length ? received.map((r) => {
+            const st = introStatus(r.status);
+            return (
+              <View key={r.id} style={s.row}>
+                <View style={{ flex: 1, gap: 4 }}>
+                  <Text style={s.rowName}>{r.fromName}</Text>
+                  <Text style={s.rowMeta}>{r.fromRole}</Text>
+                  <Text style={s.rowMeta}>{r.reason} · {r.context}</Text>
+                  <View style={{ flexDirection: 'row', marginTop: 2 }}><StatusBadge label={st.label} tone={st.tone} /></View>
+                </View>
               </View>
-              {r.status === 'moreinfo' && <View style={s.attn}><Text style={s.attnText}>Дія</Text></View>}
-              <Ionicons name="chevron-forward" size={18} color={colors.muted} />
-            </TouchableOpacity>
-          );
-        }) : <EmptyState icon="people-outline" title="Немає запитів" subtitle="Запити на знайомство зі спеціалістами й організаціями зʼявляться тут." />}
+            );
+          }) : <EmptyState icon="mail-open-outline" title="Немає отриманих запитів" subtitle="Запити на знайомство з вами зʼявляться тут." />
+        )}
       </ScrollView>
     </View>
   );
@@ -161,6 +184,9 @@ const s = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space(5), paddingTop: space(2), paddingBottom: space(3), borderBottomWidth: 1, borderBottomColor: colors.line },
   hbtn: { width: 38, height: 38, borderRadius: 12, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   hTitle: { fontFamily: fonts.extra, color: colors.ink, fontSize: 17, letterSpacing: -0.3 },
+  segment: { flexDirection: 'row', gap: 16, paddingHorizontal: space(5), paddingTop: space(3) },
+  seg: { fontFamily: fonts.semi, color: colors.muted, fontSize: 14, paddingVertical: 6, borderBottomWidth: 2, borderBottomColor: 'transparent' },
+  segOn: { color: colors.ink, fontFamily: fonts.bold, borderBottomColor: colors.accent },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: colors.line, borderRadius: radius.xl, padding: 14 },
   rowName: { fontFamily: fonts.bold, color: colors.ink, fontSize: 15 },
   rowMeta: { fontFamily: fonts.med, color: colors.dim, fontSize: 12.5 },

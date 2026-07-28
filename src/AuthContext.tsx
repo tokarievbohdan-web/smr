@@ -9,17 +9,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  */
 
 export type AccountStatus = 'active' | 'suspended';
-export interface Profile { firstName?: string; lastName?: string; position?: string; org?: string; city?: string; bio?: string; photo?: string }
+export interface Profile { firstName?: string; lastName?: string; position?: string; org?: string; city?: string; bio?: string; photo?: string; portfolio?: string }
+export interface Settings { language?: string; privacyPublic?: boolean; contactsPublic?: boolean; emailNotifications?: boolean }
 export interface UserRecord {
   email: string;
   status: AccountStatus;
   emailConfirmed: boolean;
+  verified?: boolean;
   userType?: string;
   sports?: string[];
   directions?: string[];
   contentCategories?: string[];
   goals?: string[];
+  availability?: string[];
   profile?: Profile;
+  settings?: Settings;
   onboardingStep: number; // 0 = не почато … 4 = завершено
   createdAt: number;
 }
@@ -99,6 +103,11 @@ export const AuthService = {
     return u;
   },
   async signOut() { await AsyncStorage.removeItem(SESSION); },
+  async remove(email: string) {
+    const users = await loadUsers();
+    delete users[norm(email)];
+    await saveUsers(users);
+  },
 };
 
 // ── Context ───────────────────────────────────────────
@@ -115,6 +124,8 @@ type Ctx = {
   continueAsGuest: () => void;
   signOut: () => Promise<void>;
   saveOnboarding: (partial: Partial<UserRecord>) => Promise<void>;
+  updateProfile: (partial: Partial<UserRecord> & { profile?: Partial<Profile>; settings?: Partial<Settings> }) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   promptSignIn: () => void;
   dismissPrompt: () => void;
 };
@@ -156,6 +167,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const u = await AuthService.patch(user.email, partial);
     setUser(u);
   }, [user]);
+  const updateProfile = useCallback(async (partial: Partial<UserRecord> & { profile?: Partial<Profile>; settings?: Partial<Settings> }) => {
+    if (!user) return;
+    const merged: Partial<UserRecord> = {
+      ...partial,
+      profile: partial.profile ? { ...user.profile, ...partial.profile } : user.profile,
+      settings: partial.settings ? { ...user.settings, ...partial.settings } : user.settings,
+    };
+    const u = await AuthService.patch(user.email, merged);
+    setUser(u);
+  }, [user]);
+  const deleteAccount = useCallback(async () => {
+    if (user) await AuthService.remove(user.email);
+    await AuthService.signOut();
+    setUser(null); setGuest(false);
+  }, [user]);
   const promptSignIn = useCallback(() => setAuthPrompt(true), []);
   const dismissPrompt = useCallback(() => setAuthPrompt(false), []);
 
@@ -165,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     suspended: user?.status === 'suspended',
     needsOnboarding: !!user && user.status === 'active' && user.onboardingStep < ONBOARDING_DONE,
     authPrompt,
-    requestCode, verifyCode, continueAsGuest, signOut, saveOnboarding, promptSignIn, dismissPrompt,
+    requestCode, verifyCode, continueAsGuest, signOut, saveOnboarding, updateProfile, deleteAccount, promptSignIn, dismissPrompt,
   };
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
