@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { NAV } from "@/lib/data";
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -14,8 +14,14 @@ const ICONS: Record<string, React.ReactNode> = {
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
   const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
+  };
 
   return (
     <div className="grid min-h-screen grid-cols-1 md:grid-cols-[248px_minmax(0,1fr)]">
@@ -61,11 +67,12 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <button className="grid h-11 w-11 place-items-center rounded-xl bg-panel md:hidden" onClick={() => setOpen((v) => !v)} aria-label="Меню">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <div className="flex h-11 max-w-[540px] flex-1 items-center gap-2.5 rounded-xl bg-panel px-4 text-[13.5px] font-medium text-muted">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" className="shrink-0"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-            <span className="truncate">Пошук: матеріали, люди, організації…</span>
-            <kbd className="ml-auto hidden rounded-md bg-panel2 px-1.5 py-0.5 text-[11px] font-semibold sm:block">⌘K</kbd>
-          </div>
+          <form onSubmit={submitSearch} className="flex h-11 max-w-[540px] flex-1 items-center gap-2.5 rounded-xl bg-panel px-4 text-[13.5px] focus-within:ring-2 focus-within:ring-accent/40">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" className="shrink-0 text-muted"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Пошук: матеріали, люди, організації…"
+              className="min-w-0 flex-1 bg-transparent font-medium text-ink outline-none placeholder:text-muted" aria-label="Пошук" />
+            <kbd className="hidden shrink-0 rounded-md bg-panel2 px-1.5 py-0.5 text-[11px] font-semibold text-muted sm:block">↵</kbd>
+          </form>
           <div className="ml-auto flex items-center gap-2.5">
             <button className="relative grid h-11 w-11 place-items-center rounded-xl bg-panel" aria-label="Сповіщення">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6" /><path d="M10 20a2 2 0 0 0 4 0" /></svg>
@@ -83,11 +90,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
 function ThemeToggle() {
   const [dark, setDark] = useState<boolean | null>(null);
+  useEffect(() => {
+    const root = document.documentElement;
+    const cur = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    setDark(cur === "dark");
+  }, []);
   const toggle = () => {
     const root = document.documentElement;
     const cur = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     const next = cur === "dark" ? "light" : "dark";
     root.setAttribute("data-theme", next);
+    try { localStorage.setItem("smr-theme", next); } catch {}
     setDark(next === "dark");
   };
   return (

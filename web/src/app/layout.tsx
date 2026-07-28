@@ -18,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="uk" className={`${manrope.variable} h-full`}>
       <body className="min-h-full">
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('smr-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}` }} />
         <Shell>{children}</Shell>
       </body>
     </html>

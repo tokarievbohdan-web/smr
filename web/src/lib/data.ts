@@ -21,7 +21,7 @@ export interface Opportunity {
 }
 export interface EventItem {
   id: string; day: string; month: string; title: string; org: string; format: string;
-  cost: string; seats: string; city: string; desc: string;
+  cost: string; seats: string; city: string; desc: string; thisWeek?: boolean;
 }
 
 export const ARTICLES: Article[] = [
@@ -67,8 +67,8 @@ export const OPPS: Opportunity[] = [
 export const findOpp = (id: string) => OPPS.find((o) => o.id === id);
 
 export const EVENTS: EventItem[] = [
-  { id: "e1", day: "12", month: "вер", title: "Sport Business Forum Ukraine 2026", org: "Sport Market Review · Київ", format: "Офлайн", cost: "₴2 500", seats: "58 місць", city: "Київ", desc: "Головна щорічна подія спортивного бізнесу України: панелі, кейси, нетворкінг." },
-  { id: "e4", day: "18", month: "вер", title: "Sport Business Networking Night", org: "Sport Market Review · Київ", format: "Офлайн", cost: "₴500", seats: "12 місць", city: "Київ", desc: "Вечір знайомств для професіоналів спортивної індустрії." },
+  { id: "e1", day: "12", month: "вер", title: "Sport Business Forum Ukraine 2026", org: "Sport Market Review · Київ", format: "Офлайн", cost: "₴2 500", seats: "58 місць", city: "Київ", thisWeek: true, desc: "Головна щорічна подія спортивного бізнесу України: панелі, кейси, нетворкінг." },
+  { id: "e4", day: "18", month: "вер", title: "Sport Business Networking Night", org: "Sport Market Review · Київ", format: "Офлайн", cost: "₴500", seats: "12 місць", city: "Київ", thisWeek: true, desc: "Вечір знайомств для професіоналів спортивної індустрії." },
   { id: "e2", day: "24", month: "вер", title: "Спонсорство у спорті: практикум для клубів", org: "Agency 8848 · Онлайн", format: "Онлайн", cost: "Безкоштовно", seats: "немає", city: "Онлайн", desc: "Практичний вебінар про побудову спонсорських пакетів." },
   { id: "e3", day: "03", month: "жов", title: "Медіаправа та OTT: круглий стіл", org: "MEGOGO Sport · Львів", format: "Гібрид", cost: "₴900", seats: "34 місця", city: "Львів", desc: "Дискусія про монетизацію медіаправ і власні OTT-платформи." },
   { id: "e5", day: "25", month: "жов", title: "Sport Marketing Awards 2026", org: "Sport Market Review · Київ", format: "Офлайн", cost: "від ₴1 800", seats: "140 місць", city: "Київ", desc: "Щорічна премія за найкращі кейси спортивного маркетингу." },
