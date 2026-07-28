@@ -45,3 +45,6 @@ yarn-error.*
 .env.production
 .env.staging
 .env.local
+
+# admin local config (містить локальні ключі/пароль shell-а)
+admin/config.local.js
