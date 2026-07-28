@@ -94,6 +94,50 @@ pm2 restart smr-web
 
 ---
 
+## Адмінпанель на піддомені `admin.sportmarket.review`
+
+Адмінка (`admin/index.html`) — **статична** (Node не потрібен), віддається nginx
+з окремого server-блоку на піддомені. A-запис `admin` → IP VPS має існувати.
+
+```bash
+# 1. скопіювати статику у веб-корінь (репозиторій уже клоновано в /root/smr)
+mkdir -p /var/www/smr-admin
+cp -r /root/smr/admin/* /var/www/smr-admin/
+
+# 2. nginx-блок для піддомену
+cat >/etc/nginx/sites-available/smr-admin <<'EOF'
+server {
+  listen 80;
+  server_name admin.sportmarket.review;
+  root /var/www/smr-admin;
+  index index.html;
+  location / { try_files $uri $uri/ /index.html; }
+}
+EOF
+ln -sf /etc/nginx/sites-available/smr-admin /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+
+# 3. SSL для піддомену
+certbot --nginx -d admin.sportmarket.review --non-interactive --agree-tos -m tokariev.bohdan@gmail.com
+```
+
+Оновлення після змін: `cp -r /root/smr/admin/* /var/www/smr-admin/` (після `git pull`).
+
+> **Безпека.** Поточна адмінка має **клієнтську демо-автентифікацію** (пароль
+> `smr2026`) — вона НЕ захищає дані по-справжньому (обходиться в браузері). Це
+> прийнятно лише для демо. Оскільки піддомен публічний, поставте додатковий
+> шлюз HTTP Basic Auth на рівні nginx, поки не зробимо серверну авторизацію
+> адмінів через Supabase:
+> ```bash
+> apt install -y apache2-utils
+> htpasswd -c /etc/nginx/.htpasswd smradmin        # задасте пароль
+> # у server-блоці smr-admin додати в location /:
+> #   auth_basic "SMR Admin"; auth_basic_user_file /etc/nginx/.htpasswd;
+> nginx -t && systemctl reload nginx
+> ```
+
+---
+
 ## Що знадобиться від вас
 - Доступ по SSH до VPS (root або sudo-користувач) та IP.
 - Домен, делегований на DNS, де можна створити A-записи.
