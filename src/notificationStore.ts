@@ -53,6 +53,8 @@ function demo(): Notification[] {
   const now = Date.now(); const h = 3600000; const d = 86400000;
   return [
     { id: 'n1', type: 'new_application', title: 'Новий відгук на «Head of Sponsorship»', body: 'Данило Бондар надіслав відгук.', entityType: 'opportunity', entityId: 'op1', read: false, at: now - h * 2 },
+    { id: 'n9', type: 'new_application', title: 'Новий відгук на «Head of Sponsorship»', body: 'Марія Ткаченко надіслала відгук.', entityType: 'opportunity', entityId: 'op1', read: false, at: now - h * 3 },
+    { id: 'n10', type: 'new_application', title: 'Новий відгук на «Head of Sponsorship»', body: 'Андрій Мельник надіслав відгук.', entityType: 'opportunity', entityId: 'op1', read: false, at: now - h * 4 },
     { id: 'n2', type: 'intro_status', title: 'Потрібно більше інформації', body: 'Команда SMR попросила уточнення щодо знайомства з УАФ.', entityType: 'intro', read: false, at: now - h * 5 },
     { id: 'n3', type: 'event_registration', title: 'Реєстрацію підтверджено', body: 'Sport Business Forum Ukraine 2026 — 12 вересня.', entityType: 'event', entityId: 'e1', read: false, at: now - h * 8 },
     { id: 'n4', type: 'opportunity_approved', title: 'Можливість опубліковано', body: '«Спонсорський пакет жіночої команди» пройшла модерацію.', entityType: 'opportunity', entityId: 'op5', read: true, at: now - d * 1 },

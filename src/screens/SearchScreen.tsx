@@ -12,6 +12,7 @@ const RECENT_KEY = 'smr_search_recent_v1';
 const POPULAR = ['Спонсорство', 'Медіаправа', 'Неймінг', 'iGaming', 'Партнерство'];
 const SUGGESTED = ['Кейси спонсорства', 'Вакансії у клубах', 'Події цього тижня', 'Верифіковані організації'];
 const GROUP_LIMIT = 4;
+const PAGE = 8;
 
 type Filter = 'all' | 'articles' | 'people' | 'orgs' | 'opps' | 'events';
 const FILTERS: { key: Filter; label: string }[] = [
@@ -34,9 +35,11 @@ export default function SearchScreen({
   const [debounced, setDebounced] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [recent, setRecent] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
   const timer = useRef<any>(null);
 
   useEffect(() => { AsyncStorage.getItem(RECENT_KEY).then((r) => { if (r) try { setRecent(JSON.parse(r)); } catch {} }); }, []);
+  useEffect(() => { setPage(1); }, [debounced, filter]);
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setDebounced(query.trim().toLowerCase()), 250);
@@ -62,7 +65,15 @@ export default function SearchScreen({
   const counts = { articles: res.articles.length, people: res.people.length, orgs: res.orgs.length, opps: res.opps.length, events: res.events.length };
   const total = counts.articles + counts.people + counts.orgs + counts.opps + counts.events;
   const show = (k: Filter) => filter === 'all' || filter === k;
-  const limit = (arr: any[]) => (filter === 'all' ? arr.slice(0, GROUP_LIMIT) : arr);
+  const limit = (arr: any[]) => (filter === 'all' ? arr.slice(0, GROUP_LIMIT) : arr.slice(0, page * PAGE));
+  // Кількість елементів у поточному одно-типовому списку (для пагінації / infinite scroll)
+  const activeLen = filter === 'all' ? 0 : (counts as any)[filter] as number;
+  const hasMore = filter !== 'all' && activeLen > page * PAGE;
+  const onScroll = (e: any) => {
+    if (!hasMore) return;
+    const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 240) setPage((p) => p + 1);
+  };
   const commit = () => pushRecent(query);
 
   const openA = (a: Article) => { commit(); onOpenArticle(a); };
@@ -99,7 +110,7 @@ export default function SearchScreen({
         </View>
       )}
 
-      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: space(5), paddingBottom: space(8), gap: 18 }}>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingHorizontal: space(5), paddingBottom: space(8), gap: 18 }}>
         {q.length === 0 ? (
           <>
             {recent.length > 0 && (
@@ -175,6 +186,11 @@ export default function SearchScreen({
                 ))}
               </Group>
             )}
+            {filter !== 'all' && activeLen > 0 && (
+              hasMore
+                ? <TouchableOpacity style={styles.more} onPress={() => setPage((p) => p + 1)} activeOpacity={0.8}><Text style={styles.moreText}>Показати ще ({activeLen - page * PAGE})</Text></TouchableOpacity>
+                : <Text style={styles.end}>Показано всі · {activeLen}</Text>
+            )}
           </>
         )}
       </ScrollView>
@@ -219,4 +235,7 @@ const styles = StyleSheet.create({
   orgLogo: { width: 44, height: 44, borderRadius: radius.md, backgroundColor: colors.chipBg, alignItems: 'center', justifyContent: 'center' },
   pName: { fontFamily: fonts.bold, color: colors.ink, fontSize: 13.5 },
   pRole: { fontFamily: fonts.semi, color: colors.muted, fontSize: 11.5 },
+  more: { borderWidth: 1, borderColor: colors.line, borderRadius: radius.lg, paddingVertical: 13, alignItems: 'center' },
+  moreText: { fontFamily: fonts.bold, color: colors.accent, fontSize: 13.5 },
+  end: { fontFamily: fonts.semi, color: colors.muted, fontSize: 12.5, textAlign: 'center', paddingVertical: space(2) },
 });

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, space, fonts } from '../theme';
 import { useSheet, useToast } from '../UIProvider';
-import { Notifications, Notification, NOTIF_META, EntityType } from '../notificationStore';
+import { Notifications, Notification, NotifType, NOTIF_META, EntityType } from '../notificationStore';
 import { AppHeader, EmptyState } from '../ui';
 
 const relTime = (ts: number) => {
@@ -21,9 +21,11 @@ export default function NotificationsScreen({ onBack, onDeepLink }: {
   const sheet = useSheet();
   const toast = useToast();
   const [items, setItems] = useState<Notification[]>([]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const reload = () => Notifications.list().then(setItems);
   useEffect(() => { reload(); }, []);
+  const toggleGroup = (key: string) => setExpanded((e) => ({ ...e, [key]: !e[key] }));
 
   const unread = items.filter((i) => !i.read).length;
   const buckets = useMemo(() => {
@@ -57,6 +59,35 @@ export default function NotificationsScreen({ onBack, onDeepLink }: {
     );
   };
 
+  // Групування схожих (однотипних) сповіщень у межах дня
+  const renderBucket = (list: Notification[], bucketKey: string) => {
+    const order: NotifType[] = [];
+    const byType = new Map<NotifType, Notification[]>();
+    list.forEach((n) => { if (!byType.has(n.type)) { byType.set(n.type, []); order.push(n.type); } byType.get(n.type)!.push(n); });
+    return order.map((type) => {
+      const group = byType.get(type)!;
+      if (group.length < 2) return renderItem(group[0]);
+      const key = bucketKey + ':' + type;
+      const meta = NOTIF_META[type];
+      const unread = group.filter((g) => !g.read).length;
+      const open = expanded[key];
+      return (
+        <View key={key} style={{ gap: 10 }}>
+          <TouchableOpacity style={[s.row, unread > 0 && s.unread]} activeOpacity={0.85} onPress={() => toggleGroup(key)}>
+            <View style={[s.icon, unread > 0 && { backgroundColor: colors.accentSoft }]}><Ionicons name={meta.icon as any} size={17} color={unread > 0 ? colors.accent : colors.dim} /></View>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={s.title}>{group.length} × {meta.label}</Text>
+              <Text style={s.body} numberOfLines={1}>{group[0].title}</Text>
+              <Text style={s.meta}>{unread ? `${unread} нових · ` : ''}натисніть, щоб {open ? 'згорнути' : 'розгорнути'}</Text>
+            </View>
+            <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={16} color={colors.muted} />
+          </TouchableOpacity>
+          {open && <View style={{ gap: 10, paddingLeft: 12 }}>{group.map(renderItem)}</View>}
+        </View>
+      );
+    });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <AppHeader title="Сповіщення" onBack={onBack} right={
@@ -73,8 +104,8 @@ export default function NotificationsScreen({ onBack, onDeepLink }: {
           <View style={{ marginTop: space(6) }}><EmptyState icon="notifications-outline" title="Немає сповіщень" subtitle="Тут зʼявляться статуси заявок, знайомств і подій." /></View>
         ) : (
           <>
-            {buckets.today.length > 0 && <><Text style={s.section}>СЬОГОДНІ</Text>{buckets.today.map(renderItem)}</>}
-            {buckets.earlier.length > 0 && <><Text style={[s.section, { marginTop: space(2) }]}>РАНІШЕ</Text>{buckets.earlier.map(renderItem)}</>}
+            {buckets.today.length > 0 && <><Text style={s.section}>СЬОГОДНІ</Text>{renderBucket(buckets.today, 'today')}</>}
+            {buckets.earlier.length > 0 && <><Text style={[s.section, { marginTop: space(2) }]}>РАНІШЕ</Text>{renderBucket(buckets.earlier, 'earlier')}</>}
           </>
         )}
       </ScrollView>
