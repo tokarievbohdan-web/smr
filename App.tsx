@@ -42,7 +42,6 @@ import SettingsScreen from './src/screens/profile/SettingsScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SearchScreen from './src/screens/SearchScreen';
-import SavedScreen from './src/screens/SavedScreen';
 import GalleryScreen from './src/screens/GalleryScreen';
 import AuthFlow from './src/screens/auth/AuthFlow';
 import BlockedScreen from './src/screens/auth/BlockedScreen';
@@ -96,7 +95,7 @@ function AppInner() {
   const [profileSub, setProfileSub] = useState<'edit' | 'saved' | 'opps' | 'apps' | 'events' | 'orgs' | 'settings' | null>(null);
   const [showNotifs, setShowNotifs] = useState(false);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
-  const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | 'review' | null>(null);
+  const [overlay, setOverlay] = useState<'search' | 'gallery' | 'review' | null>(null);
   const [reviewCat, setReviewCat] = useState<string | undefined>(undefined);
   const [saved, setSaved] = useState<string[]>([]);
   const [savedNet, setSavedNet] = useState<string[]>([]);
@@ -179,7 +178,6 @@ function AppInner() {
           <View key={t.key} style={{ flex: 1, display: tab === t.key ? 'flex' : 'none' }}>{t.node}</View>
         ))}
         {overlay === 'search' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SearchScreen onCancel={close} onOpenArticle={openArticle} onOpenPerson={openPerson} onOpenOrg={openOrg} onOpenOpportunity={openOpp} onOpenEvent={openEvent} />}</AnimatedScreen>}
-        {overlay === 'saved' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}</AnimatedScreen>}
         {overlay === 'gallery' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <GalleryScreen onBack={close} />}</AnimatedScreen>}
         {overlay === 'review' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <ReviewFeedScreen onBack={close} onOpen={openArticle} saved={saved} onToggleSave={toggleSave} initialCategory={reviewCat} />}</AnimatedScreen>}
         {article && <AnimatedScreen onClose={() => setArticle(null)}>{(close) => <ArticleScreen item={article} onBack={close} saved={saved.includes(article.id)} onToggleSave={() => toggleSave(article.id)} onOpen={openArticle} onGoTab={goTab} onOpenPerson={openPerson} onOpenOrg={openOrg} onOpenOpportunity={openOpp} onOpenEvent={openEvent} />}</AnimatedScreen>}
