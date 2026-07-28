@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 type TabKey = 'review' | 'network' | 'opportunities' | 'events' | 'profile';
 
 export default function HomeScreen({
-  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave, onOpenPerson, onOpenOrg, onOpenOpportunity, onOpenEvent,
+  onOpen, onOpenSearch, onGoTab, onOpenReviewFeed, saved, onToggleSave, onOpenPerson, onOpenOrg, onOpenOpportunity, onOpenEvent, onOpenNotifications, unreadNotifs,
 }: {
   onOpen: (a: Article) => void;
   onOpenSearch: () => void;
@@ -27,6 +27,8 @@ export default function HomeScreen({
   onOpenOrg: (o: OrgItem) => void;
   onOpenOpportunity: (o: OpportunityItem) => void;
   onOpenEvent: (e: EventItem) => void;
+  onOpenNotifications: () => void;
+  unreadNotifs: number;
 }) {
   const { articles, people, categories, loading } = useContent();
   const { user } = useAuth();
@@ -143,7 +145,10 @@ export default function HomeScreen({
         <Logo />
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity style={s.iconBtn} onPress={onOpenSearch}><Ionicons name="search-outline" size={18} color={colors.ink} /></TouchableOpacity>
-          <TouchableOpacity style={s.iconBtn}><Ionicons name="notifications-outline" size={18} color={colors.ink} /><View style={s.dot} /></TouchableOpacity>
+          <TouchableOpacity style={s.iconBtn} onPress={onOpenNotifications}>
+            <Ionicons name="notifications-outline" size={18} color={colors.ink} />
+            {unreadNotifs > 0 && <View style={s.notifBadge}><Text style={s.notifBadgeText}>{unreadNotifs > 9 ? '9+' : unreadNotifs}</Text></View>}
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView contentContainerStyle={{ padding: space(5), paddingTop: space(2), gap: space(7) }} showsVerticalScrollIndicator={false}>
@@ -157,6 +162,8 @@ const s = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space(5), paddingTop: space(2), paddingBottom: space(3) },
   iconBtn: { width: 38, height: 38, borderRadius: 12, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   dot: { position: 'absolute', top: 8, right: 9, width: 7, height: 7, borderRadius: 4, backgroundColor: colors.accent, borderWidth: 1.5, borderColor: colors.bg },
+  notifBadge: { position: 'absolute', top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3, borderWidth: 1.5, borderColor: colors.bg },
+  notifBadgeText: { fontFamily: fonts.bold, color: '#fff', fontSize: 9 },
   headRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   h1: { fontFamily: fonts.extra, color: colors.ink, fontSize: 20, letterSpacing: -0.4 },
   date: { fontFamily: fonts.semi, color: colors.accent, fontSize: 12 },

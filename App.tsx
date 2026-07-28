@@ -11,6 +11,9 @@ import { colors, space, fonts } from './src/theme';
 import { Article, Person } from './src/data';
 import { OrgItem, OpportunityItem, EventItem } from './src/shellData';
 import { NetworkActions, IntroTarget } from './src/networkStore';
+import { Notifications, EntityType } from './src/notificationStore';
+import { OPPORTUNITIES, EVENTS } from './src/shellData';
+import { findArticle } from './src/data';
 import { ContentProvider } from './src/ContentContext';
 import { UIProvider } from './src/UIProvider';
 import { AuthProvider, useAuth } from './src/AuthContext';
@@ -36,6 +39,7 @@ import MyApplicationsScreen from './src/screens/profile/MyApplicationsScreen';
 import MyEventsScreen from './src/screens/profile/MyEventsScreen';
 import MyOrganizationsScreen from './src/screens/profile/MyOrganizationsScreen';
 import SettingsScreen from './src/screens/profile/SettingsScreen';
+import NotificationsScreen from './src/screens/NotificationsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import SavedScreen from './src/screens/SavedScreen';
@@ -90,6 +94,8 @@ function AppInner() {
   const [introTarget, setIntroTarget] = useState<IntroTarget | null>(null);
   const [showIntros, setShowIntros] = useState(false);
   const [profileSub, setProfileSub] = useState<'edit' | 'saved' | 'opps' | 'apps' | 'events' | 'orgs' | 'settings' | null>(null);
+  const [showNotifs, setShowNotifs] = useState(false);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
   const [overlay, setOverlay] = useState<'search' | 'saved' | 'gallery' | 'review' | null>(null);
   const [reviewCat, setReviewCat] = useState<string | undefined>(undefined);
   const [saved, setSaved] = useState<string[]>([]);
@@ -111,9 +117,12 @@ function AppInner() {
       try { const rawO = await AsyncStorage.getItem(SAVED_OPP_KEY); if (rawO) setSavedOpp(JSON.parse(rawO)); } catch {}
       try { const rawE = await AsyncStorage.getItem(SAVED_EVT_KEY); if (rawE) setSavedEvt(JSON.parse(rawE)); } catch {}
       NetworkActions.seedDemoIntros().catch(() => {});
+      await Notifications.seed().catch(() => {});
+      Notifications.unreadCount().then(setUnreadNotifs).catch(() => {});
       setSavedHydrated(true);
     })();
   }, []);
+  const refreshUnread = () => Notifications.unreadCount().then(setUnreadNotifs).catch(() => {});
   useEffect(() => { if (savedHydrated) AsyncStorage.setItem(SAVED_KEY, JSON.stringify(saved)).catch(() => {}); }, [saved, savedHydrated]);
   useEffect(() => { if (savedHydrated) AsyncStorage.setItem(SAVED_NET_KEY, JSON.stringify(savedNet)).catch(() => {}); }, [savedNet, savedHydrated]);
   useEffect(() => { if (savedHydrated) AsyncStorage.setItem(SAVED_OPP_KEY, JSON.stringify(savedOpp)).catch(() => {}); }, [savedOpp, savedHydrated]);
@@ -133,13 +142,23 @@ function AppInner() {
   const openOpp = (o: OpportunityItem) => setOpp(o);
   const openEvent = (e: EventItem) => setEvt(e);
   const openIntro = (t: IntroTarget) => setIntroTarget(t);
-  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setPerson(null); setOrg(null); setOpp(null); setCreateOpp(false); setEvt(null); setCreateEvt(false); setIntroTarget(null); setShowIntros(false); setProfileSub(null); setOverlay(null); };
+  const openNotifications = () => setShowNotifs(true);
+  const deepLink = (type: EntityType, id?: string): boolean => {
+    setShowNotifs(false);
+    refreshUnread();
+    if (type === 'opportunity' && id) { const o = OPPORTUNITIES.find((x) => x.id === id); if (o) { openOpp(o); return true; } }
+    if (type === 'event' && id) { const e = EVENTS.find((x) => x.id === id); if (e) { openEvent(e); return true; } }
+    if (type === 'article' && id) { const a = findArticle(id); if (a) { openArticle(a); return true; } }
+    if (type === 'intro') { setShowIntros(true); return true; }
+    return false;
+  };
+  const goTab = (k: TabKey) => { setTab(k); setArticle(null); setPerson(null); setOrg(null); setOpp(null); setCreateOpp(false); setEvt(null); setCreateEvt(false); setIntroTarget(null); setShowIntros(false); setProfileSub(null); setShowNotifs(false); setOverlay(null); };
 
   // ── Root gate ──
   const isMain = auth.user ? (!auth.suspended && !auth.needsOnboarding) : auth.isGuest;
 
   const tabScreens: { key: TabKey; node: React.ReactNode }[] = [
-    { key: 'review', node: <HomeScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoTab={goTab} onOpenReviewFeed={(cat) => { setReviewCat(cat); setOverlay('review'); }} saved={saved} onToggleSave={toggleSave} onOpenPerson={openPerson} onOpenOrg={openOrg} onOpenOpportunity={openOpp} onOpenEvent={openEvent} /> },
+    { key: 'review', node: <HomeScreen onOpen={openArticle} onOpenSearch={() => setOverlay('search')} onGoTab={goTab} onOpenReviewFeed={(cat) => { setReviewCat(cat); setOverlay('review'); }} saved={saved} onToggleSave={toggleSave} onOpenPerson={openPerson} onOpenOrg={openOrg} onOpenOpportunity={openOpp} onOpenEvent={openEvent} onOpenNotifications={openNotifications} unreadNotifs={unreadNotifs} /> },
     { key: 'network', node: <NetworkScreen onOpenPerson={openPerson} onOpenOrg={openOrg} saved={savedNet} onToggleSave={toggleSaveNet} /> },
     { key: 'opportunities', node: <OpportunitiesScreen onOpen={openOpp} onCreate={() => setCreateOpp(true)} saved={savedOpp} onToggleSave={toggleSaveOpp} reloadKey={oppReload} /> },
     { key: 'events', node: <EventsScreen onOpen={openEvent} onCreate={() => setCreateEvt(true)} saved={savedEvt} onToggleSave={toggleSaveEvt} reloadKey={evtReload} /> },
@@ -159,7 +178,7 @@ function AppInner() {
         {tabScreens.map((t) => (
           <View key={t.key} style={{ flex: 1, display: tab === t.key ? 'flex' : 'none' }}>{t.node}</View>
         ))}
-        {overlay === 'search' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SearchScreen onCancel={close} onOpen={openArticle} />}</AnimatedScreen>}
+        {overlay === 'search' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SearchScreen onCancel={close} onOpenArticle={openArticle} onOpenPerson={openPerson} onOpenOrg={openOrg} onOpenOpportunity={openOpp} onOpenEvent={openEvent} />}</AnimatedScreen>}
         {overlay === 'saved' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <SavedScreen saved={saved} onBack={close} onOpen={openArticle} onToggleSave={toggleSave} />}</AnimatedScreen>}
         {overlay === 'gallery' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <GalleryScreen onBack={close} />}</AnimatedScreen>}
         {overlay === 'review' && <AnimatedScreen onClose={() => setOverlay(null)}>{(close) => <ReviewFeedScreen onBack={close} onOpen={openArticle} saved={saved} onToggleSave={toggleSave} initialCategory={reviewCat} />}</AnimatedScreen>}
@@ -172,6 +191,7 @@ function AppInner() {
         {createEvt && <AnimatedScreen onClose={() => setCreateEvt(false)}>{(close) => <CreateEventScreen onBack={close} onCreated={() => { setEvtReload((n) => n + 1); close(); goTab('events'); }} />}</AnimatedScreen>}
         {introTarget && <AnimatedScreen onClose={() => setIntroTarget(null)}>{(close) => <IntroRequestScreen target={introTarget} onBack={close} onCreated={() => { close(); setShowIntros(true); }} />}</AnimatedScreen>}
         {showIntros && <AnimatedScreen onClose={() => setShowIntros(false)}>{(close) => <IntroHistoryScreen onBack={close} onOpenPerson={openPerson} onOpenOrg={openOrg} />}</AnimatedScreen>}
+        {showNotifs && <AnimatedScreen onClose={() => { setShowNotifs(false); refreshUnread(); }}>{(close) => <NotificationsScreen onBack={() => { close(); refreshUnread(); }} onDeepLink={deepLink} />}</AnimatedScreen>}
         {profileSub && (
           <AnimatedScreen onClose={() => setProfileSub(null)}>
             {(close) => (
@@ -189,7 +209,7 @@ function AppInner() {
     );
   }
 
-  const showTabs = isMain && !article && !person && !org && !opp && !createOpp && !evt && !createEvt && !introTarget && !showIntros && !profileSub && !overlay;
+  const showTabs = isMain && !article && !person && !org && !opp && !createOpp && !evt && !createEvt && !introTarget && !showIntros && !profileSub && !showNotifs && !overlay;
 
   const app = (
     <View style={styles.app}>
