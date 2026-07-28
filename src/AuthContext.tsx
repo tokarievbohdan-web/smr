@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isSupabaseConfigured } from './supabase';
+import { SupabaseAuthService } from './SupabaseAuthService';
 
 /**
  * Auth-шар Sport Market Review.
@@ -134,6 +136,9 @@ const AuthCtx = createContext<Ctx>(null as any);
 export const useAuth = () => useContext(AuthCtx);
 export const ONBOARDING_STEPS = ONBOARDING_DONE;
 
+// Вибір бекенду: Supabase (якщо задані ключі) або локальний AuthService (fallback).
+const Backend = isSupabaseConfigured ? SupabaseAuthService : AuthService;
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserRecord | null>(null);
@@ -142,17 +147,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      await seed();
-      const u = await AuthService.currentUser();
+      if (!isSupabaseConfigured) await seed();
+      const u = await Backend.currentUser();
       setUser(u);
       setLoading(false);
     })();
   }, []);
 
-  const requestCode = useCallback((email: string) => AuthService.requestCode(email), []);
+  const requestCode = useCallback((email: string) => Backend.requestCode(email), []);
 
   const verifyCode = useCallback(async (email: string, code: string) => {
-    const r = await AuthService.verifyCode(email, code);
+    const r = await Backend.verifyCode(email, code);
     if (!r.ok) return { ok: false, error: r.error };
     setUser(r.user!);
     setGuest(false);
@@ -161,10 +166,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const continueAsGuest = useCallback(() => { setGuest(true); setAuthPrompt(false); }, []);
-  const signOut = useCallback(async () => { await AuthService.signOut(); setUser(null); setGuest(false); }, []);
+  const signOut = useCallback(async () => { await Backend.signOut(); setUser(null); setGuest(false); }, []);
   const saveOnboarding = useCallback(async (partial: Partial<UserRecord>) => {
     if (!user) return;
-    const u = await AuthService.patch(user.email, partial);
+    const u = await Backend.patch(user.email, partial);
     setUser(u);
   }, [user]);
   const updateProfile = useCallback(async (partial: Partial<UserRecord> & { profile?: Partial<Profile>; settings?: Partial<Settings> }) => {
@@ -174,12 +179,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       profile: partial.profile ? { ...user.profile, ...partial.profile } : user.profile,
       settings: partial.settings ? { ...user.settings, ...partial.settings } : user.settings,
     };
-    const u = await AuthService.patch(user.email, merged);
+    const u = await Backend.patch(user.email, merged);
     setUser(u);
   }, [user]);
   const deleteAccount = useCallback(async () => {
-    if (user) await AuthService.remove(user.email);
-    await AuthService.signOut();
+    if (user) await Backend.remove(user.email);
+    await Backend.signOut();
     setUser(null); setGuest(false);
   }, [user]);
   const promptSignIn = useCallback(() => setAuthPrompt(true), []);
