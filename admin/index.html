@@ -6,17 +6,16 @@
 <title>Sport Market Review — Адмінка</title>
 <style>
   :root{
-    --bg:#F4F6FA; --surface:#FFFFFF; --ink:#16181D; --dim:#5C6370; --muted:#9AA1AE;
-    --line:#E6E8EE; --accent:#2F6BFF; --accentSoft:#EAF0FF; --dark:#12141A; --darkline:#242833;
-    --ok:#0F7B4E; --okbg:#E4F5EC; --warn:#8A5A00; --warnbg:#FBF0DA; --danger:#B42318; --dangerbg:#FBE9E7;
-    --radius:12px;
+    --bg:#F4F6FA;--surface:#FFFFFF;--ink:#16181D;--dim:#5C6370;--muted:#9AA1AE;
+    --line:#E6E8EE;--accent:#2F6BFF;--accentSoft:#EAF0FF;--dark:#12141A;--darkline:#242833;
+    --ok:#0F7B4E;--okbg:#E4F5EC;--warn:#8A5A00;--warnbg:#FBF0DA;--danger:#B42318;--dangerbg:#FBE9E7;--radius:12px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
   button{font-family:inherit;cursor:pointer}
   .hidden{display:none!important}
+  a{color:var(--accent)}
 
-  /* Login */
   #login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#e9f0ff,#f4f6fa)}
   .login-card{width:420px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:0 30px 80px rgba(16,18,24,.08)}
   .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
@@ -25,10 +24,10 @@
   .login-card h1{font-size:20px;letter-spacing:-.4px;margin:16px 0 4px}
   .login-card p.sub{color:var(--dim);font-size:13px;margin-bottom:20px}
   label{display:block;font-size:12px;font-weight:600;color:var(--dim);margin:12px 0 6px}
-  input,select{width:100%;height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:14px;color:var(--ink);outline:none}
-  input:focus,select:focus{border-color:var(--accent)}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:14px;color:var(--ink);outline:none;font-family:inherit}
+  input,select{height:44px} textarea{padding:10px 12px;resize:vertical;min-height:80px}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
   .btn{height:44px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;font-size:14px;width:100%;margin-top:18px}
-  .btn.secondary{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
   .err{color:var(--danger);font-size:12.5px;font-weight:600;margin-top:10px;min-height:16px}
   .quick{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
   .quick .q-title{font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--muted);margin-bottom:10px}
@@ -36,13 +35,11 @@
   .quick button{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 10px;text-align:left;font-size:12px;font-weight:600;color:var(--ink)}
   .quick button:hover{border-color:var(--accent);background:var(--accentSoft)}
 
-  /* Shell */
   #app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
   aside{background:var(--dark);color:#fff;padding:20px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
   aside .brand b{color:#fff}
-  aside .brand .logo{background:var(--accent)}
   nav{margin-top:22px;display:flex;flex-direction:column;gap:2px;overflow:auto}
-  nav a{display:flex;align-items:center;gap:11px;color:#AEB4C2;text-decoration:none;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:600}
+  nav a{display:flex;align-items:center;gap:11px;color:#AEB4C2;text-decoration:none;padding:9px 12px;border-radius:9px;font-size:13px;font-weight:600}
   nav a .ico{width:18px;text-align:center;opacity:.9}
   nav a:hover{background:var(--darkline);color:#fff}
   nav a.active{background:var(--accent);color:#fff}
@@ -56,81 +53,131 @@
   .side-foot button{margin-top:12px;width:100%;background:transparent;border:1px solid var(--darkline);color:#AEB4C2;border-radius:9px;padding:9px;font-size:12.5px;font-weight:600}
   .side-foot button:hover{color:#fff;border-color:#3a4150}
 
-  main{padding:26px 30px;overflow:auto}
-  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+  main{padding:24px 28px;overflow:auto;max-height:100vh}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
   .topbar h2{font-size:22px;letter-spacing:-.5px}
   .topbar .sub{color:var(--dim);font-size:13px;margin-top:3px}
   .role-pill{background:var(--accentSoft);color:var(--accent);font-weight:700;font-size:11.5px;border-radius:999px;padding:5px 11px}
 
-  /* Dashboard */
   .grid-metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
   .metric{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
   .metric .k{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.3px;text-transform:uppercase}
   .metric .v{font-size:26px;font-weight:800;letter-spacing:-.6px;margin-top:8px}
   .metric .d{font-size:11.5px;font-weight:700;margin-top:4px}
-  .metric .d.up{color:var(--ok)} .metric .d.flat{color:var(--muted)}
-  .section-title{font-size:13px;font-weight:800;letter-spacing:.2px;margin:26px 0 12px;color:var(--ink)}
+  .metric .d.up{color:var(--ok)}.metric .d.flat{color:var(--muted)}.metric .d.down{color:var(--danger)}
+  .section-title{font-size:13px;font-weight:800;margin:24px 0 12px}
   .attention{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
   .attention .row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-top:1px solid var(--line)}
   .attention .row:first-child{border-top:none}
   .attention .row .ic{width:34px;height:34px;border-radius:9px;background:var(--warnbg);color:var(--warn);display:flex;align-items:center;justify-content:center;font-size:15px}
-  .attention .row .t{font-weight:700;font-size:13.5px}
-  .attention .row .s{font-size:12px;color:var(--dim)}
+  .attention .row .t{font-weight:700;font-size:13.5px}.attention .row .s{font-size:12px;color:var(--dim)}
   .attention .row .cnt{margin-left:auto;font-weight:800;font-size:16px}
   .attention .row .go{margin-left:14px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--accent)}
 
-  /* Table */
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tabs .tab{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:700;color:var(--dim)}
+  .tabs .tab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+
   .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-  .toolbar input.search{width:240px;height:38px}
+  .toolbar input.search{width:230px;height:38px}
   .toolbar select{width:auto;height:38px;padding:0 30px 0 12px}
   .toolbar .spacer{flex:1}
   .toolbar .tbtn{height:38px;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:0 14px;font-size:12.5px;font-weight:700;color:var(--ink)}
   .toolbar .tbtn.primary{background:var(--accent);color:#fff;border:none}
-  .toolbar .tbtn.warn{color:var(--warn)} .toolbar .tbtn.danger{color:var(--danger)}
+  .toolbar .tbtn.warn{color:var(--warn)}.toolbar .tbtn.danger{color:var(--danger)}
   .toolbar .tbtn[disabled]{opacity:.4;cursor:not-allowed}
-  .card-table{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .card-table{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:auto}
   table{width:100%;border-collapse:collapse}
-  thead th{text-align:left;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;padding:12px 14px;border-bottom:1px solid var(--line);background:#FBFCFE}
-  tbody td{padding:13px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+  thead th{text-align:left;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;padding:11px 14px;border-bottom:1px solid var(--line);background:#FBFCFE;white-space:nowrap}
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
   tbody tr:last-child td{border-bottom:none}
   tbody tr:hover{background:#FBFCFE}
-  td .name{font-weight:700}
-  td .meta{color:var(--dim);font-size:12px}
+  td .name{font-weight:700}td .meta{color:var(--dim);font-size:12px}
   input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
-  .badge2{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;border-radius:6px;padding:3px 8px;text-transform:uppercase}
-  .b-ok{background:var(--okbg);color:var(--ok)} .b-warn{background:var(--warnbg);color:var(--warn)}
-  .b-danger{background:var(--dangerbg);color:var(--danger)} .b-info{background:var(--accentSoft);color:var(--accent)}
-  .b-neutral{background:#EEF0F4;color:var(--dim)}
+  .badge2{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;border-radius:6px;padding:3px 8px;text-transform:uppercase;white-space:nowrap}
+  .b-ok{background:var(--okbg);color:var(--ok)}.b-warn{background:var(--warnbg);color:var(--warn)}
+  .b-danger{background:var(--dangerbg);color:var(--danger)}.b-info{background:var(--accentSoft);color:var(--accent)}.b-neutral{background:#EEF0F4;color:var(--dim)}
   .rowact{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:5px 9px;font-size:11.5px;font-weight:700;color:var(--ink);margin-left:6px}
-  .rowact.ok{color:var(--ok)} .rowact.dg{color:var(--danger)}
-  .empty{padding:48px;text-align:center;color:var(--muted);font-weight:600;font-size:13.5px}
+  .rowact.ok{color:var(--ok)}.rowact.dg{color:var(--danger)}
+  .empty{padding:44px;text-align:center;color:var(--muted);font-weight:600;font-size:13.5px}
+  .notecell{color:var(--dim);font-size:12px;font-style:italic}
+  .notrole{padding:60px;text-align:center;color:var(--muted)}.notrole b{color:var(--ink);display:block;font-size:16px;margin-bottom:6px}
 
-  /* Modal */
-  #modal-root{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(16,18,24,.45);z-index:60}
+  /* Kanban */
+  .kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+  .kcol{min-width:230px;flex:1;background:#EEF1F6;border-radius:12px;padding:10px}
+  .kcol h4{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between}
+  .kcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:9px;cursor:pointer}
+  .kcard:hover{border-color:var(--accent)}
+  .kcard .kt{font-weight:700;font-size:13px}
+  .kcard .km{color:var(--dim);font-size:11.5px;margin-top:3px}
+  .kcard .kf{display:flex;align-items:center;gap:6px;margin-top:8px}
+  .pri{font-size:10px;font-weight:800;border-radius:5px;padding:2px 6px}
+  .pri.high{background:var(--dangerbg);color:var(--danger)}.pri.med{background:var(--warnbg);color:var(--warn)}.pri.low{background:#EEF0F4;color:var(--dim)}
+
+  /* Editor */
+  .editor{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+  .ed-main{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .ed-side{display:flex;flex-direction:column;gap:16px}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .panel h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:12px}
+  .block{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px;background:#FBFCFE}
+  .block .bh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .block .btype{font-size:10.5px;font-weight:800;text-transform:uppercase;color:var(--accent);letter-spacing:.3px}
+  .block .brm{margin-left:auto;color:var(--muted);border:none;background:none;font-size:14px}
+  .addblocks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .addblocks button{border:1px dashed var(--line);background:var(--surface);border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:700;color:var(--dim)}
+  .addblocks button:hover{border-color:var(--accent);color:var(--accent)}
+  .wf{display:flex;flex-wrap:wrap;gap:8px}
+  .wf button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700}
+  .wf button.p{background:var(--accent);color:#fff;border:none}
+  .autosave{font-size:11.5px;color:var(--muted);font-weight:600}
+  .social{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .social .im{height:90px;background:#EEF1F6;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px}
+  .social .tx{padding:10px}.social .tx .st{font-weight:700;font-size:12.5px}.social .tx .sd{color:var(--dim);font-size:11.5px;margin-top:2px}.social .tx .su{color:var(--muted);font-size:10.5px;margin-top:4px;text-transform:uppercase}
+  .switchrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .switch{width:42px;height:24px;border-radius:12px;border:1px solid var(--line);background:#EEF0F4;position:relative;cursor:pointer}
+  .switch.on{background:var(--accent);border-color:var(--accent)}
+  .switch .k{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;transition:.15s}
+  .switch.on .k{left:20px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips .c{border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:11.5px;font-weight:700;cursor:pointer}
+  .chips .c.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+  #modal-root{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(16,18,24,.45);z-index:60;padding:24px}
   #modal-root.show{display:flex}
-  .modal{width:440px;background:var(--surface);border-radius:16px;padding:24px}
+  .modal{width:480px;max-height:88vh;overflow:auto;background:var(--surface);border-radius:16px;padding:24px}
+  .modal.wide{width:640px}
   .modal h3{font-size:18px;letter-spacing:-.3px}
   .modal p{color:var(--dim);font-size:13.5px;line-height:1.5;margin-top:8px}
-  .modal textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13.5px;margin-top:12px;outline:none;resize:vertical}
   .modal .row{display:flex;gap:10px;margin-top:18px}
   .modal .row button{flex:1;height:42px;border-radius:10px;font-weight:700;font-size:13.5px}
   .modal .row .c{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
   .modal .row .a{background:var(--accent);color:#fff;border:none}
   .modal .row .a.danger{background:var(--danger)}
+  .kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .kv:last-child{border:none}.kv .k{color:var(--dim)}
+  .hist{font-size:12px;color:var(--dim);padding:5px 0}
 
-  /* Toast */
   #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 18px;border-radius:11px;font-size:13.5px;font-weight:600;opacity:0;transition:.25s;z-index:70;display:flex;gap:9px;align-items:center}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   #toast .dot{width:8px;height:8px;border-radius:4px;background:#3FC77E}
 
-  .notecell{color:var(--dim);font-size:12px;font-style:italic}
-  .notrole{padding:60px;text-align:center;color:var(--muted)}
-  .notrole b{color:var(--ink);display:block;font-size:16px;margin-bottom:6px}
+  .taxwrap{display:grid;grid-template-columns:220px 1fr;gap:16px}
+  .taxlist{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .taxlist button{width:100%;text-align:left;border:none;background:none;padding:12px 14px;font-size:13px;font-weight:700;border-bottom:1px solid var(--line);color:var(--ink)}
+  .taxlist button:last-child{border:none}
+  .taxlist button.active{background:var(--accentSoft);color:var(--accent)}
+  .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .tpl{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer}
+  .tpl:hover{border-color:var(--accent)}
+  .tpl .tt{font-weight:700;font-size:13.5px}.tpl .ts{color:var(--dim);font-size:12px;margin-top:4px}
+  .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .formgrid .full{grid-column:1/3}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login">
   <div class="login-card">
     <div class="brand"><div class="logo">SM</div><b>Sport Market Review</b></div>
@@ -142,14 +189,10 @@
     <input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
     <div class="err" id="li-err"></div>
     <button class="btn" onclick="doLogin()">Увійти</button>
-    <div class="quick">
-      <div class="q-title">ДЕМО-АКАУНТИ (пароль: smr2026)</div>
-      <div class="grid" id="quick-grid"></div>
-    </div>
+    <div class="quick"><div class="q-title">ДЕМО-АКАУНТИ (пароль: smr2026)</div><div class="grid" id="quick-grid"></div></div>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" class="hidden">
   <aside>
     <div class="brand"><div class="logo">SM</div><b>SMR Admin</b></div>
@@ -160,10 +203,7 @@
     </div>
   </aside>
   <main>
-    <div class="topbar">
-      <div><h2 id="page-title"></h2><div class="sub" id="page-sub"></div></div>
-      <div class="role-pill" id="role-pill"></div>
-    </div>
+    <div class="topbar"><div><h2 id="page-title"></h2><div class="sub" id="page-sub"></div></div><div class="role-pill" id="role-pill"></div></div>
     <div id="view"></div>
   </main>
 </div>
@@ -172,388 +212,539 @@
 <div id="toast"><div class="dot"></div><span id="toast-text"></span></div>
 
 <script>
-/* ============ ДАНІ (демо) ============ */
-const ACCOUNTS = {
-  'super@smr.ua':    {name:'Ірина Адмін',      role:'super_admin'},
-  'editor@smr.ua':   {name:'Олег Редактор',    role:'editor'},
-  'moderator@smr.ua':{name:'Марія Модератор',  role:'moderator'},
-  'partner@smr.ua':  {name:'Данило Партнер',   role:'partnership_manager'},
-  'events@smr.ua':   {name:'Катерина Івенти',  role:'event_manager'},
-  'analyst@smr.ua':  {name:'Андрій Аналітик',  role:'analyst'},
+/* ============ ДОВІДНИКИ / ДАНІ ============ */
+const ACCOUNTS={
+  'super@smr.ua':{name:'Ірина Адмін',role:'super_admin'},'editor@smr.ua':{name:'Олег Редактор',role:'editor'},
+  'moderator@smr.ua':{name:'Марія Модератор',role:'moderator'},'partner@smr.ua':{name:'Данило Партнер',role:'partnership_manager'},
+  'events@smr.ua':{name:'Катерина Івенти',role:'event_manager'},'analyst@smr.ua':{name:'Андрій Аналітик',role:'analyst'},
 };
-const PASSWORD = 'smr2026';
-const ROLE_LABEL = {
-  super_admin:'Super Admin', editor:'Editor', moderator:'Moderator',
-  partnership_manager:'Partnership Manager', event_manager:'Event Manager', analyst:'Analyst'
-};
-// Матриця доступу: які секції бачить роль
-const PERMS = {
-  super_admin:['dashboard','users','organizations','articles','opportunities','events','registrations','introductions','reports','analytics','audit','settings'],
-  editor:['dashboard','articles'],
+const PASSWORD='smr2026';
+const ROLE_LABEL={super_admin:'Super Admin',editor:'Editor',moderator:'Moderator',partnership_manager:'Partnership Manager',event_manager:'Event Manager',analyst:'Analyst'};
+const PERMS={
+  super_admin:['dashboard','users','organizations','articles','opportunities','events','registrations','introductions','reports','taxonomies','analytics','email','audit','settings'],
+  editor:['dashboard','articles','taxonomies'],
   moderator:['dashboard','users','organizations','opportunities','events','reports'],
   partnership_manager:['dashboard','introductions'],
   event_manager:['dashboard','events','registrations'],
   analyst:['dashboard','analytics','audit'],
 };
-const NAV = [
-  {key:'dashboard',label:'Дашборд',ico:'▣'},
-  {key:'users',label:'Користувачі',ico:'👤'},
-  {key:'organizations',label:'Організації',ico:'🏢'},
-  {key:'articles',label:'Матеріали',ico:'📄'},
-  {key:'opportunities',label:'Можливості',ico:'💼'},
-  {key:'events',label:'Події',ico:'📅'},
-  {key:'registrations',label:'Реєстрації',ico:'🎟'},
-  {key:'introductions',label:'Знайомства',ico:'🤝'},
-  {key:'reports',label:'Скарги',ico:'🚩'},
-  {key:'analytics',label:'Аналітика',ico:'📊'},
-  {key:'audit',label:'Аудит',ico:'🧾'},
-  {key:'settings',label:'Налаштування',ico:'⚙'},
+const NAV=[
+  {key:'dashboard',label:'Дашборд',ico:'▣'},{key:'articles',label:'CMS · Матеріали',ico:'📄'},
+  {key:'users',label:'Користувачі',ico:'👤'},{key:'organizations',label:'Організації',ico:'🏢'},
+  {key:'opportunities',label:'Можливості',ico:'💼'},{key:'events',label:'Події',ico:'📅'},
+  {key:'registrations',label:'Реєстрації',ico:'🎟'},{key:'introductions',label:'Знайомства',ico:'🤝'},
+  {key:'reports',label:'Скарги',ico:'🚩'},{key:'taxonomies',label:'Довідники',ico:'🗂'},
+  {key:'analytics',label:'Аналітика',ico:'📊'},{key:'email',label:'Email-шаблони',ico:'✉'},
+  {key:'audit',label:'Аудит',ico:'🧾'},{key:'settings',label:'Налаштування',ico:'⚙'},
 ];
+const SUBTITLES={dashboard:'Огляд ключових метрик платформи',articles:'Редакційна CMS: матеріали, статуси, публікація',users:'Модерація та керування акаунтами',organizations:'Верифікація, менеджери, запити доступу',opportunities:'Модерація ділових можливостей',events:'Керування подіями та розсилками',registrations:'Реєстрації на події',introductions:'Kanban обробки запитів на знайомство',reports:'Скарги користувачів і рішення',taxonomies:'Керовані довідники платформи',analytics:'Метрики, події, експорт',email:'Транзакційні email-шаблони',audit:'Журнал дій адміністраторів',settings:'Налаштування платформи'};
 
-// Сутності
-const USERS = [
-  {id:'u1',name:'Олена Ковальчук',email:'olena@club.ua',role:'Представник організації',status:'active',verified:true,profile:100,created:'12.07'},
-  {id:'u2',name:'Андрій Мельник',email:'andrii@media.ua',role:'Фахівець',status:'active',verified:true,profile:90,created:'14.07'},
-  {id:'u3',name:'Данило Бондар',email:'dbondar@bet.pl',role:'Фахівець',status:'active',verified:false,profile:70,created:'18.07'},
-  {id:'u4',name:'Марія Ткаченко',email:'maria@student.ua',role:'Студент',status:'active',verified:false,profile:45,created:'22.07'},
-  {id:'u5',name:'Ігор Спам',email:'spam@x.co',role:'Інше',status:'pending',verified:false,profile:20,created:'26.07'},
-  {id:'u6',name:'Blocked User',email:'blocked@smr.ua',role:'Фахівець',status:'suspended',verified:false,profile:30,created:'02.06'},
+const USERS=[
+  {id:'u1',name:'Олена Ковальчук',email:'olena@club.ua',role:'Представник організації',status:'active',verified:true,profile:100,org:'ФК «Динамо» Київ',created:'12.07',active:'сьогодні'},
+  {id:'u2',name:'Андрій Мельник',email:'andrii@media.ua',role:'Фахівець',status:'active',verified:true,profile:90,org:'MEGOGO Sport',created:'14.07',active:'вчора'},
+  {id:'u3',name:'Данило Бондар',email:'dbondar@bet.pl',role:'Фахівець',status:'active',verified:false,profile:70,org:'—',created:'18.07',active:'2 дні тому'},
+  {id:'u4',name:'Марія Ткаченко',email:'maria@student.ua',role:'Студент',status:'pending',verified:false,profile:45,org:'—',created:'22.07',active:'сьогодні'},
+  {id:'u5',name:'Ігор Спам',email:'spam@x.co',role:'Інше',status:'pending',verified:false,profile:20,org:'—',created:'26.07',active:'—'},
+  {id:'u6',name:'Blocked User',email:'blocked@smr.ua',role:'Фахівець',status:'blocked',verified:false,profile:30,org:'—',created:'02.06',active:'—'},
 ];
-const ORGS = [
-  {id:'o1',name:'ФК «Динамо» Київ',type:'Клуб',city:'Київ',status:'verified'},
-  {id:'o2',name:'Українська асоціація футболу',type:'Федерація',city:'Київ',status:'verified'},
-  {id:'o3',name:'Favbet',type:'Бренд',city:'Київ',status:'pending'},
-  {id:'o4',name:'MEGOGO Sport',type:'Медіа',city:'Львів',status:'verified'},
-  {id:'o5',name:'Нова агенція',type:'Агентство',city:'Одеса',status:'pending'},
+const ORGS=[
+  {id:'o1',name:'ФК «Динамо» Київ',type:'Клуб',city:'Київ',status:'verified',owner:'Олена Ковальчук',managers:2,opps:2},
+  {id:'o2',name:'Українська асоціація футболу',type:'Федерація',city:'Київ',status:'verified',owner:'Ірина Савченко',managers:1,opps:1},
+  {id:'o3',name:'Favbet',type:'Бренд',city:'Київ',status:'pending',owner:'—',managers:0,opps:0},
+  {id:'o4',name:'MEGOGO Sport',type:'Медіа',city:'Львів',status:'verified',owner:'Андрій Мельник',managers:1,opps:1},
+  {id:'o5',name:'Нова агенція',type:'Агентство',city:'Одеса',status:'pending',owner:'—',managers:0,opps:1},
 ];
-const ARTICLES = [
-  {id:'a1',title:'Nike запускає кампанію навколо жіночого футболу',type:'Новина',status:'published',author:'Марія Левченко',date:'24.07'},
-  {id:'a2',title:'Як банк зібрав повний стадіон',type:'Кейс',status:'published',author:'Ірина Савченко',date:'22.07'},
-  {id:'a7',title:'Інтервʼю: комерційна модель федерації',type:'Інтервʼю',status:'draft',author:'Редакція SMR',date:'—'},
-  {id:'a9',title:'Гайд: оцінка спонсорського інвентарю',type:'Гайд',status:'draft',author:'Редакція SMR',date:'—'},
+const ACCESS_REQ=[
+  {id:'ar1',user:'Данило Бондар',org:'Favbet',role:'Менеджер',status:'new'},
+  {id:'ar2',user:'Марія Ткаченко',org:'Нова агенція',role:'Менеджер',status:'new'},
 ];
-const OPPS = [
-  {id:'op1',title:'Head of Sponsorship у клуб',org:'ФК «Динамо» Київ',type:'Вакансія',status:'published',apps:3},
-  {id:'op2',title:'Титульне партнерство ліги',org:'УПЛ',type:'Партнерство',status:'published',apps:5},
-  {id:'op7',title:'Тендер на кейтеринг матчдей',org:'Нова агенція',type:'Тендер',status:'pending',apps:0},
-  {id:'op8',title:'Пошук амбасадора бренду',org:'Favbet',type:'Пошук амбасадора',status:'pending',apps:0},
+const AUTHORS=['Редакція SMR','Марія Левченко','Ірина Савченко','Андрій Мельник'];
+const ARTICLES=[
+  {id:'a1',title:'Nike запускає кампанію навколо жіночого футболу',type:'Новина',category:'Маркетинг',author:'Марія Левченко',status:'published',date:'24.07',views:4210,saves:180,updated:'24.07',featured:true,homeOrder:1},
+  {id:'a2',title:'Як банк зібрав повний стадіон',type:'Кейс',category:'Кейси',author:'Ірина Савченко',status:'published',date:'22.07',views:3120,saves:260,updated:'22.07',featured:true,homeOrder:2},
+  {id:'a7',title:'Інтервʼю: комерційна модель федерації',type:'Інтервʼю',category:'Управління',author:'Редакція SMR',status:'review',date:'—',views:0,saves:0,updated:'26.07',featured:false,homeOrder:0},
+  {id:'a9',title:'Гайд: оцінка спонсорського інвентарю',type:'Гайд',category:'Комерція',author:'Редакція SMR',status:'draft',date:'—',views:0,saves:0,updated:'27.07',featured:false,homeOrder:0},
+  {id:'a10',title:'Рейтинг неймінг-угод (архів)',type:'Рейтинг',category:'Комерція',author:'Редакція SMR',status:'archived',date:'10.06',views:900,saves:40,updated:'10.06',featured:false,homeOrder:0},
 ];
-const EVENTS = [
-  {id:'e1',title:'Sport Business Forum Ukraine 2026',date:'12.09',status:'published',regs:342,format:'Офлайн'},
-  {id:'e2',title:'Практикум для клубів',date:'24.09',status:'published',regs:200,format:'Онлайн'},
-  {id:'e9',title:'Новий воркшоп (на модерації)',date:'05.10',status:'pending',regs:0,format:'Онлайн'},
+const OPPS=[
+  {id:'op1',title:'Head of Sponsorship у клуб',org:'ФК «Динамо» Київ',author:'Олена Ковальчук',type:'Вакансія',status:'published',deadline:'15.08',apps:3,reports:0,created:'18.07'},
+  {id:'op2',title:'Титульне партнерство ліги',org:'УПЛ',author:'Ірина Савченко',type:'Партнерство',status:'published',deadline:'01.09',apps:5,reports:0,created:'20.07'},
+  {id:'op7',title:'Тендер на кейтеринг матчдей',org:'Нова агенція',author:'—',type:'Тендер',status:'pending',deadline:'30.08',apps:0,reports:1,created:'26.07'},
+  {id:'op8',title:'Пошук амбасадора бренду',org:'Favbet',author:'Данило Бондар',type:'Пошук амбасадора',status:'pending',deadline:'10.09',apps:0,reports:0,created:'27.07'},
 ];
-const REGS = [
-  {id:'r1',user:'Олена Ковальчук',event:'Sport Business Forum 2026',status:'registered',date:'20.07'},
-  {id:'r2',user:'Данило Бондар',event:'Практикум для клубів',status:'waitlist',date:'21.07'},
-  {id:'r3',user:'Марія Ткаченко',event:'Sport Business Forum 2026',status:'cancelled',date:'22.07'},
+const EVENTS=[
+  {id:'e1',title:'Sport Business Forum Ukraine 2026',date:'12.09',status:'published',regs:342,cap:400,format:'Офлайн'},
+  {id:'e2',title:'Практикум для клубів',date:'24.09',status:'published',regs:200,cap:200,format:'Онлайн'},
+  {id:'e9',title:'Новий воркшоп (на модерації)',date:'05.10',status:'pending',regs:0,cap:150,format:'Онлайн'},
 ];
-const INTROS = [
-  {id:'i1',from:'fintech-бренд',to:'УАФ',reason:'Спонсорство',status:'moreinfo'},
-  {id:'i2',from:'Олена Ковальчук',to:'Андрій Мельник',reason:'Партнерство',status:'new'},
-  {id:'i3',from:'Данило Бондар',to:'ФК «Динамо»',reason:'Співпраця',status:'review'},
+const REGS=[
+  {id:'r1',user:'Олена Ковальчук',event:'Sport Business Forum 2026',status:'registered',date:'20.07',attended:false},
+  {id:'r2',user:'Данило Бондар',event:'Практикум для клубів',status:'waitlist',date:'21.07',attended:false},
+  {id:'r3',user:'Марія Ткаченко',event:'Sport Business Forum 2026',status:'cancelled',date:'22.07',attended:false},
 ];
-const REPORTS = [
-  {id:'rp1',target:'Ігор Спам',type:'Профіль',reason:'Спам або реклама',status:'open'},
+let INTROS=[
+  {id:'i1',from:'fintech-бренд',to:'УАФ',reason:'Спонсорство',outcome:'Комерційна презентація',related:'op2',manager:'—',priority:'high',status:'moreinfo',email:'—',notes:'Уточнити бюджет',history:['Створено','На розгляді','Запит інформації']},
+  {id:'i2',from:'Олена Ковальчук',to:'Андрій Мельник',reason:'Партнерство',outcome:'Пілотна співпраця',related:'a4',manager:'—',priority:'med',status:'new',email:'—',notes:'',history:['Створено']},
+  {id:'i3',from:'Данило Бондар',to:'ФК «Динамо»',reason:'Співпраця',outcome:'Дзвінок',related:'—',manager:'Данило Партнер',priority:'low',status:'review',email:'—',notes:'',history:['Створено','На розгляді']},
+  {id:'i4',from:'Марія Ткаченко',to:'Ірина Савченко',reason:'Обмін досвідом',outcome:'Консультація',related:'—',manager:'—',priority:'low',status:'declined',email:'—',notes:'',history:['Створено','Відхилено']},
+];
+const INTRO_COLS=[['new','New'],['review','Under review'],['moreinfo','Waiting for info'],['approved','Approved'],['sent','Introduction sent'],['closed','Closed'],['declined','Declined']];
+const REPORTS=[
+  {id:'rp1',target:'Ігор Спам',type:'Профіль',reason:'Спам',status:'open'},
   {id:'rp2',target:'Нова агенція',type:'Організація',reason:'Недостовірна інформація',status:'open'},
+  {id:'rp3',target:'Тендер на кейтеринг',type:'Можливість',reason:'Дублікат',status:'open'},
 ];
+const REPORT_REASONS=['Спам','Недостовірна інформація','Шахрайство','Дискримінація','Неприйнятний контент','Порушення авторських прав','Дублікат','Інше'];
+const REPORT_DECISIONS=['Приховати обʼєкт','Запросити зміни','Попередити користувача','Призупинити користувача','Заблокувати користувача','Відхилити скаргу','Закрити скаргу'];
+
+const TAXONOMIES={
+  'Види спорту':[{n:'Футбол',used:true,active:true},{n:'Баскетбол',used:true,active:true},{n:'Кіберспорт',used:false,active:true},{n:'Хокей',used:false,active:false}],
+  'Професійні напрями':[{n:'Спонсорство',used:true,active:true},{n:'Медіа',used:true,active:true},{n:'Продакшн',used:true,active:true}],
+  'Навички':[{n:'Переговори',used:true,active:true},{n:'Активації',used:true,active:true}],
+  'Типи організацій':[{n:'Клуб',used:true,active:true},{n:'Федерація',used:true,active:true},{n:'Бренд',used:true,active:true}],
+  'Типи можливостей':[{n:'Вакансія',used:true,active:true},{n:'Партнерство',used:true,active:true},{n:'Тендер',used:true,active:true}],
+  'Типи подій':[{n:'Форум',used:true,active:true},{n:'Воркшоп',used:true,active:true}],
+  'Категорії контенту':[{n:'Маркетинг',used:true,active:true},{n:'Комерція',used:true,active:true},{n:'iGaming',used:false,active:true}],
+  'Теги':[{n:'#спонсорство',used:true,active:true},{n:'#неймінг',used:false,active:true}],
+  'Області':[{n:'Київська',used:true,active:true},{n:'Львівська',used:true,active:true}],
+  'Міста':[{n:'Київ',used:true,active:true},{n:'Львів',used:true,active:true},{n:'Одеса',used:false,active:true}],
+  'Мови':[{n:'Українська',used:true,active:true},{n:'English',used:true,active:true}],
+};
+const EMAIL_TEMPLATES=[
+  ['welcome','Ласкаво просимо','Вітаємо у Sport Market Review'],['verification','Підтвердження email','Код підтвердження'],
+  ['moderation_approved','Модерацію пройдено','Ваш обʼєкт опубліковано'],['moderation_rejected','Модерацію відхилено','Потрібні зміни'],
+  ['changes_requested','Потрібні правки','Команда попросила уточнення'],['new_application','Новий відгук','Ви отримали новий відгук'],
+  ['application_status','Статус відгуку','Оновлення статусу вашого відгуку'],['event_registration','Реєстрацію підтверджено','Ви зареєстровані на подію'],
+  ['event_reminder','Нагадування про подію','Подія вже завтра'],['event_cancelled','Подію скасовано','На жаль, подію скасовано'],
+  ['event_rescheduled','Подію перенесено','Змінено дату події'],['introduction_request','Запит на знайомство','Новий запит на знайомство'],
+  ['introduction_approved','Знайомство схвалено','Ваш запит схвалено'],['introduction_email','Знайомство','Знайомимо вас із…'],
+  ['administrative_message','Повідомлення команди','Важлива інформація від SMR'],
+];
+const ANALYTICS_EVENTS=['user_registered','onboarding_completed','profile_completed','organization_created','article_viewed','article_saved','opportunity_viewed','opportunity_created','application_started','application_submitted','event_viewed','event_registered','introduction_requested','search_performed','entity_shared'];
 
 /* ============ СТАН ============ */
-let SESSION = null;
-let CUR = 'dashboard';
-const NOTES = {};        // entityId -> note
-const SELECTED = new Set();
+let SESSION=null,CUR='dashboard';
+const NOTES={},SELECTED=new Set();
 const AUDIT_KEY='smr_admin_audit';
-const loadAudit = () => { try{return JSON.parse(localStorage.getItem(AUDIT_KEY)||'[]')}catch{return[]} };
-const saveAudit = (a) => localStorage.setItem(AUDIT_KEY, JSON.stringify(a));
-function audit(action, target){
-  const a = loadAudit();
-  a.unshift({ts:Date.now(), actor:SESSION?SESSION.email:'—', role:SESSION?ROLE_LABEL[SESSION.role]:'—', action, target:target||'—'});
-  saveAudit(a.slice(0,500));
-}
+const loadAudit=()=>{try{return JSON.parse(localStorage.getItem(AUDIT_KEY)||'[]')}catch{return[]}};
+const saveAudit=a=>localStorage.setItem(AUDIT_KEY,JSON.stringify(a));
+function audit(action,target){const a=loadAudit();a.unshift({ts:Date.now(),actor:SESSION?SESSION.email:'—',role:SESSION?ROLE_LABEL[SESSION.role]:'—',action,target:target||'—'});saveAudit(a.slice(0,500));}
+let V=()=>document.getElementById('view');
 
 /* ============ AUTH ============ */
-function renderQuick(){
-  const g = document.getElementById('quick-grid');
-  g.innerHTML = Object.entries(ACCOUNTS).map(([email,a])=>
-    `<button onclick="quickFill('${email}')"><div>${ROLE_LABEL[a.role]}</div></button>`).join('');
-}
-function quickFill(email){ document.getElementById('li-email').value=email; document.getElementById('li-pass').value=PASSWORD; }
+function renderQuick(){document.getElementById('quick-grid').innerHTML=Object.entries(ACCOUNTS).map(([e,a])=>`<button onclick="quickFill('${e}')">${ROLE_LABEL[a.role]}</button>`).join('');}
+function quickFill(e){document.getElementById('li-email').value=e;document.getElementById('li-pass').value=PASSWORD;}
 function doLogin(){
-  const email=document.getElementById('li-email').value.trim().toLowerCase();
-  const pass=document.getElementById('li-pass').value;
-  const err=document.getElementById('li-err');
-  const acc=ACCOUNTS[email];
-  if(!acc){ err.textContent='Невідомий службовий акаунт'; return; }
-  if(pass!==PASSWORD){ err.textContent='Невірний пароль'; return; }
-  err.textContent='';
-  SESSION={email,...acc};
-  audit('Вхід у систему','');
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  mountShell();
-  CUR = 'dashboard';
-  go('dashboard');
+  const email=document.getElementById('li-email').value.trim().toLowerCase(),pass=document.getElementById('li-pass').value,err=document.getElementById('li-err'),acc=ACCOUNTS[email];
+  if(!acc){err.textContent='Невідомий службовий акаунт';return;}
+  if(pass!==PASSWORD){err.textContent='Невірний пароль';return;}
+  err.textContent='';SESSION={email,...acc};audit('Вхід у систему','');
+  document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');
+  mountShell();go('dashboard');
 }
-function doLogout(){ audit('Вихід',''); SESSION=null; document.getElementById('app').classList.add('hidden'); document.getElementById('login').classList.remove('hidden'); document.getElementById('li-pass').value=''; }
+function doLogout(){audit('Вихід','');SESSION=null;document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('li-pass').value='';}
 
 /* ============ SHELL ============ */
 function mountShell(){
-  const allowed = PERMS[SESSION.role];
-  document.getElementById('nav').innerHTML = NAV.filter(n=>allowed.includes(n.key)).map(n=>{
-    const att = attentionCount(n.key);
-    return `<a href="#" data-k="${n.key}" onclick="go('${n.key}');return false"><span class="ico">${n.ico}</span>${n.label}${att?`<span class="badge">${att}</span>`:''}</a>`;
-  }).join('');
-  const initials = SESSION.name.split(' ').map(w=>w[0]).join('').slice(0,2);
-  document.getElementById('su-av').textContent=initials;
-  document.getElementById('su-name').textContent=SESSION.name;
-  document.getElementById('su-role').textContent=ROLE_LABEL[SESSION.role];
+  const allowed=PERMS[SESSION.role];
+  document.getElementById('nav').innerHTML=NAV.filter(n=>allowed.includes(n.key)).map(n=>{const a=attentionCount(n.key);return `<a href="#" data-k="${n.key}" onclick="go('${n.key}');return false"><span class="ico">${n.ico}</span>${n.label}${a?`<span class="badge">${a}</span>`:''}</a>`;}).join('');
+  document.getElementById('su-av').textContent=SESSION.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  document.getElementById('su-name').textContent=SESSION.name;document.getElementById('su-role').textContent=ROLE_LABEL[SESSION.role];
   document.getElementById('role-pill').textContent=ROLE_LABEL[SESSION.role];
 }
-function attentionCount(key){
-  if(key==='users') return USERS.filter(u=>u.status==='pending').length;
-  if(key==='organizations') return ORGS.filter(o=>o.status==='pending').length;
-  if(key==='opportunities') return OPPS.filter(o=>o.status==='pending').length;
-  if(key==='events') return EVENTS.filter(e=>e.status==='pending').length;
-  if(key==='reports') return REPORTS.filter(r=>r.status==='open').length;
-  if(key==='introductions') return INTROS.filter(i=>i.status==='moreinfo').length;
+function attentionCount(k){
+  if(k==='users')return USERS.filter(u=>u.status==='pending').length;
+  if(k==='organizations')return ORGS.filter(o=>o.status==='pending').length+ACCESS_REQ.length;
+  if(k==='articles')return ARTICLES.filter(a=>a.status==='review').length;
+  if(k==='opportunities')return OPPS.filter(o=>o.status==='pending').length;
+  if(k==='events')return EVENTS.filter(e=>e.status==='pending').length;
+  if(k==='reports')return REPORTS.filter(r=>r.status==='open').length;
+  if(k==='introductions')return INTROS.filter(i=>i.status==='moreinfo'||i.status==='new').length;
   return 0;
 }
+function refreshBadges(){document.querySelectorAll('nav a').forEach(a=>{const k=a.dataset.k,c=attentionCount(k),ex=a.querySelector('.badge');if(c&&!ex){a.insertAdjacentHTML('beforeend',`<span class="badge">${c}</span>`);}else if(c&&ex){ex.textContent=c;}else if(!c&&ex){ex.remove();}});}
 function go(key){
-  if(!PERMS[SESSION.role].includes(key)){ renderNoAccess(); return; }
-  CUR=key; SELECTED.clear();
+  if(!PERMS[SESSION.role].includes(key)){V().innerHTML=`<div class="notrole"><b>Недостатньо прав</b>Ваша роль не має доступу до цього розділу.</div>`;return;}
+  CUR=key;SELECTED.clear();
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active',a.dataset.k===key));
   const meta=NAV.find(n=>n.key===key);
-  document.getElementById('page-title').textContent=meta.label;
-  document.getElementById('page-sub').textContent=SUBTITLES[key]||'';
-  audit('Перегляд розділу', meta.label);
-  VIEWS[key]();
+  document.getElementById('page-title').textContent=meta.label;document.getElementById('page-sub').textContent=SUBTITLES[key]||'';
+  audit('Перегляд розділу',meta.label);VIEWS[key]();
 }
-const SUBTITLES={
-  dashboard:'Огляд ключових метрик платформи', users:'Модерація та керування акаунтами',
-  organizations:'Верифікація й керування організаціями', articles:'Редакційний контент',
-  opportunities:'Модерація ділових можливостей', events:'Керування подіями', registrations:'Реєстрації на події',
-  introductions:'Обробка запитів на знайомство', reports:'Скарги користувачів', analytics:'Метрики та експорт',
-  audit:'Журнал дій адміністраторів', settings:'Налаштування панелі'
-};
+
+/* ============ HELPERS ============ */
+const badge=(cls,txt)=>`<span class="badge2 ${cls}">${txt}</span>`;
+const SB={active:['b-ok','активний'],pending:['b-warn','на модерації'],suspended:['b-warn','призупинений'],blocked:['b-danger','заблокований'],deleted:['b-neutral','видалений'],
+ verified:['b-ok','верифікована'],published:['b-ok','опубліковано'],draft:['b-neutral','чернетка'],review:['b-warn','на review'],scheduled:['b-info','заплановано'],archived:['b-neutral','архів'],
+ open:['b-danger','відкрита'],registered:['b-ok','зареєстровано'],waitlist:['b-warn','очікування'],cancelled:['b-neutral','скасовано'],
+ new:['b-info','новий'],moreinfo:['b-warn','потрібна інфо'],approved:['b-ok','схвалено'],sent:['b-ok','надіслано'],closed:['b-neutral','закрито'],declined:['b-danger','відхилено']};
+const sbadge=s=>SB[s]?badge(SB[s][0],SB[s][1]):badge('b-neutral',s);
 
 /* ============ VIEWS ============ */
-const V = document.getElementById('view');
-function renderNoAccess(){ V.innerHTML=`<div class="notrole"><b>Недостатньо прав</b>Ваша роль не має доступу до цього розділу.</div>`; }
-
-const badge=(cls,txt)=>`<span class="badge2 ${cls}">${txt}</span>`;
-const statusBadge=(s)=>({active:badge('b-ok','активний'),pending:badge('b-warn','на модерації'),suspended:badge('b-danger','заблокований'),
-  verified:badge('b-ok','верифікована'),published:badge('b-ok','опубліковано'),draft:badge('b-neutral','чернетка'),
-  open:badge('b-danger','відкрита'),registered:badge('b-ok','зареєстровано'),waitlist:badge('b-warn','очікування'),
-  cancelled:badge('b-neutral','скасовано'),new:badge('b-info','новий'),review:badge('b-warn','на розгляді'),
-  moreinfo:badge('b-warn','потрібна інфо')}[s]||badge('b-neutral',s));
-
-const VIEWS = {
-  dashboard(){
-    const m=[
-      ['Усього користувачів',USERS.length,'up','+12 за тиждень'],
-      ['Нові користувачі',3,'up','за 7 днів'],
-      ['Активні',USERS.filter(u=>u.status==='active').length,'flat','30 днів'],
-      ['Заповнені профілі',USERS.filter(u=>u.profile>=90).length,'up',''],
-      ['Організації',ORGS.length,'flat',''],
-      ['Профілі на модерації',USERS.filter(u=>u.status==='pending').length,'flat','потребує уваги'],
-      ['Опубліковані матеріали',ARTICLES.filter(a=>a.status==='published').length,'up',''],
-      ['Чернетки',ARTICLES.filter(a=>a.status==='draft').length,'flat',''],
-      ['Можливості на модерації',OPPS.filter(o=>o.status==='pending').length,'flat','потребує уваги'],
-      ['Активні можливості',OPPS.filter(o=>o.status==='published').length,'up',''],
-      ['Відгуки',OPPS.reduce((s,o)=>s+o.apps,0),'up',''],
-      ['Події',EVENTS.length,'flat',''],
-      ['Реєстрації',EVENTS.reduce((s,e)=>s+e.regs,0),'up',''],
-      ['Запити на знайомство',INTROS.length,'flat',''],
-      ['Відкриті скарги',REPORTS.filter(r=>r.status==='open').length,'flat','потребує уваги'],
-    ];
-    const att=[
-      ['🏢','Профілі/організації на модерації', USERS.filter(u=>u.status==='pending').length+ORGS.filter(o=>o.status==='pending').length,'organizations'],
-      ['💼','Можливості чекають модерації', OPPS.filter(o=>o.status==='pending').length,'opportunities'],
-      ['📅','Події на модерації', EVENTS.filter(e=>e.status==='pending').length,'events'],
-      ['🤝','Знайомства потребують дії', INTROS.filter(i=>i.status==='moreinfo'||i.status==='new').length,'introductions'],
-      ['🚩','Відкриті скарги', REPORTS.filter(r=>r.status==='open').length,'reports'],
-    ].filter(a=>PERMS[SESSION.role].includes(a[3]));
-    V.innerHTML=`
-      <div class="grid-metrics">${m.map(x=>`<div class="metric"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="d ${x[2]}">${x[3]||'&nbsp;'}</div></div>`).join('')}</div>
-      ${att.length?`<div class="section-title">Потребує уваги</div>
-      <div class="attention">${att.map(a=>`<div class="row"><div class="ic">${a[0]}</div><div><div class="t">${a[1]}</div><div class="s">Натисніть, щоб перейти до розділу</div></div><div class="cnt">${a[2]}</div><button class="go" onclick="go('${a[3]}')">Відкрити →</button></div>`).join('')}</div>`:''}
-    `;
-  },
-  users(){ table({
-    cols:['Користувач','Роль','Профіль','Статус','Верифікація'],
-    rows:USERS, search:r=>r.name+r.email,
-    filters:[{key:'status',opts:['active','pending','suspended']}],
-    cell:r=>`<td><div class="name">${r.name}</div><div class="meta">${r.email} · ${r.created}</div></td>
-      <td>${r.role}</td><td>${r.profile}%</td><td>${statusBadge(r.status)}</td>
-      <td>${r.verified?badge('b-ok','так'):badge('b-neutral','ні')}</td>`,
-    actions:r=>`${r.status==='pending'?`<button class="rowact ok" onclick="act('Схвалено акаунт','${r.name}')">Схвалити</button>`:''}
-      ${r.status!=='suspended'?`<button class="rowact dg" onclick="confirmAct('Заблокувати користувача?','${r.name}','Заблоковано')">Блок</button>`:`<button class="rowact ok" onclick="act('Розблоковано','${r.name}')">Розблок</button>`}
-      <button class="rowact" onclick="noteFor('${r.id}','${r.name}')">Нотатка</button>`,
-    bulk:['Схвалити вибрані','Заблокувати вибрані']
-  }); },
-  organizations(){ table({
-    cols:['Організація','Тип','Місто','Статус'], rows:ORGS, search:r=>r.name+r.type,
-    filters:[{key:'status',opts:['verified','pending']}],
-    cell:r=>`<td><div class="name">${r.name}</div></td><td>${r.type}</td><td>${r.city}</td><td>${statusBadge(r.status)}</td>`,
-    actions:r=>`${r.status==='pending'?`<button class="rowact ok" onclick="act('Верифіковано організацію','${r.name}')">Верифікувати</button>`:''}
-      <button class="rowact" onclick="noteFor('${r.id}','${r.name}')">Нотатка</button>`,
-    bulk:['Верифікувати вибрані']
-  }); },
-  articles(){ table({
-    cols:['Заголовок','Тип','Автор','Статус','Дата'], rows:ARTICLES, search:r=>r.title,
-    filters:[{key:'status',opts:['published','draft']}],
-    cell:r=>`<td><div class="name">${r.title}</div></td><td>${r.type}</td><td>${r.author}</td><td>${statusBadge(r.status)}</td><td>${r.date}</td>`,
-    actions:r=>`${r.status==='draft'?`<button class="rowact ok" onclick="act('Опубліковано матеріал','${r.title}')">Опублікувати</button>`:`<button class="rowact" onclick="act('Знято з публікації','${r.title}')">Приховати</button>`}`,
-    bulk:['Опублікувати вибрані']
-  }); },
-  opportunities(){ table({
-    cols:['Можливість','Організація','Тип','Відгуки','Статус'], rows:OPPS, search:r=>r.title+r.org,
-    filters:[{key:'status',opts:['published','pending']}],
-    cell:r=>`<td><div class="name">${r.title}</div></td><td>${r.org}</td><td>${r.type}</td><td>${r.apps}</td><td>${statusBadge(r.status)}</td>`,
-    actions:r=>`${r.status==='pending'?`<button class="rowact ok" onclick="act('Схвалено можливість','${r.title}')">Схвалити</button><button class="rowact dg" onclick="confirmAct('Відхилити можливість?','${r.title}','Відхилено')">Відхилити</button>`:''}`,
-    bulk:['Схвалити вибрані','Відхилити вибрані']
-  }); },
-  events(){ table({
-    cols:['Подія','Дата','Формат','Реєстрації','Статус'], rows:EVENTS, search:r=>r.title,
-    filters:[{key:'status',opts:['published','pending']}],
-    cell:r=>`<td><div class="name">${r.title}</div></td><td>${r.date}</td><td>${r.format}</td><td>${r.regs}</td><td>${statusBadge(r.status)}</td>`,
-    actions:r=>`${r.status==='pending'?`<button class="rowact ok" onclick="act('Схвалено подію','${r.title}')">Схвалити</button>`:`<button class="rowact dg" onclick="confirmAct('Скасувати подію?','${r.title}','Подію скасовано')">Скасувати</button>`}`,
-    bulk:['Схвалити вибрані']
-  }); },
-  registrations(){ table({
-    cols:['Учасник','Подія','Статус','Дата'], rows:REGS, search:r=>r.user+r.event,
-    filters:[{key:'status',opts:['registered','waitlist','cancelled']}],
-    cell:r=>`<td><div class="name">${r.user}</div></td><td>${r.event}</td><td>${statusBadge(r.status)}</td><td>${r.date}</td>`,
-    actions:r=>`${r.status==='waitlist'?`<button class="rowact ok" onclick="act('Підтверджено реєстрацію','${r.user}')">Підтвердити</button>`:''}`,
-    bulk:['Підтвердити вибрані']
-  }); },
-  introductions(){ table({
-    cols:['Від','До','Причина','Статус'], rows:INTROS, search:r=>r.from+r.to,
-    filters:[{key:'status',opts:['new','review','moreinfo']}],
-    cell:r=>`<td><div class="name">${r.from}</div></td><td>${r.to}</td><td>${r.reason}</td><td>${statusBadge(r.status)}</td>`,
-    actions:r=>`<button class="rowact ok" onclick="act('Знайомство схвалено','${r.from}→${r.to}')">Схвалити</button>
-      <button class="rowact" onclick="act('Запит додаткової інформації','${r.from}')">Запит інфо</button>
-      <button class="rowact dg" onclick="confirmAct('Відхилити знайомство?','${r.from}→${r.to}','Знайомство відхилено')">Відхилити</button>`,
-    bulk:['Схвалити вибрані']
-  }); },
-  reports(){ table({
-    cols:['Обʼєкт','Тип','Причина','Статус'], rows:REPORTS, search:r=>r.target+r.reason,
-    filters:[{key:'status',opts:['open']}],
-    cell:r=>`<td><div class="name">${r.target}</div></td><td>${r.type}</td><td>${r.reason}</td><td>${statusBadge(r.status)}</td>`,
-    actions:r=>`<button class="rowact ok" onclick="act('Скаргу закрито','${r.target}')">Закрити</button>
-      <button class="rowact dg" onclick="confirmAct('Заблокувати обʼєкт скарги?','${r.target}','Обʼєкт заблоковано')">Блокувати</button>
-      <button class="rowact" onclick="noteFor('${r.id}','${r.target}')">Нотатка</button>`,
-    bulk:['Закрити вибрані']
-  }); },
-  analytics(){
-    V.innerHTML=`<div class="grid-metrics">
-      <div class="metric"><div class="k">Конверсія реєстрацій</div><div class="v">68%</div><div class="d up">+4%</div></div>
-      <div class="metric"><div class="k">Заповненість профілів</div><div class="v">72%</div><div class="d up">+6%</div></div>
-      <div class="metric"><div class="k">Відгуки на можливість</div><div class="v">2.7</div><div class="d flat">середнє</div></div>
-      <div class="metric"><div class="k">Схвалення знайомств</div><div class="v">54%</div><div class="d flat"></div></div>
-    </div>
-    <div class="section-title">Експорт</div>
-    <div class="toolbar">
-      <button class="tbtn primary" onclick="exportCsv('users',USERS)">Експорт користувачів</button>
-      <button class="tbtn" onclick="exportCsv('opportunities',OPPS)">Експорт можливостей</button>
-      <button class="tbtn" onclick="exportCsv('events',EVENTS)">Експорт подій</button>
-    </div>`;
-  },
-  audit(){
-    const a=loadAudit();
-    V.innerHTML=`<div class="toolbar"><input class="search" placeholder="Пошук у журналі" oninput="filterAudit(this.value)"/><div class="spacer"></div>
-      <button class="tbtn" onclick="exportCsv('audit',loadAudit().map(x=>({time:new Date(x.ts).toLocaleString('uk-UA'),actor:x.actor,role:x.role,action:x.action,target:x.target})))">Експорт CSV</button></div>
-      <div class="card-table"><table><thead><tr><th>Час</th><th>Адміністратор</th><th>Роль</th><th>Дія</th><th>Обʼєкт</th></tr></thead><tbody id="audit-body">
-      ${a.length?a.map(x=>auditRow(x)).join(''):`<tr><td colspan="5" class="empty">Журнал порожній</td></tr>`}</tbody></table></div>`;
-  },
-  settings(){
-    V.innerHTML=`<div class="card-table" style="max-width:640px">
-      <table><tbody>
-      <tr><td><div class="name">版 Версія панелі</div><div class="meta">Sport Market Review Admin</div></td><td style="text-align:right">MVP · v0.1</td></tr>
-      <tr><td><div class="name">Двофакторна автентифікація</div><div class="meta">Рекомендовано для Super Admin</div></td><td style="text-align:right">${badge('b-warn','незабаром')}</td></tr>
-      <tr><td><div class="name">Ролі та доступи</div><div class="meta">6 ролей · матриця дозволів</div></td><td style="text-align:right">${badge('b-ok','активна')}</td></tr>
-      <tr><td><div class="name">Журнал аудиту</div><div class="meta">${loadAudit().length} записів</div></td><td style="text-align:right"><button class="rowact" onclick="go('audit')">Відкрити</button></td></tr>
-      </tbody></table></div>`;
-  },
+const VIEWS={};
+VIEWS.dashboard=function(){
+  const m=[['Усього користувачів',USERS.length,'up','+12 за тиждень'],['Нові користувачі',3,'up','за 7 днів'],['Активні',USERS.filter(u=>u.status==='active').length,'flat','30 днів'],['Заповнені профілі',USERS.filter(u=>u.profile>=90).length,'up',''],
+  ['Організації',ORGS.length,'flat',''],['Профілі на модерації',USERS.filter(u=>u.status==='pending').length,'flat','потребує уваги'],['Опубліковані матеріали',ARTICLES.filter(a=>a.status==='published').length,'up',''],['Чернетки',ARTICLES.filter(a=>a.status==='draft').length,'flat',''],
+  ['Можливості на модерації',OPPS.filter(o=>o.status==='pending').length,'flat','потребує уваги'],['Активні можливості',OPPS.filter(o=>o.status==='published').length,'up',''],['Відгуки',OPPS.reduce((s,o)=>s+o.apps,0),'up',''],['Події',EVENTS.length,'flat',''],
+  ['Реєстрації',EVENTS.reduce((s,e)=>s+e.regs,0),'up',''],['Запити на знайомство',INTROS.length,'flat',''],['Відкриті скарги',REPORTS.filter(r=>r.status==='open').length,'flat','потребує уваги']];
+  const att=[['🏢','Профілі/організації на модерації',USERS.filter(u=>u.status==='pending').length+ORGS.filter(o=>o.status==='pending').length,'organizations'],['📄','Матеріали на review',ARTICLES.filter(a=>a.status==='review').length,'articles'],['💼','Можливості чекають модерації',OPPS.filter(o=>o.status==='pending').length,'opportunities'],['📅','Події на модерації',EVENTS.filter(e=>e.status==='pending').length,'events'],['🤝','Знайомства потребують дії',INTROS.filter(i=>i.status==='moreinfo'||i.status==='new').length,'introductions'],['🚩','Відкриті скарги',REPORTS.filter(r=>r.status==='open').length,'reports']].filter(a=>PERMS[SESSION.role].includes(a[3])&&a[2]>0);
+  V().innerHTML=`<div class="grid-metrics">${m.map(x=>`<div class="metric"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="d ${x[2]}">${x[3]||'&nbsp;'}</div></div>`).join('')}</div>
+  ${att.length?`<div class="section-title">Потребує уваги</div><div class="attention">${att.map(a=>`<div class="row"><div class="ic">${a[0]}</div><div><div class="t">${a[1]}</div><div class="s">Натисніть, щоб перейти до розділу</div></div><div class="cnt">${a[2]}</div><button class="go" onclick="go('${a[3]}')">Відкрити →</button></div>`).join('')}</div>`:''}`;
 };
-function auditRow(x){ return `<tr><td class="meta">${new Date(x.ts).toLocaleString('uk-UA')}</td><td><div class="name">${x.actor}</div></td><td>${x.role}</td><td>${x.action}</td><td class="meta">${x.target}</td></tr>`; }
-function filterAudit(q){ q=q.toLowerCase(); const a=loadAudit().filter(x=>(x.actor+x.action+x.target).toLowerCase().includes(q)); document.getElementById('audit-body').innerHTML=a.length?a.map(auditRow).join(''):`<tr><td colspan="5" class="empty">Нічого не знайдено</td></tr>`; }
+
+/* ---- CMS ---- */
+let EDIT=null;
+VIEWS.articles=function(){
+  if(EDIT){return renderEditor();}
+  table({cols:['Заголовок','Тип','Категорія','Автор','Статус','Публікація','Перегляди','Збереження','Оновлено'],rows:ARTICLES,search:r=>r.title+r.author,
+    filters:[{key:'status',opts:['published','draft','review','scheduled','archived']}],
+    extra:`<button class="tbtn primary" onclick="openEditor()">+ Створити матеріал</button><button class="tbtn" onclick="homeSort()">Сортування Home</button>`,
+    cell:r=>`<td><div class="name">${r.title}</div>${r.featured?badge('b-info','featured'):''}</td><td>${r.type}</td><td>${r.category}</td><td>${r.author}</td><td>${sbadge(r.status)}</td><td>${r.date}</td><td>${r.views.toLocaleString('uk-UA')}</td><td>${r.saves}</td><td class="meta">${r.updated}</td>`,
+    actions:r=>`<button class="rowact" onclick="openEditor('${r.id}')">Ред.</button><button class="rowact" onclick="cloneArticle('${r.id}')">Клон</button><button class="rowact" onclick="revisions('${r.id}')">Ревізії</button>`,
+    bulk:['Опублікувати вибрані','Архівувати вибрані']});
+};
+function openEditor(id){
+  const a=id?ARTICLES.find(x=>x.id===id):null;
+  EDIT=a?{...a,blocks:a.blocks||[{type:'paragraph',text:'Текст матеріалу…'}],seo:a.seo||{},related:a.related||[]}:{id:'new',title:'',subtitle:'',type:'Новина',category:'Маркетинг',author:AUTHORS[0],status:'draft',featured:false,blocks:[{type:'paragraph',text:''}],seo:{},related:[],views:0,saves:0};
+  VIEWS.articles();
+}
+function renderEditor(){
+  const e=EDIT;const bt={heading:'Заголовок',paragraph:'Абзац',list:'Список',quote:'Цитата',link:'Посилання',image:'Зображення',caption:'Підпис',embed:'Embed',table:'Таблиця',callout:'Callout',related:'Повʼязані'};
+  V().innerHTML=`
+  <div class="toolbar"><button class="tbtn" onclick="EDIT=null;VIEWS.articles()">← До списку</button><span class="autosave" id="autosave">Автозбереження увімкнено</span><div class="spacer"></div><button class="tbtn" onclick="previewArticle()">Preview</button></div>
+  <div class="editor">
+    <div class="ed-main">
+      <label>Заголовок</label><input id="e-title" value="${esc(e.title)}" oninput="edField('title',this.value)" placeholder="Заголовок матеріалу"/>
+      <label>Підзаголовок</label><input id="e-sub" value="${esc(e.subtitle)}" oninput="edField('subtitle',this.value)" placeholder="Підзаголовок"/>
+      <label style="margin-top:16px">Контент</label>
+      <div id="blocks">${e.blocks.map((b,i)=>blockHtml(b,i,bt)).join('')}</div>
+      <div class="addblocks">${Object.entries(bt).map(([k,l])=>`<button onclick="addBlock('${k}')">+ ${l}</button>`).join('')}</div>
+    </div>
+    <div class="ed-side">
+      <div class="panel"><h4>Публікація</h4>
+        <div class="kv"><span class="k">Статус</span><span>${sbadge(e.status)}</span></div>
+        <div class="wf" style="margin-top:12px">
+          <button onclick="wf('draft')">Чернетка</button><button onclick="wf('review')">На review</button>
+          <button onclick="wf('changes')">Повернути</button><button class="p" onclick="wf('published')">Опублікувати</button>
+          <button onclick="scheduleArt()">Запланувати</button><button onclick="wf('draft2')">Зняти</button><button onclick="wf('archived')">Архів</button>
+        </div>
+      </div>
+      <div class="panel"><h4>Класифікація</h4>
+        <label>Тип</label><select onchange="edField('type',this.value)">${['Новина','Кейс','Інтервʼю','Дослідження','Інсайт','Колонка','Гайд','Рейтинг','Партнерський'].map(t=>`<option ${e.type===t?'selected':''}>${t}</option>`).join('')}</select>
+        <label>Категорія</label><select onchange="edField('category',this.value)">${TAXONOMIES['Категорії контенту'].map(c=>`<option ${e.category===c.n?'selected':''}>${c.n}</option>`).join('')}</select>
+        <label>Автор</label><select onchange="edField('author',this.value)">${AUTHORS.map(a=>`<option ${e.author===a?'selected':''}>${a}</option>`).join('')}</select>
+        <div class="switchrow" style="margin-top:14px"><span style="font-size:13px;font-weight:600">Featured на Home</span><div class="switch ${e.featured?'on':''}" onclick="edField('featured',!EDIT.featured);renderEditor()"><div class="k"></div></div></div>
+      </div>
+      <div class="panel"><h4>Повʼязані сутності</h4>
+        <div class="chips">${['Організації','Люди','Можливості','Події'].map(r=>`<div class="c ${e.related.includes(r)?'on':''}" onclick="toggleRel('${r}')">${r}</div>`).join('')}</div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px">Клікніть, щоб привʼязати сутності до матеріалу.</p>
+      </div>
+      <div class="panel"><h4>SEO та соцпрев'ю</h4>
+        <label>Meta title</label><input value="${esc(e.seo.title||e.title)}" oninput="edSeo('title',this.value)"/>
+        <label>Meta description</label><textarea oninput="edSeo('desc',this.value)" style="min-height:60px">${esc(e.seo.desc||'')}</textarea>
+        <label>Slug</label><input value="${esc(e.seo.slug||'')}" oninput="edSeo('slug',this.value)" placeholder="url-slug"/>
+        <div class="social" style="margin-top:12px"><div class="im">соц-прев'ю зображення</div><div class="tx"><div class="st">${esc(e.seo.title||e.title||'Заголовок')}</div><div class="sd">${esc(e.seo.desc||e.subtitle||'Опис матеріалу')}</div><div class="su">sportmarket.review</div></div></div>
+      </div>
+    </div>
+  </div>`;
+}
+function blockHtml(b,i,bt){return `<div class="block"><div class="bh"><span class="btype">${bt[b.type]||b.type}</span><button class="brm" onclick="rmBlock(${i})">✕</button></div><textarea oninput="edBlock(${i},this.value)" style="min-height:${b.type==='paragraph'?70:48}px" placeholder="${bt[b.type]||''}">${esc(b.text||'')}</textarea></div>`;}
+function addBlock(t){EDIT.blocks.push({type:t,text:''});renderEditor();touchAutosave();}
+function rmBlock(i){EDIT.blocks.splice(i,1);renderEditor();touchAutosave();}
+function edBlock(i,v){EDIT.blocks[i].text=v;touchAutosave();}
+function edField(k,v){EDIT[k]=v;touchAutosave();}
+function edSeo(k,v){EDIT.seo[k]=v;touchAutosave();}
+function toggleRel(r){const i=EDIT.related.indexOf(r);i<0?EDIT.related.push(r):EDIT.related.splice(i,1);renderEditor();touchAutosave();}
+let autosaveT;
+function touchAutosave(){const el=document.getElementById('autosave');if(el)el.textContent='Збереження…';clearTimeout(autosaveT);autosaveT=setTimeout(()=>{if(el)el.textContent='Чернетку збережено ✓';},700);}
+function wf(s){const map={draft:'Чернетка',review:'Надіслано на review',changes:'Повернуто на доробку',published:'Опубліковано',draft2:'Знято з публікації',archived:'Архівовано'};const st=s==='draft2'?'draft':s==='changes'?'draft':s;if(EDIT)EDIT.status=st;audit('CMS: '+map[s],EDIT.title||'матеріал');toast(map[s]);renderEditor();}
+function scheduleArt(){openModal(`<h3>Запланувати публікацію</h3><label>Дата й час</label><input type="datetime-local" id="sch"/><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="EDIT.status='scheduled';audit('CMS: заплановано публікацію',EDIT.title);closeModal();toast('Публікацію заплановано');renderEditor()">Запланувати</button></div>`);}
+function previewArticle(){openModal(`<div class="wide"></div><h3>${esc(EDIT.title||'Без назви')}</h3><p style="color:var(--dim)">${esc(EDIT.subtitle||'')}</p><div style="margin-top:14px">${EDIT.blocks.map(b=>b.type==='quote'?`<blockquote style="border-left:3px solid var(--accent);padding-left:12px;margin:10px 0;font-weight:700">${esc(b.text)}</blockquote>`:b.type==='heading'?`<h4 style="margin:12px 0 4px">${esc(b.text)}</h4>`:`<p style="margin:8px 0;font-size:13.5px;line-height:1.5">${esc(b.text)}</p>`).join('')}</div><div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`,'wide');}
+function cloneArticle(id){const a=ARTICLES.find(x=>x.id===id);audit('CMS: клоновано матеріал',a.title);toast('Матеріал клоновано як чернетку');}
+function revisions(id){const a=ARTICLES.find(x=>x.id===id);openModal(`<h3>Ревізії — ${esc(a.title)}</h3><div style="margin-top:12px">${['v3 · оновлено 27.07 · Олег Редактор','v2 · опубліковано 24.07 · Марія Левченко','v1 · створено 20.07 · Редакція SMR'].map(r=>`<div class="hist">📄 ${r}</div>`).join('')}</div><div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`);}
+function homeSort(){openModal(`<h3>Ручне сортування Home</h3><p>Порядок featured-матеріалів на головній.</p><div style="margin-top:12px">${ARTICLES.filter(a=>a.featured).sort((a,b)=>a.homeOrder-b.homeOrder).map((a,i)=>`<div class="kv"><span>${i+1}. ${esc(a.title)}</span><span class="meta">order ${a.homeOrder}</span></div>`).join('')}</div><div class="row"><button class="a" onclick="audit('CMS: змінено сортування Home','');closeModal();toast('Порядок збережено')">Готово</button></div>`);}
+
+/* ---- USERS ---- */
+let UST=0;
+VIEWS.users=function(){
+  const q=['Черга: нові','Черга: зміни','Verification','Скарги'];
+  document.getElementById('view').innerHTML=`<div class="tabs">${['Усі користувачі',...q].map((t,i)=>`<div class="tab ${i===UST?'active':''}" onclick="UST=${i};VIEWS.users()">${t}</div>`).join('')}</div><div id="uslot"></div>`;
+  const slot=document.getElementById('uslot');
+  if(UST===0){userTable(slot);}
+  else{TSTATE={};const map=[null,USERS.filter(u=>u.status==='pending'),USERS.filter(u=>u.profile<100&&u.status==='active'),USERS.filter(u=>!u.verified&&u.status==='active'),USERS.filter(u=>u.status==='blocked'||u.name.includes('Спам'))];moderationQueue(slot,map[UST]);}
+};
+function userTable(container){
+  table({container,cols:['Користувач','Роль','Організація','Профіль','Активність','Статус','Верифікація'],rows:USERS,search:r=>r.name+r.email,filters:[{key:'status',opts:['active','pending','suspended','blocked','deleted']}],
+    cell:r=>`<td><div class="name">${r.name}</div><div class="meta">${r.email} · рег. ${r.created}</div></td><td>${r.role}</td><td>${r.org}</td><td>${r.profile}%</td><td class="meta">${r.active}</td><td>${sbadge(r.status)}</td><td>${r.verified?badge('b-ok','так'):badge('b-neutral','ні')}</td>`,
+    actions:r=>`<button class="rowact" onclick="userCard('${r.id}')">Профіль</button>`,bulk:['Верифікувати вибрані','Заблокувати вибрані']});
+}
+function moderationQueue(container,rows){
+  if(!rows||!rows.length){container.innerHTML=`<div class="card-table"><div class="empty">Черга порожня</div></div>`;return;}
+  container.innerHTML=`<div class="card-table"><table><thead><tr><th>Користувач</th><th>Профіль</th><th>Статус</th><th style="text-align:right">Рішення</th></tr></thead><tbody>${rows.map(r=>`<tr><td><div class="name">${r.name}</div><div class="meta">${r.email}</div></td><td>${r.profile}%</td><td>${sbadge(r.status)}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="rowact ok" onclick="act('Профіль схвалено','${r.name}')">Approve</button><button class="rowact ok" onclick="act('Схвалено і верифіковано','${r.name}')">Approve+verify</button><button class="rowact" onclick="act('Запит змін','${r.name}')">Changes</button><button class="rowact dg" onclick="confirmAct('Відхилити профіль?','${r.name}','Профіль відхилено')">Reject</button><button class="rowact dg" onclick="confirmAct('Призупинити?','${r.name}','Призупинено')">Suspend</button></td></tr>`).join('')}</tbody></table></div>`;
+}
+function userCard(id){
+  const u=USERS.find(x=>x.id===id);
+  openModal(`<h3>${esc(u.name)}</h3><p>${esc(u.email)}</p>
+    <div style="margin-top:14px">
+      <div class="kv"><span class="k">Роль</span><span>${u.role}</span></div>
+      <div class="kv"><span class="k">Організація</span><span>${u.org}</span></div>
+      <div class="kv"><span class="k">Реєстрація</span><span>${u.created}</span></div>
+      <div class="kv"><span class="k">Активність</span><span>${u.active}</span></div>
+      <div class="kv"><span class="k">Заповнення профілю</span><span>${u.profile}%</span></div>
+      <div class="kv"><span class="k">Статус</span><span>${sbadge(u.status)}</span></div>
+    </div>
+    <label style="margin-top:14px">Змінити роль</label><select id="urole">${['Фахівець','Представник організації','Студент','Інше'].map(r=>`<option ${u.role===r?'selected':''}>${r}</option>`).join('')}</select>
+    <div class="wf" style="margin-top:14px">
+      <button onclick="uAct('${id}','Роль оновлено')">Зберегти роль</button>
+      <button class="p" onclick="uAct('${id}','${u.verified?'Знято верифікацію':'Верифіковано'}')">${u.verified?'Зняти верифікацію':'Верифікувати'}</button>
+      <button onclick="uAct('${id}','Повідомлення надіслано')">Написати</button>
+      <button onclick="uAct('${id}','Тимчасово заблоковано')">Suspend</button>
+      <button onclick="uAct('${id}','Повністю заблоковано')">Block</button>
+      <button onclick="uAudit('${id}')">Audit history</button>
+      <button onclick="confirmAct('Soft delete акаунта?','${u.name}','Акаунт видалено (soft)')">Soft delete</button>
+    </div>
+    <div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`,'wide');
+}
+function uAct(id,msg){const u=USERS.find(x=>x.id===id);audit(msg,u.name);toast(msg);closeModal();}
+function uAudit(id){const u=USERS.find(x=>x.id===id);openModal(`<h3>Історія — ${esc(u.name)}</h3><div style="margin-top:12px">${['Реєстрація · '+u.created,'Заповнено профіль на '+u.profile+'%',u.verified?'Верифіковано':'Очікує верифікації','Останній вхід · '+u.active].map(h=>`<div class="hist">• ${h}</div>`).join('')}</div><div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`);}
+
+/* ---- ORGANIZATIONS ---- */
+let OST=0;
+VIEWS.organizations=function(){
+  document.getElementById('view').innerHTML=`<div class="tabs">${['Організації','Запити доступу'].map((t,i)=>`<div class="tab ${i===OST?'active':''}" onclick="OST=${i};VIEWS.organizations()">${t}${i===1&&ACCESS_REQ.length?' · '+ACCESS_REQ.length:''}</div>`).join('')}</div><div id="oslot"></div>`;
+  const slot=document.getElementById('oslot');
+  if(OST===0){table({container:slot,cols:['Організація','Тип','Місто','Власник','Менеджери','Можливості','Статус'],rows:ORGS,search:r=>r.name+r.type,filters:[{key:'status',opts:['verified','pending']}],
+    extra:`<button class="tbtn primary" onclick="act('Створено організацію','нова')">+ Створити</button>`,
+    cell:r=>`<td><div class="name">${r.name}</div></td><td>${r.type}</td><td>${r.city}</td><td>${r.owner}</td><td>${r.managers}</td><td>${r.opps}</td><td>${sbadge(r.status)}</td>`,
+    actions:r=>`<button class="rowact" onclick="orgCard('${r.id}')">Керувати</button>`,bulk:['Верифікувати вибрані']});}
+  else{TSTATE={};slot.innerHTML=`<div class="card-table"><table><thead><tr><th>Користувач</th><th>Організація</th><th>Роль</th><th style="text-align:right">Рішення</th></tr></thead><tbody>${ACCESS_REQ.map(r=>`<tr><td><div class="name">${r.user}</div></td><td>${r.org}</td><td>${r.role}</td><td style="text-align:right;white-space:nowrap"><button class="rowact ok" onclick="act('Доступ схвалено','${r.user}→${r.org}')">Approve</button><button class="rowact" onclick="act('Запит інформації','${r.user}')">Request info</button><button class="rowact" onclick="act('Призначено роль в організації','${r.user}')">Assign role</button><button class="rowact dg" onclick="confirmAct('Відхилити запит?','${r.user}','Запит доступу відхилено')">Reject</button></td></tr>`).join('')}</tbody></table></div>`;}
+};
+function orgCard(id){const o=ORGS.find(x=>x.id===id);
+  openModal(`<h3>${esc(o.name)}</h3><p>${o.type} · ${o.city}</p>
+  <div style="margin-top:14px"><div class="kv"><span class="k">Власник</span><span>${o.owner}</span></div><div class="kv"><span class="k">Менеджери</span><span>${o.managers}</span></div><div class="kv"><span class="k">Активні можливості</span><span>${o.opps}</span></div><div class="kv"><span class="k">Статус</span><span>${sbadge(o.status)}</span></div></div>
+  <div class="wf" style="margin-top:14px">
+    <button class="p" onclick="oAct('${id}','${o.status==='verified'?'Знято верифікацію':'Верифіковано організацію'}')">${o.status==='verified'?'Зняти верифікацію':'Верифікувати'}</button>
+    <button onclick="oAct('${id}','Редаговано організацію')">Редагувати</button>
+    <button onclick="oAct('${id}','Призначено власника')">Призначити власника</button>
+    <button onclick="oAct('${id}','Додано менеджера')">+ Менеджер</button>
+    <button onclick="oAct('${id}','Знято менеджера')">− Менеджер</button>
+    <button onclick="oAct('${id}','Обʼєднано дублікати')">Обʼєднати дублікат</button>
+    <button onclick="oAct('${id}','Приховано організацію')">Приховати</button>
+    <button onclick="oAct('${id}','Архівовано організацію')">Архів</button>
+    <button onclick="oAudit('${id}')">Історія змін</button>
+  </div><div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`,'wide');}
+function oAct(id,msg){const o=ORGS.find(x=>x.id===id);audit(msg,o.name);toast(msg);closeModal();}
+function oAudit(id){const o=ORGS.find(x=>x.id===id);openModal(`<h3>Історія — ${esc(o.name)}</h3><div style="margin-top:12px">${['Створено','Верифіковано','Додано менеджера','Опубліковано можливість'].map(h=>`<div class="hist">• ${h}</div>`).join('')}</div><div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`);}
+
+/* ---- OPPORTUNITIES ---- */
+VIEWS.opportunities=function(){
+  table({cols:['Можливість','Автор','Організація','Тип','Дедлайн','Відгуки','Скарги','Статус'],rows:OPPS,search:r=>r.title+r.org,filters:[{key:'status',opts:['published','pending']}],
+    cell:r=>`<td><div class="name">${r.title}</div><div class="meta">створено ${r.created}</div></td><td>${r.author}</td><td>${r.org}</td><td>${r.type}</td><td>${r.deadline}</td><td>${r.apps}</td><td>${r.reports?badge('b-danger',r.reports):'0'}</td><td>${sbadge(r.status)}</td>`,
+    actions:r=>`<button class="rowact" onclick="oppCard('${r.id}')">Модерувати</button>`,bulk:['Схвалити вибрані','Відхилити вибрані']});
+};
+function oppCard(id){const o=OPPS.find(x=>x.id===id);
+  openModal(`<h3>${esc(o.title)}</h3><p>${o.org} · ${o.type} · дедлайн ${o.deadline}</p>
+  <div style="margin-top:14px"><div class="kv"><span class="k">Автор</span><span>${o.author}</span></div><div class="kv"><span class="k">Відгуки</span><span>${o.apps}</span></div><div class="kv"><span class="k">Скарги</span><span>${o.reports}</span></div><div class="kv"><span class="k">Статус</span><span>${sbadge(o.status)}</span></div></div>
+  <div class="wf" style="margin-top:14px">
+    <button class="p" onclick="opAct('${id}','Схвалено можливість')">Approve</button>
+    <button onclick="rejectOpp('${id}')">Reject</button>
+    <button onclick="opAct('${id}','Запит змін')">Request changes</button>
+    <button onclick="opAct('${id}','Редаговано')">Edit</button>
+    <button onclick="opAct('${id}','Позначено featured')">Feature</button>
+    <button onclick="opAct('${id}','Призупинено')">Pause</button>
+    <button onclick="opAct('${id}','Закрито')">Close</button>
+    <button onclick="opAct('${id}','Архівовано')">Archive</button>
+    <button onclick="opAct('${id}','Продовжено дедлайн')">Extend</button>
+    <button onclick="opAct('${id}','Звʼязок з автором')">Contact author</button>
+  </div><div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`,'wide');}
+function opAct(id,msg){const o=OPPS.find(x=>x.id===id);audit(msg,o.title);toast(msg);closeModal();}
+function rejectOpp(id){const o=OPPS.find(x=>x.id===id);
+  openModal(`<h3>Відхилити можливість</h3><p>${esc(o.title)}</p><label>Причина відхилення (обовʼязково)</label><textarea id="rej" placeholder="Опишіть, що потрібно виправити"></textarea><div class="row"><button class="c" onclick="oppCard('${id}')">Назад</button><button class="a danger" onclick="doRejectOpp('${id}')">Відхилити</button></div>`);}
+function doRejectOpp(id){const v=document.getElementById('rej').value.trim();if(v.length<5){toast('Вкажіть причину відхилення');return;}const o=OPPS.find(x=>x.id===id);audit('Можливість відхилено · '+v,o.title);closeModal();toast('Можливість відхилено');}
+
+/* ---- EVENTS ---- */
+VIEWS.events=function(){
+  table({cols:['Подія','Дата','Формат','Місткість','Реєстрації','Статус'],rows:EVENTS,search:r=>r.title,filters:[{key:'status',opts:['published','pending']}],
+    extra:`<button class="tbtn primary" onclick="act('Створено подію','нова')">+ Створити подію</button>`,
+    cell:r=>`<td><div class="name">${r.title}</div></td><td>${r.date}</td><td>${r.format}</td><td>${r.cap}</td><td>${r.regs}/${r.cap}${r.regs>=r.cap?' '+badge('b-warn','повна'):''}</td><td>${sbadge(r.status)}</td>`,
+    actions:r=>`<button class="rowact" onclick="eventCard('${r.id}')">Керувати</button>`,bulk:['Схвалити вибрані']});
+};
+function eventCard(id){const e=EVENTS.find(x=>x.id===id);
+  openModal(`<h3>${esc(e.title)}</h3><p>${e.date} · ${e.format} · ${e.regs}/${e.cap} місць</p>
+  <div class="wf" style="margin-top:14px">
+    ${e.status==='pending'?`<button class="p" onclick="evAct('${id}','Схвалено і опубліковано')">Publish</button>`:''}
+    <button onclick="evAct('${id}','Редаговано подію')">Edit</button>
+    <button onclick="evAct('${id}','Змінено місткість')">Capacity</button>
+    <button onclick="evAct('${id}','Відкрито waitlist')">Open waitlist</button>
+    <button onclick="evAct('${id}','Клоновано подію')">Clone</button>
+    <button onclick="evAct('${id}','Експорт учасників')">Export учасників</button>
+    <button onclick="evAct('${id}','Позначено attendance')">Attendance</button>
+    <button onclick="notifyEvent('${id}','повідомлення')">Написати зареєстрованим</button>
+    <button onclick="rescheduleEvent('${id}')">Перенести</button>
+    <button onclick="cancelEvent('${id}')">Скасувати</button>
+  </div><div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`,'wide');}
+function evAct(id,msg){const e=EVENTS.find(x=>x.id===id);audit(msg,e.title);toast(msg);closeModal();}
+function cancelEvent(id){const e=EVENTS.find(x=>x.id===id);confirmModal('Скасувати подію?',`Усі ${e.regs} зареєстрованих отримають сповіщення про скасування.`,()=>{audit('Подію скасовано + сповіщення '+e.regs+' учасникам',e.title);toast('Подію скасовано, сповіщення надіслано');},true);}
+function rescheduleEvent(id){const e=EVENTS.find(x=>x.id===id);openModal(`<h3>Перенести подію</h3><p>${esc(e.title)}. Зареєстровані (${e.regs}) отримають сповіщення.</p><label>Нова дата</label><input type="date" id="nd"/><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="audit('Подію перенесено + сповіщення ${e.regs}','${esc(e.title)}');closeModal();toast('Подію перенесено, сповіщення надіслано')">Перенести</button></div>`);}
+function notifyEvent(id){const e=EVENTS.find(x=>x.id===id);openModal(`<h3>Повідомлення зареєстрованим</h3><p>${esc(e.title)} · ${e.regs} отримувачів</p><textarea id="msg" placeholder="Текст повідомлення"></textarea><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="audit('Розсилка зареєстрованим (${e.regs})','${esc(e.title)}');closeModal();toast('Повідомлення надіслано ${e.regs} учасникам')">Надіслати</button></div>`);}
+
+/* ---- REGISTRATIONS ---- */
+VIEWS.registrations=function(){
+  table({cols:['Учасник','Подія','Статус','Дата','Attendance'],rows:REGS,search:r=>r.user+r.event,filters:[{key:'status',opts:['registered','waitlist','cancelled']}],
+    extra:`<button class="tbtn" onclick="exportCsv('registrations',REGS)">Експорт учасників</button>`,
+    cell:r=>`<td><div class="name">${r.user}</div></td><td>${r.event}</td><td>${sbadge(r.status)}</td><td>${r.date}</td><td>${r.attended?badge('b-ok','був'):badge('b-neutral','—')}</td>`,
+    actions:r=>`${r.status==='waitlist'?`<button class="rowact ok" onclick="act('Підтверджено реєстрацію','${r.user}')">Підтвердити</button>`:''}<button class="rowact" onclick="act('Позначено attendance','${r.user}')">Attendance</button>`,bulk:['Підтвердити вибрані','Позначити attendance']});
+};
+
+/* ---- INTRODUCTIONS (kanban) ---- */
+VIEWS.introductions=function(){
+  V().innerHTML=`<div class="toolbar"><span class="autosave">Перетягування замінено кнопками статусу на картці</span></div>
+  <div class="kanban">${INTRO_COLS.map(([k,l])=>{const cards=INTROS.filter(i=>i.status===k);return `<div class="kcol"><h4><span>${l}</span><span>${cards.length}</span></h4>${cards.map(c=>introCard(c)).join('')||'<div style="font-size:11.5px;color:var(--muted);text-align:center;padding:8px">—</div>'}</div>`;}).join('')}</div>`;
+};
+function introCard(c){return `<div class="kcard" onclick="introModal('${c.id}')"><div class="kt">${esc(c.from)} → ${esc(c.to)}</div><div class="km">${c.reason}</div><div class="kf"><span class="pri ${c.priority}">${c.priority}</span>${c.manager!=='—'?badge('b-info',c.manager.split(' ')[0]):badge('b-neutral','без відп.')}</div></div>`;}
+function introModal(id){const c=INTROS.find(x=>x.id===id);
+  openModal(`<h3>${esc(c.from)} → ${esc(c.to)}</h3>
+  <div style="margin-top:12px"><div class="kv"><span class="k">Причина</span><span>${c.reason}</span></div><div class="kv"><span class="k">Очікуваний результат</span><span>${c.outcome}</span></div><div class="kv"><span class="k">Повʼязана сутність</span><span>${c.related}</span></div><div class="kv"><span class="k">Відповідальний</span><span>${c.manager}</span></div><div class="kv"><span class="k">Пріоритет</span><span class="pri ${c.priority}">${c.priority}</span></div><div class="kv"><span class="k">Email-статус</span><span>${c.email}</span></div><div class="kv"><span class="k">Статус</span><span>${sbadge(c.status)}</span></div></div>
+  <label style="margin-top:12px">Внутрішні нотатки</label><textarea id="inote" placeholder="Нотатка">${esc(c.notes)}</textarea>
+  <div style="margin-top:8px"><div style="font-size:11px;font-weight:800;color:var(--muted)">ІСТОРІЯ</div>${c.history.map(h=>`<div class="hist">• ${h}</div>`).join('')}</div>
+  <div class="wf" style="margin-top:12px">
+    <button onclick="iAssign('${id}')">Призначити відп.</button>
+    <button onclick="iMove('${id}','moreinfo','Запит інформації')">Запросити інфо</button>
+    <button class="p" onclick="iMove('${id}','approved','Схвалено')">Одобрити</button>
+    <button onclick="iMove('${id}','declined','Відхилено')">Відхилити</button>
+    <button onclick="genEmail('${id}')">Сформувати email</button>
+    <button onclick="iMove('${id}','sent','Знайомство надіслано')">Надіслати знайомство</button>
+    <button onclick="iMove('${id}','closed','Закрито')">Закрити</button>
+  </div><div class="row"><button class="c" onclick="saveINote('${id}')">Зберегти нотатку</button><button class="a" onclick="closeModal()">Закрити</button></div>`,'wide');}
+function iMove(id,st,label){const c=INTROS.find(x=>x.id===id);c.status=st;c.history.push(label);if(st==='sent')c.email='надіслано';audit('Знайомство: '+label,c.from+'→'+c.to);closeModal();toast(label);VIEWS.introductions();}
+function iAssign(id){const c=INTROS.find(x=>x.id===id);c.manager=SESSION.name;c.history.push('Призначено: '+SESSION.name);audit('Призначено відповідального',c.from+'→'+c.to);toast('Вас призначено відповідальним');introModal(id);}
+function saveINote(id){const c=INTROS.find(x=>x.id===id);c.notes=document.getElementById('inote').value;audit('Нотатка до знайомства',c.from+'→'+c.to);toast('Нотатку збережено');}
+function genEmail(id){const c=INTROS.find(x=>x.id===id);openModal(`<h3>Introduction email</h3><label>Тема</label><input value="Знайомство: ${esc(c.from)} ↔ ${esc(c.to)}"/><label>Текст</label><textarea style="min-height:140px">Вітаємо!\n\nРаді познайомити вас у межах Sport Market Review.\nПричина: ${esc(c.reason)}.\nОчікуваний результат: ${esc(c.outcome)}.\n\nЗ повагою, команда SMR.</textarea><div class="row"><button class="c" onclick="introModal('${id}')">Назад</button><button class="a" onclick="iMove('${id}','sent','Знайомство надіслано (email)')">Відправити знайомство</button></div>`,'wide');}
+
+/* ---- REPORTS ---- */
+VIEWS.reports=function(){
+  table({cols:['Обʼєкт','Тип','Причина','Статус'],rows:REPORTS,search:r=>r.target+r.reason,filters:[{key:'status',opts:['open']}],
+    cell:r=>`<td><div class="name">${r.target}</div></td><td>${r.type}</td><td>${r.reason}</td><td>${sbadge(r.status)}</td>`,
+    actions:r=>`<button class="rowact" onclick="reportCard('${r.id}')">Розглянути</button>`,bulk:['Закрити вибрані']});
+};
+function reportCard(id){const r=REPORTS.find(x=>x.id===id);
+  openModal(`<h3>Скарга на «${esc(r.target)}»</h3><p>${r.type} · причина: ${r.reason}</p><label style="margin-top:12px">Рішення</label>
+  <div class="wf" style="margin-top:8px">${REPORT_DECISIONS.map(d=>`<button ${d.includes('Заблокувати')||d.includes('Приховати')?'class="p"':''} onclick="rAct('${id}','${d}')">${d}</button>`).join('')}</div>
+  <label style="margin-top:12px">Внутрішня нотатка</label><textarea placeholder="Коментар модератора"></textarea>
+  <div class="row"><button class="a" onclick="closeModal()">Закрити</button></div>`,'wide');}
+function rAct(id,d){const r=REPORTS.find(x=>x.id===id);audit('Скарга · '+d,r.target);toast('Рішення: '+d);closeModal();}
+
+/* ---- TAXONOMIES ---- */
+let TAX=Object.keys(TAXONOMIES)[0];
+VIEWS.taxonomies=function(){
+  V().innerHTML=`<div class="taxwrap"><div class="taxlist">${Object.keys(TAXONOMIES).map(t=>`<button class="${t===TAX?'active':''}" onclick="TAX='${t}';VIEWS.taxonomies()">${t}</button>`).join('')}</div>
+  <div><div class="toolbar"><h3 style="font-size:16px">${TAX}</h3><div class="spacer"></div><button class="tbtn primary" onclick="taxAdd()">+ Додати</button></div>
+  <div class="card-table"><table><thead><tr><th>Значення</th><th>Використання</th><th>Активність</th><th style="text-align:right">Дії</th></tr></thead><tbody>
+  ${TAXONOMIES[TAX].map((it,i)=>`<tr><td><div class="name">${it.n}</div></td><td>${it.used?badge('b-info','використовується'):badge('b-neutral','не використовується')}</td><td>${it.active?badge('b-ok','активний'):badge('b-neutral','деактивований')}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="rowact" onclick="taxRename(${i})">Перейменувати</button><button class="rowact" onclick="taxMerge(${i})">Обʼєднати</button><button class="rowact" onclick="taxToggle(${i})">${it.active?'Деактивувати':'Активувати'}</button>${it.used?'':`<button class="rowact dg" onclick="taxDelete(${i})">Видалити</button>`}</td></tr>`).join('')}
+  </tbody></table></div><p style="font-size:12px;color:var(--muted);margin-top:10px">Значення, що використовується, не можна видалити — лише деактивувати, перейменувати або обʼєднати.</p></div></div>`;
+};
+function taxAdd(){openModal(`<h3>Додати значення</h3><label>${TAX}</label><input id="txn" placeholder="Нове значення"/><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="const v=document.getElementById('txn').value.trim();if(v){TAXONOMIES['${TAX}'].push({n:v,used:false,active:true});audit('Довідник: додано','${TAX} · '+v);}closeModal();VIEWS.taxonomies();toast('Додано')">Додати</button></div>`);setTimeout(()=>document.getElementById('txn').focus(),50);}
+function taxRename(i){const it=TAXONOMIES[TAX][i];openModal(`<h3>Перейменувати</h3><input id="txr" value="${esc(it.n)}"/><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="TAXONOMIES['${TAX}'][${i}].n=document.getElementById('txr').value;audit('Довідник: перейменовано','${TAX}');closeModal();VIEWS.taxonomies();toast('Перейменовано')">Зберегти</button></div>`);}
+function taxMerge(i){const it=TAXONOMIES[TAX][i];const others=TAXONOMIES[TAX].filter((_,j)=>j!==i);openModal(`<h3>Обʼєднати «${esc(it.n)}»</h3><label>З яким значенням обʼєднати</label><select id="txm">${others.map(o=>`<option>${o.n}</option>`).join('')}</select><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="audit('Довідник: обʼєднано','${TAX} · ${esc(it.n)}');TAXONOMIES['${TAX}'].splice(${i},1);closeModal();VIEWS.taxonomies();toast('Значення обʼєднано')">Обʼєднати</button></div>`);}
+function taxToggle(i){TAXONOMIES[TAX][i].active=!TAXONOMIES[TAX][i].active;audit('Довідник: змінено активність',TAX);VIEWS.taxonomies();toast('Оновлено');}
+function taxDelete(i){const it=TAXONOMIES[TAX][i];confirmModal('Видалити значення?',esc(it.n),()=>{TAXONOMIES[TAX].splice(i,1);audit('Довідник: видалено',TAX+' · '+it.n);VIEWS.taxonomies();toast('Видалено');},true);}
+
+/* ---- ANALYTICS ---- */
+let PERIOD='30';
+VIEWS.analytics=function(){
+  const mult=PERIOD==='7'?0.25:PERIOD==='90'?3:1;const r=n=>Math.round(n*mult);
+  const cards=[['Реєстрації',r(48),'up'],['Activation rate','62%','up'],['Заповнення профілів','72%','up'],['Активні користувачі',r(120),'flat'],['Перегляди можливостей',r(1340),'up'],['View→application','8.4%','flat'],['Реєстрації на події',r(542),'up'],['Запити на знайомство',r(36),'flat'],['Час модерації','6 год','down'],['Пошуки без результатів',r(14),'down']];
+  V().innerHTML=`<div class="toolbar"><select onchange="PERIOD=this.value;VIEWS.analytics()">${[['7','7 днів'],['30','30 днів'],['90','90 днів']].map(([v,l])=>`<option value="${v}" ${PERIOD===v?'selected':''}>${l}</option>`).join('')}</select><div class="spacer"></div><button class="tbtn" onclick="exportCsv('analytics',[{metric:'registrations',value:${r(48)}},{metric:'activation',value:'62%'},{metric:'profile_completion',value:'72%'}])">Експорт CSV</button></div>
+  <div class="grid-metrics">${cards.map(c=>`<div class="metric"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="d ${c[2]}">за ${PERIOD} дн</div></div>`).join('')}</div>
+  <div class="section-title">Популярні категорії / матеріали / запити</div>
+  <div class="card-table"><table><thead><tr><th>Популярні категорії</th><th>Популярні матеріали</th><th>Топ-запити</th><th>Запити без результатів</th></tr></thead><tbody><tr>
+    <td>Маркетинг · Комерція · Медіа</td><td class="meta">Nike · Реферальна програма</td><td class="meta">спонсорство · неймінг</td><td class="meta">хокей · esports jobs</td></tr></tbody></table></div>
+  <div class="section-title">Джерела трафіку</div><div class="card-table"><table><tbody><tr><td>Прямі</td><td style="text-align:right">48%</td></tr><tr><td>Соцмережі</td><td style="text-align:right">31%</td></tr><tr><td>Пошук</td><td style="text-align:right">21%</td></tr></tbody></table></div>
+  <div class="section-title">Analytics events (${ANALYTICS_EVENTS.length})</div><div class="card-table"><div style="padding:14px;display:flex;flex-wrap:wrap;gap:6px">${ANALYTICS_EVENTS.map(e=>`<span class="badge2 b-neutral">${e}</span>`).join('')}</div></div>`;
+};
+
+/* ---- EMAIL ---- */
+VIEWS.email=function(){
+  V().innerHTML=`<div class="tpl-grid">${EMAIL_TEMPLATES.map(t=>`<div class="tpl" onclick="emailTpl('${t[0]}')"><div class="tt">${t[1]}</div><div class="ts">${t[2]}</div><div style="margin-top:8px">${badge('b-neutral',t[0])}</div></div>`).join('')}</div>`;
+};
+function emailTpl(key){const t=EMAIL_TEMPLATES.find(x=>x[0]===key);openModal(`<h3>${t[1]}</h3><label>Тема</label><input value="${esc(t[2])}"/><label>Тіло листа</label><textarea style="min-height:160px">Вітаємо, {{name}}!\n\n${esc(t[2])}.\n{{body}}\n\nЗ повагою, команда Sport Market Review.</textarea><label>Змінні</label><div style="font-size:12px;color:var(--dim)">{{name}} · {{entity}} · {{status}} · {{link}}</div><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="audit('Email-шаблон збережено','${t[1]}');closeModal();toast('Шаблон збережено')">Зберегти</button></div>`,'wide');}
+
+/* ---- AUDIT ---- */
+VIEWS.audit=function(){
+  const a=loadAudit();
+  V().innerHTML=`<div class="toolbar"><input class="search" placeholder="Пошук у журналі" oninput="filterAudit(this.value)"/><div class="spacer"></div><button class="tbtn" onclick="exportCsv('audit',loadAudit().map(x=>({time:new Date(x.ts).toLocaleString('uk-UA'),actor:x.actor,role:x.role,action:x.action,target:x.target})))">Експорт CSV</button></div>
+  <div class="card-table"><table><thead><tr><th>Час</th><th>Адміністратор</th><th>Роль</th><th>Дія</th><th>Обʼєкт</th></tr></thead><tbody id="audit-body">${a.length?a.map(auditRow).join(''):`<tr><td colspan="5" class="empty">Журнал порожній</td></tr>`}</tbody></table></div>`;
+};
+function auditRow(x){return `<tr><td class="meta">${new Date(x.ts).toLocaleString('uk-UA')}</td><td><div class="name">${x.actor}</div></td><td>${x.role}</td><td>${x.action}</td><td class="meta">${x.target}</td></tr>`;}
+function filterAudit(q){q=q.toLowerCase();const a=loadAudit().filter(x=>(x.actor+x.action+x.target).toLowerCase().includes(q));document.getElementById('audit-body').innerHTML=a.length?a.map(auditRow).join(''):`<tr><td colspan="5" class="empty">Нічого не знайдено</td></tr>`;}
+
+/* ---- SETTINGS ---- */
+VIEWS.settings=function(){
+  V().innerHTML=`<div class="panel" style="max-width:760px"><h4>Платформа</h4><div class="formgrid">
+    <div><label>Назва платформи</label><input value="Sport Market Review"/></div>
+    <div><label>Контактний email</label><input value="hello@sportmarket.review"/></div>
+    <div class="full"><label>Логотип</label><input value="logo.svg" /></div>
+    <div class="full"><label>Соцмережі</label><input value="instagram.com/smr · linkedin.com/company/smr"/></div>
+    <div class="full"><label>Default SEO опис</label><textarea style="min-height:60px">Ділова екосистема спортивного бізнесу України.</textarea></div>
+  </div></div>
+  <div class="panel" style="max-width:760px;margin-top:16px"><h4>Модерація та контент</h4>
+    <div class="switchrow"><span style="font-size:13px;font-weight:600">Реєстрація відкрита</span><div class="switch on" onclick="this.classList.toggle('on');toast('Збережено')"><div class="k"></div></div></div>
+    <div class="switchrow"><span style="font-size:13px;font-weight:600">Премодерація контенту</span><div class="switch on" onclick="this.classList.toggle('on');toast('Збережено')"><div class="k"></div></div></div>
+    <div class="switchrow"><span style="font-size:13px;font-weight:600">Режим обслуговування</span><div class="switch" onclick="this.classList.toggle('on');toast('Збережено')"><div class="k"></div></div></div>
+    <div class="formgrid" style="margin-top:12px">
+      <div><label>Ліміт файлу (МБ)</label><input value="10"/></div>
+      <div><label>Підтримувані файли</label><input value="PDF, JPG, PNG"/></div>
+      <div><label>Термін дії можливості (днів)</label><input value="45"/></div>
+      <div><label>Нагадування про подію (год до)</label><input value="24"/></div>
+    </div>
+  </div>
+  <div class="panel" style="max-width:760px;margin-top:16px"><h4>Блоки головної (Home)</h4>
+    <div style="font-size:13px;color:var(--dim)">Матеріали · Можливості · Події · Спеціалісти · Організації — порядок керується у CMS → «Сортування Home».</div>
+  </div>
+  <button class="btn" style="max-width:200px;margin-top:16px" onclick="audit('Оновлено налаштування','');toast('Налаштування збережено')">Зберегти зміни</button>`;
+};
 
 /* ============ TABLE ENGINE ============ */
-let TSTATE={};
-function table(cfg){
-  TSTATE={cfg,q:'',filter:''};
-  renderTable();
-}
+let TSTATE={},TCONTAINER=null;
+function table(cfg){TCONTAINER=cfg.container||null;TSTATE={cfg,q:'',filter:''};renderTable();}
 function renderTable(){
-  const {cfg}=TSTATE;
-  let rows=cfg.rows.slice();
-  if(TSTATE.q){ const q=TSTATE.q.toLowerCase(); rows=rows.filter(r=>cfg.search(r).toLowerCase().includes(q)); }
-  if(TSTATE.filter){ rows=rows.filter(r=>r.status===TSTATE.filter); }
-  const f=cfg.filters&&cfg.filters[0];
-  const anySel=SELECTED.size>0;
-  V.innerHTML=`
-    <div class="toolbar">
-      <input class="search" placeholder="Пошук…" value="${TSTATE.q}" oninput="tSearch(this.value)"/>
-      ${f?`<select onchange="tFilter(this.value)"><option value="">Усі статуси</option>${f.opts.map(o=>`<option ${TSTATE.filter===o?'selected':''} value="${o}">${o}</option>`).join('')}</select>`:''}
-      <div class="spacer"></div>
-      ${(cfg.bulk||[]).map((b,i)=>`<button class="tbtn ${i===1?'danger':''}" ${anySel?'':'disabled'} onclick="bulk('${b}')">${b} ${anySel?`(${SELECTED.size})`:''}</button>`).join('')}
-      <button class="tbtn" onclick="exportCsv('${CUR}',TSTATE.cfg.rows)">Експорт CSV</button>
-    </div>
-    <div class="card-table"><table>
-      <thead><tr><th style="width:36px"><input type="checkbox" ${rows.length&&rows.every(r=>SELECTED.has(r.id))?'checked':''} onchange="selAll(this.checked)"/></th>
-      ${cfg.cols.map(c=>`<th>${c}</th>`).join('')}<th style="text-align:right">Дії</th></tr></thead>
-      <tbody>${rows.length?rows.map(r=>`<tr><td><input type="checkbox" ${SELECTED.has(r.id)?'checked':''} onchange="selRow('${r.id}',this.checked)"/></td>${cfg.cell(r)}
-        <td style="text-align:right;white-space:nowrap">${cfg.actions?cfg.actions(r):''}</td></tr>
-        ${NOTES[r.id]?`<tr><td></td><td colspan="${cfg.cols.length+1}"><span class="notecell">📝 Нотатка: ${NOTES[r.id]}</span></td></tr>`:''}`).join(''):`<tr><td colspan="${cfg.cols.length+2}" class="empty">Нічого не знайдено</td></tr>`}
-      </tbody></table></div>`;
+  const {cfg}=TSTATE;if(!cfg)return;let rows=cfg.rows.slice();
+  const host=TCONTAINER||document.getElementById('view');
+  if(TSTATE.q){const q=TSTATE.q.toLowerCase();rows=rows.filter(r=>cfg.search(r).toLowerCase().includes(q));}
+  if(TSTATE.filter)rows=rows.filter(r=>r.status===TSTATE.filter);
+  const f=cfg.filters&&cfg.filters[0];const anySel=SELECTED.size>0;
+  host.innerHTML=`<div class="toolbar"><input class="search" placeholder="Пошук…" value="${TSTATE.q}" oninput="tSearch(this.value)"/>
+    ${f?`<select onchange="tFilter(this.value)"><option value="">Усі статуси</option>${f.opts.map(o=>`<option ${TSTATE.filter===o?'selected':''} value="${o}">${o}</option>`).join('')}</select>`:''}
+    ${cfg.extra||''}<div class="spacer"></div>
+    ${(cfg.bulk||[]).map((b,i)=>`<button class="tbtn ${i===1?'danger':''}" ${anySel?'':'disabled'} onclick="bulk('${b}')">${b} ${anySel?`(${SELECTED.size})`:''}</button>`).join('')}
+    <button class="tbtn" onclick="exportCsv('${CUR}',TSTATE.cfg.rows)">Експорт CSV</button></div>
+  <div class="card-table"><table><thead><tr><th style="width:36px"><input type="checkbox" ${rows.length&&rows.every(r=>SELECTED.has(r.id))?'checked':''} onchange="selAll(this.checked)"/></th>${cfg.cols.map(c=>`<th>${c}</th>`).join('')}<th style="text-align:right">Дії</th></tr></thead>
+  <tbody>${rows.length?rows.map(r=>`<tr><td><input type="checkbox" ${SELECTED.has(r.id)?'checked':''} onchange="selRow('${r.id}',this.checked)"/></td>${cfg.cell(r)}<td style="text-align:right;white-space:nowrap">${cfg.actions?cfg.actions(r):''}</td></tr>${NOTES[r.id]?`<tr><td></td><td colspan="${cfg.cols.length+1}"><span class="notecell">📝 ${NOTES[r.id]}</span></td></tr>`:''}`).join(''):`<tr><td colspan="${cfg.cols.length+2}" class="empty">Нічого не знайдено</td></tr>`}</tbody></table></div>`;
 }
-function tSearch(v){ TSTATE.q=v; renderTable(); }
-function tFilter(v){ TSTATE.filter=v; renderTable(); }
-function selRow(id,on){ on?SELECTED.add(id):SELECTED.delete(id); renderTable(); }
-function selAll(on){ const {cfg}=TSTATE; cfg.rows.forEach(r=>on?SELECTED.add(r.id):SELECTED.delete(r.id)); renderTable(); }
-function bulk(label){
-  confirmModal(label+'?', `Дію буде застосовано до ${SELECTED.size} записів.`, ()=>{
-    audit('Масова дія: '+label, SELECTED.size+' записів');
-    SELECTED.clear(); toast(label+' — виконано'); renderTable();
-  });
-}
+function tSearch(v){TSTATE.q=v;renderTable();}
+function tFilter(v){TSTATE.filter=v;renderTable();}
+function selRow(id,on){on?SELECTED.add(id):SELECTED.delete(id);renderTable();}
+function selAll(on){TSTATE.cfg.rows.forEach(r=>on?SELECTED.add(r.id):SELECTED.delete(r.id));renderTable();}
+function bulk(label){confirmModal(label+'?',`Дію буде застосовано до ${SELECTED.size} записів.`,()=>{audit('Масова дія: '+label,SELECTED.size+' записів');SELECTED.clear();toast(label+' — виконано');renderTable();});}
 
-/* ============ ACTIONS ============ */
-function act(action,target){ audit(action,target); toast(action); if(TSTATE.cfg) renderTable(); }
-function confirmAct(title,target,action){ confirmModal(title,'Підтвердьте дію — вона буде записана в аудит.',()=>{ audit(action,target); toast(action); if(TSTATE.cfg)renderTable(); },true); }
-function noteFor(id,name){
-  openModal(`<h3>Внутрішня нотатка</h3><p>${name} · видима лише команді</p>
-    <textarea id="note-in" placeholder="Напр.: перевірити звʼязок з організацією">${NOTES[id]||''}</textarea>
-    <div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="saveNote('${id}','${name}')">Зберегти</button></div>`);
-  setTimeout(()=>document.getElementById('note-in').focus(),50);
-}
-function saveNote(id,name){ const v=document.getElementById('note-in').value.trim(); NOTES[id]=v; audit('Внутрішня нотатка',name); closeModal(); toast('Нотатку збережено'); if(TSTATE.cfg)renderTable(); }
-
-/* ============ MODAL / TOAST ============ */
-function openModal(html){ document.getElementById('modal').innerHTML=html; document.getElementById('modal-root').classList.add('show'); }
-function closeModal(){ document.getElementById('modal-root').classList.remove('show'); }
-function confirmModal(title,msg,onOk,danger){
-  openModal(`<h3>${title}</h3><p>${msg}</p><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a ${danger?'danger':''}" id="cm-ok">Підтвердити</button></div>`);
-  document.getElementById('cm-ok').onclick=()=>{ closeModal(); onOk(); };
-}
+/* ============ ACTIONS / MODAL / TOAST / EXPORT ============ */
+function act(action,target){audit(action,target);toast(action);refreshBadges();if(TSTATE.cfg)renderTable();}
+function confirmAct(title,target,action){confirmModal(title,'Підтвердьте дію — вона буде записана в аудит.',()=>{audit(action,target);toast(action);refreshBadges();if(TSTATE.cfg)renderTable();},true);}
+function noteFor(id,name){openModal(`<h3>Внутрішня нотатка</h3><p>${name}</p><textarea id="note-in" placeholder="Нотатка">${NOTES[id]||''}</textarea><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a" onclick="saveNote('${id}','${name}')">Зберегти</button></div>`);setTimeout(()=>document.getElementById('note-in').focus(),50);}
+function saveNote(id,name){NOTES[id]=document.getElementById('note-in').value.trim();audit('Внутрішня нотатка',name);closeModal();toast('Нотатку збережено');if(TSTATE.cfg)renderTable();}
+function openModal(html){document.getElementById('modal').className='modal'+(html.includes('class="wide"')||arguments[1]==='wide'?' wide':'');document.getElementById('modal').innerHTML=html;document.getElementById('modal-root').classList.add('show');}
+function closeModal(){document.getElementById('modal-root').classList.remove('show');}
+function confirmModal(title,msg,onOk,danger){openModal(`<h3>${title}</h3><p>${msg}</p><div class="row"><button class="c" onclick="closeModal()">Скасувати</button><button class="a ${danger?'danger':''}" id="cm-ok">Підтвердити</button></div>`);document.getElementById('cm-ok').onclick=()=>{closeModal();onOk();};}
 let toastT;
-function toast(txt){ const t=document.getElementById('toast'); document.getElementById('toast-text').textContent=txt; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2000); }
-
-/* ============ EXPORT ============ */
-function exportCsv(name,rows){
-  if(!rows||!rows.length){ toast('Немає даних для експорту'); return; }
-  const cols=Object.keys(rows[0]);
-  const csv=[cols.join(',')].concat(rows.map(r=>cols.map(c=>`"${String(r[c]??'').replace(/"/g,'""')}"`).join(','))).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`smr_${name}.csv`; a.click(); URL.revokeObjectURL(url);
-  audit('Експорт CSV',name); toast('Експорт готовий: smr_'+name+'.csv');
-}
+function toast(txt){const t=document.getElementById('toast');document.getElementById('toast-text').textContent=txt;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2000);}
+function exportCsv(name,rows){if(!rows||!rows.length){toast('Немає даних для експорту');return;}const cols=Object.keys(rows[0]);const csv=[cols.join(',')].concat(rows.map(r=>cols.map(c=>`"${String(r[c]??'').replace(/"/g,'""')}"`).join(','))).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`smr_${name}.csv`;a.click();URL.revokeObjectURL(url);audit('Експорт CSV',name);toast('Експорт: smr_'+name+'.csv');}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 /* ============ INIT ============ */
 renderQuick();
-document.getElementById('li-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('li-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 </script>
 </body>
 </html>
