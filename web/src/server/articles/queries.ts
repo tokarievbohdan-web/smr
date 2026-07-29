@@ -73,8 +73,11 @@ export async function getArticleFeed(jwt: string | null, p: FeedParams) {
   return { items, total: count ?? null, limit, offset, nextCursor: items.length === limit ? String(offset + limit) : null };
 }
 
-export async function getArticleBySlug(jwt: string | null, slug: string) {
+export async function getArticleBySlug(jwt: string | null, slugRaw: string) {
   const db = readClient(jwt);
+  // Next може віддавати param URL-кодованим (кирилиця) → декодуємо для точного збігу.
+  let slug = slugRaw;
+  try { slug = decodeURIComponent(slugRaw); } catch { /* лишаємо як є */ }
   // прямий збіг або редірект зі slug_history
   const first = await db.from('articles').select(DETAIL_SELECT)
     .eq('slug', slug).eq('status', 'published').is('deleted_at', null)

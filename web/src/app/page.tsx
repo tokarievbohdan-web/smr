@@ -1,11 +1,16 @@
 import Link from "next/link";
-import { ARTICLES, EVENTS, OPPS, PEOPLE } from "@/lib/data";
-import { ArticleCard, DateBox } from "@/components/cards";
+import { EVENTS, OPPS, PEOPLE } from "@/lib/data";
+import { DateBox } from "@/components/cards";
 import { Badge, Thumb } from "@/components/ui";
+import { listReview } from "@/lib/reviewData";
 
-export default function HomePage() {
-  const featured = ARTICLES.find((a) => a.featured)!;
-  const rest = ARTICLES.filter((a) => a.id !== featured.id);
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const { items } = await listReview({ limit: 12 });
+  const featured = items.find((a) => a.featured) ?? items[0] ?? null;
+  const rest = featured ? items.filter((a) => a.slug !== featured.slug) : items;
+
   return (
     <div className="mx-auto w-full max-w-[1280px] px-6 pb-24 pt-10 md:px-10">
       <div className="mb-10 flex items-end justify-between gap-4">
@@ -13,30 +18,44 @@ export default function HomePage() {
           <h1 className="text-[34px] font-extrabold leading-none tracking-tight">Головне сьогодні</h1>
           <p className="mt-3 text-[15px] font-medium text-dim">Персоналізована стрічка спортивного бізнесу</p>
         </div>
-        <span className="text-[14px] font-bold text-accent">24 липня 2026</span>
+        <Link href="/review" className="text-[14px] font-bold text-accent">Уся стрічка →</Link>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-x-14 gap-y-12 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-14">
-          <Link href={`/review/${featured.id}`} className="group grid grid-cols-1 gap-6 overflow-hidden rounded-3xl bg-panel p-4 transition hover:bg-panel2 sm:grid-cols-[1.1fr_1fr] sm:p-5">
-            <Thumb label="" className="min-h-[260px] rounded-2xl" />
-            <div className="flex flex-col justify-center p-2 sm:p-4">
-              <Badge tone="accent">{featured.category} · {featured.type}</Badge>
-              <h2 className="mt-4 text-[30px] font-extrabold leading-[1.1] tracking-tight">{featured.title}</h2>
-              <p className="mt-4 text-[15.5px] leading-relaxed text-dim">{featured.subtitle}</p>
-              <div className="mt-6 text-[13px] font-semibold text-muted">{featured.author} · {featured.readMin} хв читання · {featured.comments} коментарів</div>
-            </div>
-          </Link>
+          {featured ? (
+            <Link href={`/review/${featured.slug}`} className="group grid grid-cols-1 gap-6 overflow-hidden rounded-3xl bg-panel p-4 transition hover:bg-panel2 sm:grid-cols-[1.1fr_1fr] sm:p-5">
+              <Thumb label="" className="min-h-[260px] rounded-2xl" />
+              <div className="flex flex-col justify-center p-2 sm:p-4">
+                <Badge tone="accent">{[featured.categoryLabel, featured.typeLabel].filter(Boolean).join(" · ")}</Badge>
+                <h2 className="mt-4 text-[30px] font-extrabold leading-[1.1] tracking-tight">{featured.title}</h2>
+                {featured.subtitle && <p className="mt-4 text-[15.5px] leading-relaxed text-dim">{featured.subtitle}</p>}
+                <div className="mt-6 text-[13px] font-semibold text-muted">{[featured.author, featured.readMin ? `${featured.readMin} хв читання` : null].filter(Boolean).join(" · ")}</div>
+              </div>
+            </Link>
+          ) : (
+            <div className="rounded-3xl bg-panel p-12 text-center text-[15px] text-muted">Матеріали зʼявляться тут після публікації.</div>
+          )}
 
-          <section>
-            <div className="mb-8 flex items-baseline justify-between">
-              <h2 className="text-[24px] font-extrabold tracking-tight">Свіжі матеріали</h2>
-              <span className="text-[13px] font-bold text-accent">Уся стрічка →</span>
-            </div>
-            <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
-              {rest.map((a) => <ArticleCard key={a.id} a={a} />)}
-            </div>
-          </section>
+          {rest.length > 0 && (
+            <section>
+              <div className="mb-8 flex items-baseline justify-between">
+                <h2 className="text-[24px] font-extrabold tracking-tight">Свіжі матеріали</h2>
+                <Link href="/review" className="text-[13px] font-bold text-accent">Уся стрічка →</Link>
+              </div>
+              <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+                {rest.map((a) => (
+                  <Link key={a.slug} href={`/review/${a.slug}`} className="group flex flex-col">
+                    <Thumb label="" className="mb-4 aspect-[16/10] rounded-2xl" />
+                    <Badge tone="neutral">{[a.categoryLabel, a.typeLabel].filter(Boolean).join(" · ")}</Badge>
+                    <h3 className="mt-3 text-[18px] font-extrabold leading-snug tracking-tight group-hover:text-accent">{a.title}</h3>
+                    {a.subtitle && <p className="mt-2 line-clamp-2 text-[14px] leading-relaxed text-dim">{a.subtitle}</p>}
+                    <div className="mt-3 text-[12px] font-semibold text-muted">{[a.author, a.readMin ? `${a.readMin} хв` : null].filter(Boolean).join(" · ")}</div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         <aside className="flex flex-col gap-10 lg:sticky lg:top-[84px]">
