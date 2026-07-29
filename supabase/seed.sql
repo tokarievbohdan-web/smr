@@ -30,6 +30,15 @@ insert into public.authors (name, slug, headline, active) values
   ('Марія Левченко','maria-levchenko','Авторка, спортивний маркетинг', true)
 on conflict (slug) do nothing;
 
+-- ---------- Типи організацій (Milestone 3) ----------
+insert into public.organization_types (code, title, "order") values
+  ('club','Клуб',1),('federation','Федерація',2),('league','Ліга',3),('brand','Бренд',4),
+  ('agency','Агенція',5),('media','Медіа',6),('sports_tech','Спорттех',7),('startup','Стартап',8),
+  ('investor','Інвестор',9),('fund','Фонд',10),('venue','Обʼєкт/Арена',11),('academy','Академія',12),
+  ('sports_school','Спортшкола',13),('ngo','Громадська організація',14),('government_organization','Державна організація',15),
+  ('event_organizer','Організатор подій',16),('production','Продакшн',17),('service_provider','Постачальник послуг',18),('other','Інше',19)
+on conflict (code) do nothing;
+
 -- ---------- Taxonomies ----------
 insert into public.taxonomies (kind, value, slug, "order") values
   ('sport','Футбол','football',1),
