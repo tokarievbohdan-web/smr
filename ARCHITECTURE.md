@@ -135,3 +135,42 @@ Staging-import demo-статей: `scripts/import-demo-articles.ts` (mock→UUID
 mapping-артефакт, ідемпотентно, не автозапуск у проді).
 **Rollback:** повернути `DATA_MODE=mock` на web → сайт знову на fixtures; схема/дані
 Supabase лишаються (міграції адитивні, `deleted_at`/`archived` замість фізичного видалення).
+
+---
+
+# Milestone 3 — Network (профілі, організації, членство, доступ)
+
+Supabase — джерело правди для профілів, організацій, членства, запитів доступу.
+
+## Схема (016→021 додає)
+- `profiles`: структуровані поля (first/last/display, headline, current_position/
+  organization, city/region/country, bio, languages/sports/professional_categories/
+  skills/availability_statuses[]), `verification_status`, `profile_visibility`/
+  `contact_visibility`, `version`, FTS; окремі `profile_experience/projects/portfolio_items`.
+- `organizations`: `slug`, `organization_types` довідник (19), **moderation окремо від
+  verification**, `normalized_name` (дедуплікація), `version`, FTS, `organization_slug_history`.
+- `organization_members` (роль owner/manager/editor/member, status, job_title, is_public);
+  `access_requests` (requested_role/reason/proof/statuses, один активний запит).
+
+## Приватність (на сервері)
+`public_profiles`/`public_organizations` — definer-views: `profile_visibility`
+(public/authenticated_only/hidden) і `contact_visibility` (public/authenticated_only/
+introduction_only/private) вирішуються в SQL; email/phone приховані, поки політика не
+дозволяє; організації — лише `moderation='approved'`. Захищені поля (verification/
+moderation/verified_by/owner) змінюються лише через RPC (тригер-барʼєр + привіл. флаг).
+
+## RPC (14) + notifications + audit
+update_own_profile · submit/admin_set_profile_verification · create/update/submit/
+admin_set_org_moderation/verification · create/cancel/admin_review access request
+(атомарне членство при approve) · change_role/remove_member (захист останнього owner) ·
+transfer_ownership (super_admin).
+
+## API / Web / Admin
+23 роути (`/api/network/*`, `/api/me/profile*`, `/api/organizations/*`, `/api/admin/*`).
+Web: `/network/people|organizations` (SSR directory), детальні з Person/Organization
+JSON-LD, `/profile/edit`, `/organizations/new|[id]/manage`. Admin: черги профілів/
+організацій/запитів доступу на реальний API. Import: `scripts/import-demo-network.ts`.
+
+## Не входило / далі
+Introductions (M5, кнопка-заглушка), Opportunities (M4), Applications, Events; складний
+matching; org merge — лише marking/redirect. Mobile — на паузі.
