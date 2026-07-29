@@ -8,7 +8,8 @@
 -- ============================================================
 
 -- ---------- PUBLIC PROFILES (без email/phone/settings/admin_notes) ----------
-create or replace view public.public_profiles as
+drop view if exists public.public_profiles;
+create view public.public_profiles as
   select
     p.id,
     coalesce(p.profile->>'displayName',
@@ -39,7 +40,8 @@ create or replace view public.public_profiles as
     and coalesce((p.settings->>'privacyPublic')::boolean, true);
 
 -- ---------- PUBLIC ORGANIZATIONS ----------
-create or replace view public.public_organizations as
+drop view if exists public.public_organizations;
+create view public.public_organizations as
   select
     o.id, o.name, o.type, o.city, o.region, o.country,
     o.short_desc, o.full_desc, o.website, o.logo, o.cover, o.founded, o.audience,
@@ -64,7 +66,9 @@ create view public.public_articles as
     and a.status = 'published';
 
 -- ---------- PUBLIC OPPORTUNITIES (бюджет — лише коли public) ----------
-create or replace view public.public_opportunities as
+-- drop перед create: у 023 view розширюється (M4) → re-apply старої форми впав би.
+drop view if exists public.public_opportunities;
+create view public.public_opportunities as
   select
     op.id, op.title, op.type, op.org, op.org_id, op.sport, op.geography,
     op.format, op.professional_category,
@@ -81,7 +85,8 @@ create or replace view public.public_opportunities as
     and op.status = 'published';
 
 -- ---------- PUBLIC EVENTS ----------
-create or replace view public.public_events as
+drop view if exists public.public_events;
+create view public.public_events as
   select
     e.id, e.title, e.type, e.organizer, e.org_id,
     e.event_date, e.start_time, e.end_time, e.timezone,

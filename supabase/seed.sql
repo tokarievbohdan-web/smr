@@ -39,6 +39,15 @@ insert into public.organization_types (code, title, "order") values
   ('event_organizer','Організатор подій',16),('production','Продакшн',17),('service_provider','Постачальник послуг',18),('other','Інше',19)
 on conflict (code) do nothing;
 
+-- ---------- Типи можливостей (Milestone 4) ----------
+insert into public.opportunity_types (slug, title_uk, sort_order, requires_budget) values
+  ('sponsorship','Спонсорство',1,false),('partnership','Партнерство',2,false),('vacancy','Вакансія',3,false),
+  ('project_work','Проєктна робота',4,false),('tender','Тендер',5,true),('service_request','Пошук підрядника',6,false),
+  ('investment','Інвестиції',7,false),('grant','Грант',8,false),('media_partnership','Медіапартнерство',9,false),
+  ('ambassador_search','Пошук амбасадора',10,false),('venue_search','Пошук локації',11,false),
+  ('speaker_search','Пошук спікера',12,false),('volunteering','Волонтерство',13,false),('other','Інше',14,false)
+on conflict (slug) do nothing;
+
 -- ---------- Taxonomies ----------
 insert into public.taxonomies (kind, value, slug, "order") values
   ('sport','Футбол','football',1),

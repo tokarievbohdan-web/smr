@@ -59,11 +59,13 @@ create policy "org_slug: read" on public.organization_slug_history for select us
 
 -- ---------- organizations write: owner/editor/admin ----------
 drop policy if exists "orgs: owner/admin write" on public.organizations;
+drop policy if exists "orgs: owner/editor/admin write" on public.organizations;
 create policy "orgs: owner/editor/admin write" on public.organizations
   for all using (owner_id = auth.uid() or public.is_org_editor(id) or public.has_admin_role('moderator'))
   with check (owner_id = auth.uid() or public.is_org_editor(id) or public.has_admin_role('moderator'));
 -- read: approved (public) або власні/член/адмін
 drop policy if exists "orgs: read published" on public.organizations;
+drop policy if exists "orgs: read network" on public.organizations;
 create policy "orgs: read network" on public.organizations
   for select using (
     (deleted_at is null and moderation = 'approved')
@@ -72,24 +74,29 @@ create policy "orgs: read network" on public.organizations
 
 -- ---------- organization_members read: публічні активні члени approved-орг ----------
 drop policy if exists "org_members: read" on public.organization_members;
+drop policy if exists "org_members: read" on public.organization_members;
 create policy "org_members: read" on public.organization_members
   for select using (
     user_id = auth.uid() or public.is_admin() or public.is_org_owner(org_id)
     or (is_public and status = 'active' and public.is_org_public(org_id))
   );
 drop policy if exists "org_members: owner/admin write" on public.organization_members;
+drop policy if exists "org_members: manager/admin write" on public.organization_members;
 create policy "org_members: manager/admin write" on public.organization_members
   for all using (public.is_admin() or public.is_org_manager(org_id))
   with check (public.is_admin() or public.is_org_manager(org_id));
 
 -- ---------- access_requests: власник запиту / адмін / власник-менеджер орг ----------
 drop policy if exists "access_req: own/admin" on public.access_requests;
+drop policy if exists "access_req: read" on public.access_requests;
 create policy "access_req: read" on public.access_requests
   for select using (user_id = auth.uid() or public.is_admin() or public.is_org_manager(org_id));
+drop policy if exists "access_req: requester insert" on public.access_requests;
 drop policy if exists "access_req: requester insert" on public.access_requests;
 create policy "access_req: requester insert" on public.access_requests
   for insert with check (user_id = auth.uid());
 drop policy if exists "access_req: requester cancel" on public.access_requests;
+drop policy if exists "access_req: requester update" on public.access_requests;
 create policy "access_req: requester update" on public.access_requests
   for update using (user_id = auth.uid() or public.is_admin() or public.is_org_manager(org_id));
 
