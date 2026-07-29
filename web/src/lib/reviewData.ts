@@ -1,6 +1,7 @@
 import 'server-only';
 import { DATA_MODE } from '@/server/env';
 import { getArticleFeed, getArticleBySlug, type FeedParams } from '@/server/articles/queries';
+import { anonClient } from '@/server/database/clients';
 import { ARTICLES, type Article } from '@/lib/data';
 import { articleTypeLabel } from '@shared/contracts/status';
 
@@ -64,6 +65,15 @@ export async function getReview(slug: string): Promise<ReviewDetail | null> {
     bodyParagraphs: a.body ?? [a.subtitle], publishedAt: a.date, authorHeadline: null,
     tags: [], seoTitle: null, seoDescription: a.subtitle, canonicalUrl: null,
   };
+}
+
+// Slug + дата для sitemap (усі опубліковані).
+export async function reviewSitemap(): Promise<{ slug: string; updatedAt: string }[]> {
+  if (DATA_MODE === 'supabase') {
+    const { data } = await anonClient().from('public_articles').select('slug,updated_at,published_at').limit(2000);
+    return (data ?? []).map((r: Record<string, unknown>) => ({ slug: String(r.slug), updatedAt: String(r.updated_at ?? r.published_at ?? '') }));
+  }
+  return ARTICLES.map((a) => ({ slug: a.id, updatedAt: '2026-07-01T00:00:00.000Z' }));
 }
 
 export async function similarReview(categorySlugOrLabel: string | null, excludeSlug: string): Promise<ReviewCard[]> {

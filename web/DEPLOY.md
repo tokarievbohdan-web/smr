@@ -138,9 +138,26 @@ certbot --nginx -d admin.sportmarket.review --non-interactive --agree-tos -m tok
 
 ---
 
+## Cron: публікація запланованих матеріалів (Milestone 2)
+
+Заплановані статті (`status=scheduled`) публікуються серверним cron, не браузером.
+Ендпоінт `POST /api/cron/publish-scheduled` захищений заголовком `x-cron-secret`
+(значення = `CRON_SECRET` з env) і викликає ідемпотентний RPC (повторний запуск
+не дублює публікацію).
+
+VPS crontab (щохвилини):
+```bash
+* * * * * curl -fsS -X POST https://sportmarket.review/api/cron/publish-scheduled \
+  -H "x-cron-secret: $CRON_SECRET" >/dev/null 2>&1
+```
+Альтернатива — Supabase Scheduled Function / pg_cron, що дергає той самий URL.
+
 ## Що знадобиться від вас
 - Доступ по SSH до VPS (root або sudo-користувач) та IP.
 - Домен, делегований на DNS, де можна створити A-записи.
 - Git-remote (GitHub/GitLab) або можливість залити папку `web/` на сервер.
+- Env на сервері: `DATA_MODE=supabase`, `NEXT_PUBLIC_SUPABASE_URL/ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY` (server-only), `ADMIN_ORIGIN`, `CRON_SECRET`,
+  `NEXT_PUBLIC_SITE_URL`.
 
 Готовий `ecosystem.config.js` для PM2 — у цій же папці.
