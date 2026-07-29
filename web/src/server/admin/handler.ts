@@ -26,21 +26,24 @@ export function adminPreflight(req: NextRequest): NextResponse {
   return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
 }
 
-type Handler = (args: { req: NextRequest; ctx: RequestContext; admin: AdminContext }) => Promise<NextResponse>;
+type RouteCtx = { params?: Promise<Record<string, string>> } | undefined;
+type Handler = (args: { req: NextRequest; ctx: RequestContext; admin: AdminContext; params: Record<string, string> }) => Promise<NextResponse>;
 
 /**
  * Обгортка адміністративного ендпоінта:
  *  request context → rate limit → verify JWT → require role → handler → структурні помилки → CORS.
+ * Пробрасывает route-параметри ([id] тощо) у handler.
  */
 export function adminRoute(role: AdminRole, handler: Handler) {
-  return async (req: NextRequest): Promise<NextResponse> => {
+  return async (req: NextRequest, routeCtx?: RouteCtx): Promise<NextResponse> => {
     const ctx = buildRequestContext(req);
     const cors = corsHeaders(req);
     try {
       const admin = await requireAdminRole(req, role);
       const rl = checkRateLimit(`admin:${admin.id}`);
       if (!rl.allowed) throw new ApiHttpError('rate_limited', 'Too many requests');
-      const res = await handler({ req, ctx, admin });
+      const params = routeCtx?.params ? await routeCtx.params : {};
+      const res = await handler({ req, ctx, admin, params });
       for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
       res.headers.set('x-request-id', ctx.requestId);
       return res;

@@ -11,6 +11,9 @@ export async function callAdminRpc(admin: AdminContext, fn: string, params: Reco
     const code = (error as { code?: string }).code;
     if (code === '42501') throw new ApiHttpError('forbidden', error.message);
     if (code === 'P0002') throw new ApiHttpError('not_found', error.message);
+    if (code === 'P0001') throw new ApiHttpError('validation', error.message);      // валідація/невірний перехід
+    if (code === '40001') throw new ApiHttpError('conflict', error.message);        // optimistic concurrency
+    if (code === '23505') throw new ApiHttpError('conflict', error.message);        // unique (slug)
     throw new ApiHttpError('server_error', error.message);
   }
   return data;
