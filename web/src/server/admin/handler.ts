@@ -2,7 +2,7 @@ import 'server-only';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { AdminRole } from '@shared/contracts/status';
 import { ADMIN_ORIGIN } from '../env';
-import { requireAdminRole, type AdminContext } from '../auth/guards';
+import { requireAdminRole, requireUser, type AdminContext, type AuthedUser } from '../auth/guards';
 import { buildRequestContext, serverLog, type RequestContext } from '../auth/context';
 import { jsonError, ApiHttpError } from '../http';
 import { checkRateLimit } from './rateLimit';
@@ -51,6 +51,29 @@ export function adminRoute(role: AdminRole, handler: Handler) {
       serverLog(ctx, 'warn', 'admin route error', { err: e instanceof Error ? e.message : String(e) });
       const res = jsonError(e, ctx.requestId);
       for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
+      res.headers.set('x-request-id', ctx.requestId);
+      return res;
+    }
+  };
+}
+
+type UserHandler = (args: { req: NextRequest; ctx: RequestContext; user: AuthedUser; params: Record<string, string> }) => Promise<NextResponse>;
+
+/** Обгортка ендпоінта для будь-якого авторизованого користувача (same-origin web). */
+export function authedRoute(handler: UserHandler) {
+  return async (req: NextRequest, routeCtx?: RouteCtx): Promise<NextResponse> => {
+    const ctx = buildRequestContext(req);
+    try {
+      const user = await requireUser(req);
+      const rl = checkRateLimit(`user:${user.id}`);
+      if (!rl.allowed) throw new ApiHttpError('rate_limited', 'Too many requests');
+      const params = routeCtx?.params ? await routeCtx.params : {};
+      const res = await handler({ req, ctx, user, params });
+      res.headers.set('x-request-id', ctx.requestId);
+      return res;
+    } catch (e) {
+      serverLog(ctx, 'warn', 'user route error', { err: e instanceof Error ? e.message : String(e) });
+      const res = jsonError(e, ctx.requestId);
       res.headers.set('x-request-id', ctx.requestId);
       return res;
     }
