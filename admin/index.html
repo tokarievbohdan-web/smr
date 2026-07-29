@@ -877,5 +877,76 @@ function sbPreview(){const b=textToBlocks(SB_ART.edit.bodyText).blocks.map(x=>`<
 // Перекриваємо демо-Articles живою CMS для Supabase-сесії.
 if(typeof VIEWS!=='undefined'){const _demoArts=VIEWS.articles;VIEWS.articles=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){sbArticlesView();return;}return _demoArts&&_demoArts();};}
 </script>
+
+<!-- ============ LIVE Network admin: профілі / організації / доступ ============ -->
+<script>
+/* Черги Network через реальний Next API (Bearer). */
+const VERIF_LBL={unverified:'не верифік.',pending:'на розгляді',verified:'верифіковано',rejected:'відхилено',changes_required:'потребує змін'};
+const MOD_LBL={draft:'чернетка',pending:'на модерації',changes_required:'потребує змін',approved:'схвалено',rejected:'відхилено',archived:'архів'};
+function nadRow(cells){return '<tr>'+cells.map(c=>`<td>${c}</td>`).join('')+'</tr>';}
+
+// ---- Профілі ----
+async function nadUsersView(){
+  V().innerHTML='<div class="toolbar"><b>Профілі (Supabase)</b><div class="spacer"></div><input id="nad-uq" placeholder="Пошук" onkeydown="if(event.key===\'Enter\')nadUsers()"/></div><div id="uslot">Завантаження…</div>';
+  nadUsers();
+}
+async function nadUsers(){
+  const q=(document.getElementById('nad-uq')||{}).value||'';
+  try{const d=await smrAdmin.request('GET','/api/admin/profiles'+(q?('?q='+encodeURIComponent(q)):''));
+    const rows=(d.items||[]).map(u=>nadRow([
+      `<div class="name">${esc(u.display_name||((u.first_name||'')+' '+(u.last_name||''))||'—')}</div><div class="meta">${esc(u.email||'')}</div>`,
+      esc(VERIF_LBL[u.verification_status]||u.verification_status), esc(u.status||''), esc(u.city||'—'),
+      `<button onclick="nadProfile('${u.id}','${esc((u.display_name||u.email||'').replace(/'/g,''))}')">Дії</button>`])).join('');
+    document.getElementById('uslot').innerHTML=`<table class="tbl"><thead><tr><th>Користувач</th><th>Верифікація</th><th>Статус</th><th>Місто</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan=5 class=meta>Порожньо</td></tr>'}</tbody></table>`;
+  }catch(err){document.getElementById('uslot').innerHTML='<div class="hist">Помилка: '+esc(err.message||err.code||'')+'</div>';}
+}
+function nadProfile(id,name){openModal(`<h3>Профіль — ${esc(name)}</h3><div class="row" style="flex-wrap:wrap;gap:8px">
+  <button class="a" onclick="nadVerif('${id}','verified')">Верифікувати</button>
+  <button onclick="nadVerif('${id}','changes_required')">Потрібні зміни</button>
+  <button onclick="nadVerif('${id}','rejected')">Відхилити</button>
+  <button onclick="nadVerif('${id}','unverified')">Зняти верифікацію</button>
+  </div><div class="row"><button class="c" onclick="closeModal()">Закрити</button></div>`);}
+async function nadVerif(id,status){let note=null;if(status==='rejected'||status==='changes_required'){note=prompt('Причина:')||'';}
+  try{await smrAdmin.request('POST','/api/admin/profiles/'+id+'/verification',{status,note});closeModal();toast('Оновлено');nadUsers();}catch(err){toast('Помилка: '+(err.code||''));}}
+
+// ---- Організації + запити доступу ----
+let NAD_OT=0;
+async function nadOrgsView(){
+  V().innerHTML=`<div class="tabs"><div class="tab ${NAD_OT===0?'active':''}" onclick="NAD_OT=0;nadOrgsView()">Організації</div><div class="tab ${NAD_OT===1?'active':''}" onclick="NAD_OT=1;nadOrgsView()">Запити доступу</div></div><div id="oslot">Завантаження…</div>`;
+  if(NAD_OT===0)nadOrgs();else nadAccess();
+}
+async function nadOrgs(){
+  try{const d=await smrAdmin.request('GET','/api/admin/organizations');
+    const rows=(d.items||[]).map(o=>nadRow([
+      `<div class="name">${esc(o.name)}</div><div class="meta">${esc(o.slug||'')}</div>`,
+      esc(MOD_LBL[o.moderation]||o.moderation), esc(VERIF_LBL[o.verification]||o.verification), esc(o.city||'—'),
+      `<button onclick="nadOrg('${o.id}','${esc((o.name||'').replace(/'/g,''))}')">Дії</button>`])).join('');
+    document.getElementById('oslot').innerHTML=`<table class="tbl"><thead><tr><th>Організація</th><th>Модерація</th><th>Верифікація</th><th>Місто</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan=5 class=meta>Порожньо</td></tr>'}</tbody></table>`;
+  }catch(err){document.getElementById('oslot').innerHTML='<div class="hist">Помилка: '+esc(err.message||err.code||'')+'</div>';}
+}
+function nadOrg(id,name){openModal(`<h3>Організація — ${esc(name)}</h3>
+  <div class="meta" style="margin:8px 0">Модерація</div><div class="row" style="flex-wrap:wrap;gap:8px">
+   <button class="a" onclick="nadMod('${id}','approved')">Схвалити</button><button onclick="nadMod('${id}','changes_required')">Потрібні зміни</button>
+   <button onclick="nadMod('${id}','rejected')">Відхилити</button><button onclick="nadMod('${id}','archived')">Архівувати</button></div>
+  <div class="meta" style="margin:12px 0 8px">Верифікація</div><div class="row" style="flex-wrap:wrap;gap:8px">
+   <button class="a" onclick="nadOrgVer('${id}','verified')">Верифікувати</button><button onclick="nadOrgVer('${id}','rejected')">Відхилити</button></div>
+  <div class="row"><button class="c" onclick="closeModal()">Закрити</button></div>`);}
+async function nadMod(id,status){let note=null;if(status==='rejected'||status==='changes_required')note=prompt('Причина:')||'';try{await smrAdmin.request('POST','/api/admin/organizations/'+id+'/moderation',{status,note});closeModal();toast('Оновлено');nadOrgs();}catch(err){toast('Помилка: '+(err.code||''));}}
+async function nadOrgVer(id,status){try{await smrAdmin.request('POST','/api/admin/organizations/'+id+'/verification',{status});closeModal();toast('Оновлено');nadOrgs();}catch(err){toast('Помилка: '+(err.code||''));}}
+async function nadAccess(){
+  try{const d=await smrAdmin.request('GET','/api/admin/organization-access-requests?status=pending');
+    const rows=(d.items||[]).map(r=>`<div class="hist">${esc((r.organization&&r.organization.name)||'')} · ${esc(r.requested_role)} · ${esc(r.job_title||'')} — ${esc(r.reason||'')}
+      <button onclick="nadReview('${r.id}','approve')">Прийняти</button> <button onclick="nadReview('${r.id}','reject')">Відхилити</button></div>`).join('')||'<div class=meta>Немає запитів</div>';
+    document.getElementById('oslot').innerHTML=rows;
+  }catch(err){document.getElementById('oslot').innerHTML='<div class="hist">Помилка: '+esc(err.message||err.code||'')+'</div>';}
+}
+async function nadReview(id,action){try{await smrAdmin.request('POST','/api/admin/organization-access-requests/'+id+'/review',{action});toast('Оновлено');nadAccess();}catch(err){toast('Помилка: '+(err.code||''));}}
+
+if(typeof VIEWS!=='undefined'){
+  const _du=VIEWS.users, _do=VIEWS.organizations;
+  VIEWS.users=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadUsersView();return;}return _du&&_du();};
+  VIEWS.organizations=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadOrgsView();return;}return _do&&_do();};
+}
+</script>
 </body>
 </html>
