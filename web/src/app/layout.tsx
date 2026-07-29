@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import Shell from "@/components/Shell";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="uk" className={`${manrope.variable} h-full`}>
       <body className="min-h-full">
         <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('smr-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}` }} />
-        <Shell>{children}</Shell>
+        <AuthProvider>
+          <Shell>{children}</Shell>
+        </AuthProvider>
       </body>
     </html>
   );

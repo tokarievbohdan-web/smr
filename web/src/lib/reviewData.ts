@@ -14,6 +14,7 @@ export interface ReviewCard {
   readMin: number | null; featured: boolean;
 }
 export interface ReviewDetail extends ReviewCard {
+  id: string;
   body: unknown; bodyParagraphs: string[] | null; publishedAt: string | null;
   authorHeadline: string | null; categorySlug: string | null; tags: { name: string; slug: string }[];
   seoTitle: string | null; seoDescription: string | null; canonicalUrl: string | null;
@@ -46,6 +47,7 @@ export async function getReview(slug: string): Promise<ReviewDetail | null> {
     const a = await getArticleBySlug(null, slug);
     if (!a) return null;
     return {
+      id: a.id,
       slug: a.slug, typeLabel: articleTypeLabel(a.type), categoryLabel: a.category?.title ?? null,
       categorySlug: a.category?.slug ?? null, title: a.title, subtitle: a.subtitle ?? null,
       author: a.author?.name ?? null, authorHeadline: a.author?.headline ?? null,
@@ -58,7 +60,7 @@ export async function getReview(slug: string): Promise<ReviewDetail | null> {
   const a = ARTICLES.find((x) => x.id === slug);
   if (!a) return null;
   return {
-    ...mockCard(a), categorySlug: null, body: null,
+    id: a.id, ...mockCard(a), categorySlug: null, body: null,
     bodyParagraphs: a.body ?? [a.subtitle], publishedAt: a.date, authorHeadline: null,
     tags: [], seoTitle: null, seoDescription: a.subtitle, canonicalUrl: null,
   };

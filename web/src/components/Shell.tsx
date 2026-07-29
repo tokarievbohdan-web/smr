@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV } from "@/lib/data";
+import AuthWidget from "@/components/auth/AuthWidget";
 
 const ICONS: Record<string, React.ReactNode> = {
   "/": <path d="M4 5h16M4 12h16M4 19h10" />,
@@ -50,14 +51,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="mt-auto flex items-center gap-2.5 pt-4">
-          <span className="relative grid h-[38px] w-[38px] shrink-0 place-items-center rounded-xl bg-panel2 text-[13px] font-extrabold text-dim">
-            ОК<i className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-panel bg-accent" />
-          </span>
-          <span className="leading-tight">
-            <span className="block text-[13px] font-bold">Олена Ковальчук</span>
-            <span className="text-[11.5px] font-semibold text-muted">Head of Sponsorship</span>
-          </span>
+        <div className="mt-auto pt-4">
+          <AuthWidget />
         </div>
       </aside>
 

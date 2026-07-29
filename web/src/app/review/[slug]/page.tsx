@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getReview, similarReview } from "@/lib/reviewData";
 import { ArticleBody } from "@/components/ArticleBody";
 import { Badge, Thumb } from "@/components/ui";
+import { BookmarkButton, ShareButton, ViewTracker } from "@/components/reader/ReaderButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
       )}
+      <div className="mt-6 flex flex-wrap gap-2.5">
+        <BookmarkButton entityId={a.id} />
+        <ShareButton entityId={a.id} title={a.title} />
+      </div>
+      <ViewTracker entityId={a.id} />
+
       <Thumb className="mt-8 aspect-video rounded-3xl" label="кадр матеріалу" />
 
       {a.body ? (
