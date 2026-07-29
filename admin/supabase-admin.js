@@ -43,21 +43,24 @@
     },
     async logout() { await client().auth.signOut(); },
 
-    /** Виклик довіреного API. Кидає {code,message} при 4xx/5xx. */
-    async api(path, body) {
+    /** Довільний виклик довіреного API. Кидає {code,message} при 4xx/5xx. */
+    async request(method, path, body) {
       var token = await this.getToken();
       if (!token) throw { code: 'unauthorized', message: 'Немає сесії — увійдіть повторно' };
-      var res = await fetch((cfg.API_BASE || '') + path, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: 'Bearer ' + token },
-        body: JSON.stringify(body || {}),
-      });
+      var opts = { method: method, headers: { authorization: 'Bearer ' + token } };
+      if (body !== undefined && method !== 'GET') {
+        opts.headers['content-type'] = 'application/json';
+        opts.body = JSON.stringify(body || {});
+      }
+      var res = await fetch((cfg.API_BASE || '') + path, opts);
       var json = await res.json().catch(function () { return null; });
       if (!res.ok || !json || json.ok === false) {
         throw (json && json.error) || { code: 'server_error', message: 'HTTP ' + res.status };
       }
       return json.data;
     },
+    /** POST-обгортка (сумісність). */
+    api(path, body) { return this.request('POST', path, body); },
 
     // Зручні обгортки над еталонними ендпоінтами:
     verifyProfile(profileId) { return this.api('/api/admin/profiles/verify', { profileId: profileId }); },
