@@ -75,3 +75,63 @@ fallback на mock**. `DATA_MODE=mock` — лише явний вибір для
 Продуктовий UI Articles/CMS/Bookmarks/Opportunities/Applications/Events/
 Introductions, push, email-розсилки, аплоуд файлів, аналітичні дашборди, Sanity —
 готуються схема/контракти/API foundation, але не інтегруються (Milestone 2+).
+
+---
+
+# Milestone 2 — Articles (єдиний редакційний контур)
+
+Supabase — **єдине джерело правди** для матеріалів. Ланцюг:
+`Admin CMS → Next API → PostgreSQL RPC → articles/revisions/relations → Web SSR → (Mobile) → bookmarks/analytics/audit`.
+
+## Схема (міграції 016–018)
+- `articles` (розширено): `slug` (unique), `type` (enum `article_type`), `status`
+  (enum `article_status`), `access_level`, `author_id`, `category_id`,
+  `scheduled_at`/`archived_at`, `case_study_data`, `version` (concurrency),
+  `content_version`, SEO, FTS `tsv`.
+- Нові: `authors`, `article_categories` (12 канонічних), `article_tags`(+links),
+  `article_relations`, `article_revisions`, `media_files`, `article_slug_history`.
+
+## Статуси й переходи
+`draft → in_review → (scheduled) → published → archived` (+ повернення в draft,
+restore-revision → новий draft). **Критичні поля** (status/published_at/
+scheduled_at/archived_at/featured/slug/created_by) змінюються ЛИШЕ через RPC:
+тригер-барʼєр пропускає їх тільки за `app.privileged_write=1`, який ставлять
+SECURITY DEFINER RPC. Прямий client-update їх не змінює.
+
+## Дозволи
+`editor`+ (і `super_admin`) — CRUD/submit/publish/schedule/archive/restore.
+`moderator` без editor — не публікує. `analyst` — лише читання аналітики.
+Звичайний користувач — читає public (і authenticated після входу), зберігає, ділиться.
+
+## API (Next.js Route Handlers)
+Public: `GET /api/articles`, `GET /api/articles/[slug]`.
+Admin (роль editor): `GET/POST /api/admin/articles`, `GET/PATCH /api/admin/articles/[id]`,
+`…/submit|publish|schedule|archive|revisions|restore-revision`.
+User: `POST /api/bookmarks`, `DELETE /api/bookmarks/[type]/[id]`, `GET /api/me/bookmarks`,
+`POST /api/analytics`. Cron: `POST /api/cron/publish-scheduled` (service_role + `CRON_SECRET`).
+Читання — anon або user-JWT (RLS вирішує); записи — RPC від імені editor (роль
+перевіряється в БД). optimistic concurrency через `version`/`expectedVersion` → 409.
+
+## RPC (атомарні, SECURITY DEFINER, audit + revision)
+`create_article_draft`, `update_article_draft`, `submit_article_for_review`,
+`return_article_to_draft`, `schedule_article`, `publish_article` (валідація title/
+author/category/body), `archive_article`, `restore_article_revision`,
+`change_published_slug` (+ slug_history редірект), `publish_due_scheduled` (cron, ідемпотентний).
+
+## Web
+`DATA_MODE=supabase` → SSR з Supabase (`/`, `/review`, `/review/[slug]`),
+метадані + JSON-LD `NewsArticle`, декод кирилиці slug, редірект зі старого slug.
+`DATA_MODE=mock` → локальні fixtures (лише dev; **без тихого fallback** у проді).
+Ревалідація (`revalidatePath`) після publish/archive/slug/featured — точкова, не rebuild.
+
+## Preview / Media / Scheduled
+Preview чернетки — у CMS (клієнтський рендер; серверні preview-токени — далі).
+Media — таблиця `media_files` (+RLS: чернеткові приватні); signed-upload flow — далі.
+Scheduled — cron дергає `/api/cron/publish-scheduled` (VPS cron / Supabase scheduled),
+не залежить від браузера.
+
+## Import / Rollback
+Staging-import demo-статей: `scripts/import-demo-articles.ts` (mock→UUID/ISO/Body v1,
+mapping-артефакт, ідемпотентно, не автозапуск у проді).
+**Rollback:** повернути `DATA_MODE=mock` на web → сайт знову на fixtures; схема/дані
+Supabase лишаються (міграції адитивні, `deleted_at`/`archived` замість фізичного видалення).
