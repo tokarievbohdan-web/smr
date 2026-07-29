@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getReview, similarReview } from "@/lib/reviewData";
 import { ArticleBody } from "@/components/ArticleBody";
-import { Badge, Thumb } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { Cover } from "@/components/Cover";
 import { BookmarkButton, ShareButton, ViewTracker } from "@/components/reader/ReaderButtons";
 
 export const dynamic = "force-dynamic";
@@ -55,7 +56,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
       <ViewTracker entityId={a.id} />
 
-      <Thumb className="mt-8 aspect-video rounded-3xl" label="кадр матеріалу" />
+      <Cover src={a.cover} className="mt-8 aspect-video w-full rounded-3xl" label="кадр матеріалу" />
 
       {a.body ? (
         <ArticleBody doc={a.body} />
@@ -77,7 +78,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <div className="flex flex-col gap-3">
             {similar.map((s) => (
               <Link key={s.slug} href={`/review/${s.slug}`} className="flex items-center gap-4 rounded-2xl bg-panel p-4 transition hover:bg-panel2">
-                <Thumb className="h-16 w-16 shrink-0 rounded-xl" label="" />
+                <Cover src={s.cover} className="h-16 w-16 shrink-0 rounded-xl" label="" />
                 <div><div className="text-[14.5px] font-bold leading-snug">{s.title}</div><div className="mt-1 text-[12px] font-semibold text-muted">{[s.categoryLabel, s.typeLabel].filter(Boolean).join(" · ")}</div></div>
               </Link>
             ))}

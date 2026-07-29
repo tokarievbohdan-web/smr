@@ -106,6 +106,7 @@ begin
     type = case when p_patch ? 'type' then (p_patch->>'type')::article_type else type end,
     category_id = coalesce(nullif(p_patch->>'category_id','')::uuid, category_id),
     author_id = coalesce(nullif(p_patch->>'author_id','')::uuid, author_id),
+    cover = coalesce(p_patch->>'cover', cover),
     cover_media_id = coalesce(nullif(p_patch->>'cover_media_id','')::uuid, cover_media_id),
     seo_title = coalesce(p_patch->>'seo_title', seo_title),
     seo_description = coalesce(p_patch->>'seo_description', seo_description),

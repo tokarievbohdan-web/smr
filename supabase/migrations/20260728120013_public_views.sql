@@ -50,7 +50,10 @@ create or replace view public.public_organizations as
     and (o.status = 'published' or o.verified);
 
 -- ---------- PUBLIC ARTICLES ----------
-create or replace view public.public_articles as
+-- drop перед create: у 017 view розширюється колонками, тож re-apply із
+-- create-or-replace старої форми впав би ("cannot drop columns from view").
+drop view if exists public.public_articles;
+create view public.public_articles as
   select
     a.id, a.type, a.category, a.title, a.subtitle, a.excerpt,
     a.body, a.content_version, a.cover, a.author,

@@ -12,7 +12,7 @@ import { articleTypeLabel } from '@shared/contracts/status';
 export interface ReviewCard {
   slug: string; typeLabel: string; categoryLabel: string | null;
   title: string; subtitle: string | null; author: string | null;
-  readMin: number | null; featured: boolean;
+  readMin: number | null; featured: boolean; cover: string | null;
 }
 export interface ReviewDetail extends ReviewCard {
   id: string;
@@ -23,7 +23,7 @@ export interface ReviewDetail extends ReviewCard {
 
 const mockCard = (a: Article): ReviewCard => ({
   slug: a.id, typeLabel: a.type, categoryLabel: a.category, title: a.title,
-  subtitle: a.subtitle, author: a.author, readMin: a.readMin, featured: !!a.featured,
+  subtitle: a.subtitle, author: a.author, readMin: a.readMin, featured: !!a.featured, cover: null,
 });
 
 export async function listReview(params: FeedParams = {}): Promise<{ items: ReviewCard[]; total: number | null }> {
@@ -34,7 +34,7 @@ export async function listReview(params: FeedParams = {}): Promise<{ items: Revi
       items: f.items.map((a) => ({
         slug: a.slug, typeLabel: articleTypeLabel(a.type), categoryLabel: a.category?.title ?? null,
         title: a.title, subtitle: a.subtitle ?? null, author: a.author?.name ?? null,
-        readMin: a.readingTimeMinutes ?? null, featured: a.featured,
+        readMin: a.readingTimeMinutes ?? null, featured: a.featured, cover: a.cover ?? null,
       })),
     };
   }
@@ -52,7 +52,7 @@ export async function getReview(slug: string): Promise<ReviewDetail | null> {
       slug: a.slug, typeLabel: articleTypeLabel(a.type), categoryLabel: a.category?.title ?? null,
       categorySlug: a.category?.slug ?? null, title: a.title, subtitle: a.subtitle ?? null,
       author: a.author?.name ?? null, authorHeadline: a.author?.headline ?? null,
-      readMin: a.readingTimeMinutes ?? null, featured: a.featured,
+      readMin: a.readingTimeMinutes ?? null, featured: a.featured, cover: a.cover ?? null,
       body: a.body, bodyParagraphs: null, publishedAt: a.publishedAt ?? null,
       tags: a.tags ?? [], seoTitle: a.seoTitle ?? null, seoDescription: a.seoDescription ?? null,
       canonicalUrl: a.canonicalUrl ?? null,

@@ -23,7 +23,8 @@ type Row = Record<string, any>;
 function mapSummary(r: Row) {
   return {
     id: r.id, slug: r.slug, type: r.type, title: r.title, subtitle: r.subtitle ?? null,
-    excerpt: r.excerpt ?? null, cover: r.cover ?? null,
+    excerpt: r.excerpt ?? null,
+    cover: r.cover ?? null,
     readingTimeMinutes: r.reading_time_minutes ?? null,
     featured: !!r.featured, partnerMaterial: !!r.partner_material,
     accessLevel: r.access_level, publishedAt: r.published_at ?? null,

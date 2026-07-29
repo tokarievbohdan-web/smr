@@ -827,8 +827,9 @@ async function sbArticlesView(){
     <td>${sbadge(a.status)}</td><td class="meta">${(a.updated_at||'').slice(0,10)}</td></tr>`).join('');
   document.getElementById('artslot').innerHTML=`<table class="tbl"><thead><tr><th>Заголовок</th><th>Тип</th><th>Категорія</th><th>Статус</th><th>Оновлено</th></tr></thead><tbody>${rows||'<tr><td colspan=5 class=meta>Порожньо</td></tr>'}</tbody></table>`;
 }
-function sbNew(){SB_ART.edit={id:'new',status:'draft',version:0,title:'',subtitle:'',excerpt:'',type:'news',category_id:'',author_id:'',bodyText:''};sbEditor();}
-async function sbEdit(id){const r=await sb().from('articles').select('*').eq('id',id).maybeSingle();if(r.error||!r.data){toast('Не знайдено');return;}const a=r.data;SB_ART.edit={id:a.id,slug:a.slug,status:a.status,version:a.version,title:a.title||'',subtitle:a.subtitle||'',excerpt:a.excerpt||'',type:a.type,category_id:a.category_id||'',author_id:a.author_id||'',bodyText:blocksToText(a.body)};sbEditor();}
+function sbNew(){SB_ART.edit={id:'new',status:'draft',version:0,title:'',subtitle:'',excerpt:'',type:'news',category_id:'',author_id:'',cover:'',cover_media_id:'',bodyText:''};sbEditor();}
+async function sbEdit(id){const r=await sb().from('articles').select('*').eq('id',id).maybeSingle();if(r.error||!r.data){toast('Не знайдено');return;}const a=r.data;SB_ART.edit={id:a.id,slug:a.slug,status:a.status,version:a.version,title:a.title||'',subtitle:a.subtitle||'',excerpt:a.excerpt||'',type:a.type,category_id:a.category_id||'',author_id:a.author_id||'',cover:a.cover||'',cover_media_id:a.cover_media_id||'',bodyText:blocksToText(a.body)};sbEditor();}
+async function sbUploadCover(input){const f=input.files&&input.files[0];if(!f)return;try{const d=await smrAdmin.request('POST','/api/admin/media/sign',{filename:f.name,mimeType:f.type,sizeBytes:f.size});const up=await sb().storage.from(d.bucket).uploadToSignedUrl(d.path,d.token,f);if(up.error)throw up.error;SB_ART.edit.cover=d.publicUrl;SB_ART.edit.cover_media_id=d.mediaId;await sbSave(true);sbEditor();toast('Обкладинку завантажено');}catch(err){toast('Помилка: '+((err&&(err.message||err.code))||''));}}
 function sbF(k,v){SB_ART.edit[k]=v;if(SB_ART.edit.id!=='new'&&(SB_ART.edit.status==='draft'||SB_ART.edit.status==='in_review')){clearTimeout(SB_ART.saveTimer);setAutosave('Збереження…');SB_ART.saveTimer=setTimeout(sbSave,1200);}}
 function setAutosave(t){const el=document.getElementById('sb-autosave');if(el)el.textContent=t;}
 function sbEditor(){
@@ -844,6 +845,8 @@ function sbEditor(){
     <div class="grid2"><div><label>Тип</label><select onchange="sbF('type',this.value)">${ART_TYPES.map(t=>`<option value="${t[0]}" ${t[0]===e.type?'selected':''}>${t[1]}</option>`).join('')}</select></div>
       <div><label>Категорія</label><select onchange="sbF('category_id',this.value)"><option value="">—</option>${opt(SB_ART.cats,e.category_id,'id','title')}</select></div></div>
     <label>Автор</label><select onchange="sbF('author_id',this.value)"><option value="">—</option>${opt(SB_ART.authors,e.author_id,'id','name')}</select>
+    <label>Обкладинка</label>${e.cover?`<img src="${esc(e.cover)}" alt="" style="max-width:280px;border-radius:12px;margin-bottom:8px;display:block"/>`:''}
+    <input type="file" accept="image/jpeg,image/png,image/webp" onchange="sbUploadCover(this)"/>
     <label>Тіло (абзаци через порожній рядок)</label><textarea style="min-height:220px" oninput="sbF('bodyText',this.value)">${esc(e.bodyText)}</textarea>
     <div class="row" style="flex-wrap:wrap;gap:8px">
       <button class="a" onclick="sbSave(true)">Зберегти</button>
@@ -855,7 +858,7 @@ function sbEditor(){
     <div class="hist" id="sb-msg"></div>
   </div>`;
 }
-function sbPatch(){const e=SB_ART.edit;return{title:e.title,subtitle:e.subtitle,excerpt:e.excerpt,type:e.type,category_id:e.category_id||null,author_id:e.author_id||null,body:textToBlocks(e.bodyText)};}
+function sbPatch(){const e=SB_ART.edit;return{title:e.title,subtitle:e.subtitle,excerpt:e.excerpt,type:e.type,category_id:e.category_id||null,author_id:e.author_id||null,cover:e.cover||null,cover_media_id:e.cover_media_id||null,body:textToBlocks(e.bodyText)};}
 async function sbSave(manual){const e=SB_ART.edit;try{
   if(e.id==='new'){const d=await smrAdmin.request('POST','/api/admin/articles',sbPatch());e.id=d.id;e.slug=d.slug;e.version=d.version;e.status='draft';setAutosave('Збережено');if(manual)toast('Чернетку створено');sbEditor();}
   else{const d=await smrAdmin.request('PATCH','/api/admin/articles/'+e.id,Object.assign({expectedVersion:e.version},sbPatch()));e.version=d.version;setAutosave('Збережено · v'+e.version);if(manual)toast('Збережено');}
