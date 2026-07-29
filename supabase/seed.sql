@@ -8,15 +8,27 @@
 -- Ідемпотентно (on conflict do nothing).
 -- ============================================================
 
--- ---------- Категорії статей ----------
-insert into public.article_categories (title, slug, "order") values
-  ('Аналітика','analytics',1),
-  ('Кейси','cases',2),
-  ('Інтерв''ю','interviews',3),
-  ('Ринок','market',4),
-  ('Технології','tech',5),
-  ('Право','legal',6)
-on conflict do nothing;
+-- ---------- Категорії статей (Milestone 2 — канонічні 12) ----------
+insert into public.article_categories (title, slug, description, "order") values
+  ('Індустрія','industry','Загальні тренди спортивного бізнесу',1),
+  ('Врядування','governance','Управління, регуляції, федерації',2),
+  ('Комерція','commercial','Спонсорство, продаж прав, монетизація',3),
+  ('Маркетинг','marketing','Бренд, кампанії, аудиторія',4),
+  ('Кейси','case-studies','Розбори кампаній і практик',5),
+  ('Інсайти','insights','Аналітика й висновки',6),
+  ('iGaming','igaming','Ставки, iGaming-партнерства',7),
+  ('Медіа','media','Права, продакшн, дистрибуція',8),
+  ('Технології','technology','Спорттех, дані, продукти',9),
+  ('Інфраструктура','infrastructure','Стадіони, обʼєкти, операції',10),
+  ('Інвестиції','investments','Угоди, M&A, фандрейзинг',11),
+  ('Масовий спорт','community-sport','Ком’юніті та масовий спорт',12)
+on conflict (slug) do nothing;
+
+-- ---------- Автори ----------
+insert into public.authors (name, slug, headline, active) values
+  ('Редакція SMR','smr-editorial','Команда Sport Market Review', true),
+  ('Марія Левченко','maria-levchenko','Авторка, спортивний маркетинг', true)
+on conflict (slug) do nothing;
 
 -- ---------- Taxonomies ----------
 insert into public.taxonomies (kind, value, slug, "order") values
