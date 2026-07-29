@@ -48,3 +48,6 @@ yarn-error.*
 
 # admin local config (містить локальні ключі/пароль shell-а)
 admin/config.local.js
+
+# generated staging import mapping
+scripts/import-artifact.json
