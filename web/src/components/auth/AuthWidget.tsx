@@ -21,7 +21,8 @@ export default function AuthWidget() {
         <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-xl bg-panel2 text-[13px] font-extrabold text-dim">{initials}</span>
         <span className="min-w-0 leading-tight">
           <span className="block truncate text-[12.5px] font-bold">{user.email}</span>
-          <span className="flex gap-2 text-[11.5px] font-semibold text-muted">
+          <span className="flex flex-wrap gap-2 text-[11.5px] font-semibold text-muted">
+            <Link href="/profile/edit" className="hover:text-accent">Профіль</Link>
             <Link href="/saved" className="hover:text-accent">Збережене</Link>
             <button onClick={() => signOut()} className="hover:text-accent">Вийти</button>
           </span>
