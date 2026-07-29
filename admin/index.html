@@ -189,6 +189,10 @@
     <input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
     <div class="err" id="li-err"></div>
     <button class="btn" onclick="doLogin()">Увійти</button>
+    <div class="quick"><div class="q-title">РОБОЧИЙ ВХІД · Supabase</div>
+      <button class="btn" style="background:#0aa06e;margin-top:8px" onclick="sbSendCode()">Надіслати посилання для входу</button>
+      <div class="sub" style="margin-top:8px;font-size:12px;color:var(--dim)">Введіть робочий email → відкрийте «Sign in» у листі → повернетесь сюди авторизованим.</div>
+    </div>
     <div class="quick"><div class="q-title">ДЕМО-АКАУНТИ · dev</div><div class="grid" id="quick-grid"></div></div>
   </div>
 </div>
@@ -210,6 +214,17 @@
 
 <div id="modal-root"><div class="modal" id="modal"></div></div>
 <div id="toast"><div class="dot"></div><span id="toast-text"></span></div>
+
+<!-- Supabase SDK + публічний конфіг (anon/publishable — безпечно у клієнті).
+     Перекривається необовʼязковим config.local.js, якщо він підключений. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  window.SMR_ADMIN_CONFIG = window.SMR_ADMIN_CONFIG || {
+    SUPABASE_URL: 'https://esanyyhwabqwmvmisauy.supabase.co',
+    SUPABASE_ANON_KEY: 'sb_publishable_Zb11cJq2vzLlV-baxsrN1A_ZF19WJDf',
+    API_BASE: '',
+  };
+</script>
 
 <script>
 /* ============ ДОВІДНИКИ / ДАНІ ============ */
@@ -346,7 +361,36 @@ function doLogin(){
   document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');
   mountShell();go('dashboard');
 }
-function doLogout(){audit('Вихід','');SESSION=null;document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('li-pass').value='';}
+function doLogout(){audit('Вихід','');try{sb().auth.signOut();}catch(_){}SESSION=null;document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('li-pass').value='';}
+
+/* ---- Робочий вхід через Supabase Auth (magic link) ----
+   На free tier зі стандартним провайдером Supabase шле посилання (не код),
+   тож використовуємо magic-link + автопідхоплення сесії при поверненні. ---- */
+let _sb=null;
+function sb(){ if(!_sb){ const c=window.SMR_ADMIN_CONFIG; _sb=window.supabase.createClient(c.SUPABASE_URL,c.SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}}); } return _sb; }
+async function sbSendCode(){
+  const email=document.getElementById('li-email').value.trim().toLowerCase(),err=document.getElementById('li-err');
+  err.style.color='';err.textContent='';
+  if(!email){err.textContent='Вкажіть робочий email';return;}
+  try{
+    const {error}=await sb().auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
+    if(error)throw error;
+    err.style.color='#0a7';err.textContent='Лист надіслано на '+email+'. Відкрийте у ньому посилання «Sign in» — повернетесь сюди вже авторизованим.';
+  }catch(e){err.style.color='';err.textContent='Помилка надсилання: '+(e.message||e);}
+}
+async function sbEnterWithSession(user){
+  const err=document.getElementById('li-err');
+  const {data:row}=await sb().from('admin_users').select('email,role,status').eq('id',user.id).maybeSingle();
+  if(!row){err.style.color='';err.textContent='Цей акаунт не має адмін-ролі (admin_users).';await sb().auth.signOut();return false;}
+  if(row.status!=='active'){err.style.color='';err.textContent='Адмін-акаунт неактивний.';await sb().auth.signOut();return false;}
+  err.textContent='';SESSION={email:row.email,name:row.email.split('@')[0],role:row.role,supabase:true};
+  audit('Вхід у систему (Supabase)','');
+  document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');
+  mountShell();go('dashboard');return true;
+}
+async function sbTryResume(){
+  try{ const {data:{session}}=await sb().auth.getSession(); if(session&&session.user){ await sbEnterWithSession(session.user);} }catch(_){}
+}
 
 /* ============ SHELL ============ */
 function mountShell(){
@@ -749,6 +793,8 @@ function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 /* ============ INIT ============ */
 renderQuick();
 document.getElementById('li-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+// Повернення з magic-link: підхопити сесію й автоматично увійти.
+sbTryResume();
 </script>
 </body>
 </html>
