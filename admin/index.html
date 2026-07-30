@@ -947,6 +947,31 @@ if(typeof VIEWS!=='undefined'){
   VIEWS.users=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadUsersView();return;}return _du&&_du();};
   VIEWS.organizations=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadOrgsView();return;}return _do&&_do();};
 }
+
+/* ---- Черга модерації Opportunities ---- */
+const OPP_MOD_LBL={not_submitted:'не подано',pending:'на модерації',changes_required:'потрібні зміни',approved:'схвалено',rejected:'відхилено'};
+async function nadOppsView(){
+  V().innerHTML='<div class="toolbar"><b>Можливості (Supabase)</b><div class="spacer"></div></div><div id="opslot">Завантаження…</div>';
+  try{const d=await smrAdmin.request('GET','/api/admin/opportunities?moderation=pending');
+    let items=d.items||[];
+    if(items.length===0){const all=await smrAdmin.request('GET','/api/admin/opportunities');items=all.items||[];}
+    const rows=items.map(o=>nadRow([
+      `<div class="name">${esc(o.title||'')}</div><div class="meta">${esc((o.organization&&o.organization.name)||'')}</div>`,
+      esc((o.type&&o.type.title_uk)||'—'), esc(OPP_MOD_LBL[o.moderation]||o.moderation), esc(o.business_status||''),
+      esc((o.application_deadline||'').slice(0,10)||'—'), o.applications_count||0,
+      `<button onclick="nadOpp('${o.id}','${esc((o.title||'').replace(/'/g,''))}')">Дії</button>`])).join('');
+    document.getElementById('opslot').innerHTML=`<table class="tbl"><thead><tr><th>Можливість</th><th>Тип</th><th>Модерація</th><th>Статус</th><th>Дедлайн</th><th>Відгуки</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan=7 class=meta>Порожньо</td></tr>'}</tbody></table>`;
+  }catch(err){document.getElementById('opslot').innerHTML='<div class="hist">Помилка: '+esc(err.message||err.code||'')+'</div>';}
+}
+function nadOpp(id,title){openModal(`<h3>Можливість — ${esc(title)}</h3><div class="row" style="flex-wrap:wrap;gap:8px">
+  <button class="a" onclick="nadOppAct('${id}','approve')">Схвалити й опублікувати</button>
+  <button onclick="nadOppReason('${id}','request-changes')">Потрібні зміни</button>
+  <button onclick="nadOppReason('${id}','reject')">Відхилити</button>
+  <button onclick="nadOppAct('${id}','pause')">Призупинити</button>
+  </div><div class="row"><button class="c" onclick="closeModal()">Закрити</button></div>`);}
+async function nadOppAct(id,action){try{await smrAdmin.request('POST','/api/admin/opportunities/'+id+'/'+action,{});closeModal();toast('Оновлено');nadOppsView();}catch(err){toast('Помилка: '+(err.code||''));}}
+async function nadOppReason(id,action){const reason=prompt('Причина:');if(!reason)return;try{await smrAdmin.request('POST','/api/admin/opportunities/'+id+'/'+action,{reason});closeModal();toast('Оновлено');nadOppsView();}catch(err){toast('Помилка: '+(err.code||''));}}
+if(typeof VIEWS!=='undefined'){const _dop=VIEWS.opportunities;VIEWS.opportunities=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadOppsView();return;}return _dop&&_dop();};}
 </script>
 </body>
 </html>
