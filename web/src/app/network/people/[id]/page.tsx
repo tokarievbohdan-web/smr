@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { personDetail } from "@/lib/networkData";
+import { IntroduceButton } from "@/components/intro/IntroduceButton";
 
 export const dynamic = "force-dynamic";
 
@@ -56,9 +57,7 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
           </div></div>
       )}
 
-      <div className="mt-8 flex gap-2.5">
-        <button className="rounded-full bg-panel px-4 py-2 text-[13.5px] font-bold text-dim" disabled title="Milestone 5">Запросити знайомство</button>
-      </div>
+      <div className="mt-8"><IntroduceButton targetProfileId={p.id} /></div>
     </div>
   );
 }

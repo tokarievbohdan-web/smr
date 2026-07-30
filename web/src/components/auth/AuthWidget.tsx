@@ -23,6 +23,7 @@ export default function AuthWidget() {
           <span className="block truncate text-[12.5px] font-bold">{user.email}</span>
           <span className="flex flex-wrap gap-2 text-[11.5px] font-semibold text-muted">
             <Link href="/profile/edit" className="hover:text-accent">Профіль</Link>
+            <Link href="/profile/introductions" className="hover:text-accent">Знайомства</Link>
             <Link href="/saved" className="hover:text-accent">Збережене</Link>
             <button onClick={() => signOut()} className="hover:text-accent">Вийти</button>
           </span>

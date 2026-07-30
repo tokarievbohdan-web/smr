@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { orgDetail } from "@/lib/networkData";
 import { Cover } from "@/components/Cover";
+import { IntroduceButton } from "@/components/intro/IntroduceButton";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,8 @@ export default async function OrgPage({ params }: { params: Promise<{ slug: stri
       {chips("Послуги", o.services)}
       {chips("Комерційні напрями", o.commercialDirections)}
       {chips("Партнери", o.partners)}
+
+      <div className="mt-8"><IntroduceButton targetOrganizationId={o.id} /></div>
 
       {team.length > 0 && (
         <div className="mt-8"><h2 className="mb-3 text-[13px] font-extrabold uppercase tracking-wider text-muted">Команда</h2>
