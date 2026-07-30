@@ -48,6 +48,15 @@ insert into public.opportunity_types (slug, title_uk, sort_order, requires_budge
   ('speaker_search','Пошук спікера',12,false),('volunteering','Волонтерство',13,false),('other','Інше',14,false)
 on conflict (slug) do nothing;
 
+-- ---------- Типи знайомств (Milestone 5) ----------
+insert into public.introduction_types (slug, title_uk, sort_order) values
+  ('partnership','Партнерство',1),('sponsorship','Спонсорство',2),('investment','Інвестиції',3),
+  ('service_request','Запит на послуги',4),('employment','Працевлаштування',5),('project_collaboration','Спільний проєкт',6),
+  ('media_request','Медіазапит',7),('speaker_request','Запрошення спікера',8),('event_invitation','Запрошення на подію',9),
+  ('expert_consultation','Експертна консультація',10),('organization_access','Доступ до організації',11),
+  ('opportunity_follow_up','Продовження щодо можливості',12),('other','Інше',13)
+on conflict (slug) do nothing;
+
 -- ---------- Taxonomies ----------
 insert into public.taxonomies (kind, value, slug, "order") values
   ('sport','Футбол','football',1),
