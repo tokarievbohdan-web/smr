@@ -972,6 +972,48 @@ function nadOpp(id,title){openModal(`<h3>Можливість — ${esc(title)}<
 async function nadOppAct(id,action){try{await smrAdmin.request('POST','/api/admin/opportunities/'+id+'/'+action,{});closeModal();toast('Оновлено');nadOppsView();}catch(err){toast('Помилка: '+(err.code||''));}}
 async function nadOppReason(id,action){const reason=prompt('Причина:');if(!reason)return;try{await smrAdmin.request('POST','/api/admin/opportunities/'+id+'/'+action,{reason});closeModal();toast('Оновлено');nadOppsView();}catch(err){toast('Помилка: '+(err.code||''));}}
 if(typeof VIEWS!=='undefined'){const _dop=VIEWS.opportunities;VIEWS.opportunities=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadOppsView();return;}return _dop&&_dop();};}
+
+/* ---- Kanban Introductions (Partnership Manager) ---- */
+const INTRO_COLS=[['new','Нові'],['under_review','На розгляді'],['information_required','Потрібна інформація'],['waiting_for_target_consent','Очікуємо згоду'],['target_accepted','Погоджено'],['approved','Схвалені'],['introduction_prepared','Підготовка'],['introduction_sent','Надіслані'],['follow_up_due','Follow-up'],['closed','Закриті'],['declined','Відхилені']];
+async function nadIntrosView(){
+  V().innerHTML='<div class="toolbar"><b>Знайомства (Kanban)</b></div><div id="knslot" style="overflow-x:auto"><div class="meta">Завантаження…</div></div>';
+  try{const d=await smrAdmin.request('GET','/api/admin/introductions');const items=d.items||[];
+    const byS={};INTRO_COLS.forEach(c=>byS[c[0]]=[]);items.forEach(i=>{(byS[i.status]||(byS[i.status]=[])).push(i);});
+    const cols=INTRO_COLS.map(([s,label])=>{
+      const cards=(byS[s]||[]).map(i=>`<div onclick="nadIntro('${i.id}')" style="cursor:pointer;background:var(--panel);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-weight:800;font-size:13px">${esc(i.subject||'—')}</div>
+        <div class="meta" style="font-size:11px">${esc((i.type&&i.type.title_uk)||'')} · ${esc((i.requester&&i.requester.display_name)||'')} → ${esc((i.target&&i.target.display_name)||(i.target_org&&i.target_org.name)||'')}</div></div>`).join('')||'<div class="meta" style="font-size:11px">—</div>';
+      return `<div style="min-width:220px;flex:0 0 220px"><div style="font-weight:800;font-size:12px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">${label} · ${(byS[s]||[]).length}</div>${cards}</div>`;
+    }).join('');
+    document.getElementById('knslot').innerHTML='<div style="display:flex;gap:12px;padding-bottom:12px">'+cols+'</div>';
+  }catch(err){document.getElementById('knslot').innerHTML='<div class="hist">Помилка: '+esc(err.message||err.code||'')+'</div>';}
+}
+async function nadIntro(id){
+  let d; try{d=await smrAdmin.request('GET','/api/admin/introductions/'+id);}catch(e){toast('Помилка');return;}
+  const st=d.status; const acts=[];
+  if(st==='new'||st==='under_review'){acts.push(['assign','Взяти в роботу']);acts.push(['request-information','Запит інформації','reason']);acts.push(['request-consent','Запит згоди']);acts.push(['approve','Схвалити']);acts.push(['decline','Відхилити','reason']);}
+  else if(st==='information_required'){acts.push(['request-consent','Запит згоди']);acts.push(['decline','Відхилити','reason']);}
+  else if(st==='target_accepted'){acts.push(['approve','Схвалити']);acts.push(['decline','Відхилити','reason']);}
+  else if(st==='approved'){acts.push(['prepare','Підготувати текст','message']);acts.push(['decline','Відхилити','reason']);}
+  else if(st==='introduction_prepared'){acts.push(['send','Надіслати знайомство']);}
+  else if(st==='introduction_sent'||st==='follow_up_due'){acts.push(['close','Закрити','resolution']);}
+  const notes=(d.internalNotes||[]).map(n=>`<div class="hist" style="font-size:12px">${esc(n.body)}</div>`).join('')||'<div class="meta" style="font-size:11px">Немає нотаток</div>';
+  const btns=acts.map(a=>`<button ${a[0]==='approve'||a[0]==='send'?'class="a"':''} onclick="nadIntroAct('${id}','${a[0]}','${a[2]||''}')">${a[1]}</button>`).join('');
+  openModal(`<h3>${esc(d.subject||'Знайомство')}</h3>
+    <div class="meta" style="margin:6px 0">Статус: ${esc(st)} · тип ${esc(d.request_type_id?'✓':'—')}</div>
+    <div style="font-size:13px;line-height:1.5;margin:8px 0"><b>Контекст:</b> ${esc(d.context||'')}<br><b>Результат:</b> ${esc(d.expected_outcome||'')}<br><b>Цінність:</b> ${esc(d.value_for_target||'')}</div>
+    <div class="meta" style="margin-top:8px">Внутрішні нотатки</div>${notes}
+    <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:10px">${btns}</div>
+    <div class="row"><button class="c" onclick="closeModal()">Закрити</button></div>`,'wide');
+}
+async function nadIntroAct(id,action,arg){
+  let body={};
+  if(arg==='reason'){const r=prompt('Причина (публічна):');if(!r)return;body=action==='decline'?{publicReason:r,internalReason:prompt('Внутрішня причина (необовʼязково):')||null}:{question:r};}
+  if(arg==='message'){const m=prompt('Текст знайомства для обох сторін:');if(!m)return;body={message:m};}
+  if(arg==='resolution'){body={resolution:prompt('Підсумок:')||null};}
+  try{await smrAdmin.request('POST','/api/admin/introductions/'+id+'/'+action,body);closeModal();toast('Оновлено');nadIntrosView();}catch(err){toast('Помилка: '+(err.code||err.message||''));}
+}
+if(typeof VIEWS!=='undefined'){const _di=VIEWS.introductions;VIEWS.introductions=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadIntrosView();return;}return _di&&_di();};}
 </script>
 </body>
 </html>
