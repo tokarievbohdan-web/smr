@@ -24,12 +24,14 @@ grant execute on function public.intro_is_party(uuid), public.is_pm() to anon, a
 
 -- ---------- introductions read/insert/update ----------
 drop policy if exists "intros: requester/pm read" on public.introductions;
+drop policy if exists "intros: parties/pm read" on public.introductions;
 create policy "intros: parties/pm read" on public.introductions
   for select using (requester_id = auth.uid() or target_user_id = auth.uid() or public.is_pm());
 drop policy if exists "intros: requester insert" on public.introductions;
 create policy "intros: requester insert" on public.introductions
   for insert with check (requester_id = auth.uid());
 drop policy if exists "intros: requester/pm update" on public.introductions;
+drop policy if exists "intros: parties/pm update" on public.introductions;
 create policy "intros: parties/pm update" on public.introductions
   for update using (requester_id = auth.uid() or target_user_id = auth.uid() or public.is_pm());
 

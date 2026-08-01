@@ -174,12 +174,14 @@ begin
   if tg_op = 'INSERT' then
     new.verified := false; new.featured := false; new.admin_notes := null; new.deleted_at := null;
     new.moderation := 'draft'; new.verification := 'unverified';
+    if new.status is null or new.status not in ('draft','pending') then new.status := 'pending'; end if;  -- легасі-колонка: публікацію робить лише модерація
     new.verified_at := null; new.verified_by := null; new.moderation_note := null;
     new.created_by := auth.uid(); new.owner_id := coalesce(new.owner_id, auth.uid());
     new.version := 1;
   else
     new.verified := old.verified; new.featured := old.featured; new.admin_notes := old.admin_notes;
     new.deleted_at := old.deleted_at; new.owner_id := old.owner_id; new.created_by := old.created_by;
+    if new.status is distinct from old.status and new.status not in ('draft','pending','paused','closed') then new.status := old.status; end if;
     new.moderation := old.moderation; new.verification := old.verification;
     new.verified_at := old.verified_at; new.verified_by := old.verified_by; new.moderation_note := old.moderation_note;
     new.slug := old.slug;

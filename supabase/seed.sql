@@ -57,6 +57,15 @@ insert into public.introduction_types (slug, title_uk, sort_order) values
   ('opportunity_follow_up','Продовження щодо можливості',12),('other','Інше',13)
 on conflict (slug) do nothing;
 
+-- ---------- Типи подій (Milestone 6) ----------
+insert into public.event_types (slug, title_uk, sort_order, supports_registration, default_duration_minutes) values
+  ('conference','Конференція',1,true,480),('forum','Форум',2,true,480),('webinar','Вебінар',3,true,90),
+  ('networking','Нетворкінг',4,true,180),('workshop','Воркшоп',5,true,240),('presentation','Презентація',6,true,120),
+  ('award','Премія',7,true,240),('sports_business_event','Подія спортивного бізнесу',8,true,240),
+  ('community_event','Подія спільноти',9,true,180),('educational_program','Освітня програма',10,true,600),
+  ('deadline','Дедлайн',11,false,0),('round_table','Круглий стіл',12,true,120),('other','Інше',13,true,120)
+on conflict (slug) do nothing;
+
 -- ---------- Taxonomies ----------
 insert into public.taxonomies (kind, value, slug, "order") values
   ('sport','Футбол','football',1),
