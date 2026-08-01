@@ -1014,6 +1014,53 @@ async function nadIntroAct(id,action,arg){
   try{await smrAdmin.request('POST','/api/admin/introductions/'+id+'/'+action,body);closeModal();toast('Оновлено');nadIntrosView();}catch(err){toast('Помилка: '+(err.code||err.message||''));}
 }
 if(typeof VIEWS!=='undefined'){const _di=VIEWS.introductions;VIEWS.introductions=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadIntrosView();return;}return _di&&_di();};}
+
+/* ---- LIVE Events admin (Event Manager) ---- */
+const EV_MOD={not_submitted:'Чернетка',pending:'На модерації',changes_required:'Потрібні зміни',approved:'Схвалено',rejected:'Відхилено'};
+const EV_BS={draft:'Чернетка',scheduled:'Заплановано',published:'Опубліковано',postponed:'Перенесено',cancelled:'Скасовано',completed:'Завершено',archived:'Архів'};
+let _evFilter='';
+async function nadEventsView(){
+  V().innerHTML='<div class="toolbar"><b>Події</b> <select id="evf" onchange="_evFilter=this.value;nadEventsView()" style="margin-left:8px"><option value="">Усі</option><option value="pending">На модерації</option><option value="changes_required">Потрібні зміни</option><option value="approved">Схвалені</option></select></div><div id="evslot"><div class="meta">Завантаження…</div></div>';
+  const sel=document.getElementById('evf'); if(sel) sel.value=_evFilter;
+  try{const d=await smrAdmin.request('GET','/api/admin/events'+(_evFilter?('?moderation='+_evFilter):''));const items=d.items||[];
+    if(!items.length){document.getElementById('evslot').innerHTML='<div class="meta">Подій немає</div>';return;}
+    const rows=items.map(e=>nadRow([
+      '<b onclick="nadEvent(\''+e.id+'\')" style="cursor:pointer">'+esc(e.title||'—')+'</b>',
+      esc((e.org&&e.org.name)||''),esc((e.type&&e.type.title_uk)||''),esc(e.format_kind||''),
+      esc((e.starts_at||'').slice(0,10)),esc(e.city||'—'),
+      '<span class="pill">'+esc(EV_MOD[e.moderation]||e.moderation)+'</span>',
+      '<span class="pill">'+esc(EV_BS[e.business_status]||e.business_status)+'</span>',
+      (e.registered_count||0)+'/'+(e.capacity==null?'∞':e.capacity)+(e.waitlist_count?(' +'+e.waitlist_count):''),
+    ])).join('');
+    document.getElementById('evslot').innerHTML='<table class="tbl"><thead><tr><th>Назва</th><th>Організація</th><th>Тип</th><th>Формат</th><th>Дата</th><th>Місто</th><th>Модерація</th><th>Статус</th><th>Реєстр.</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }catch(err){document.getElementById('evslot').innerHTML='<div class="hist">Помилка: '+esc(err.code||err.message||'')+'</div>';}
+}
+async function nadEvent(id){
+  let d; try{d=await smrAdmin.request('GET','/api/admin/events/'+id);}catch(e){toast('Помилка');return;}
+  const mod=d.moderation,bs=d.business_status,acts=[];
+  if(mod==='pending'||mod==='changes_required'){acts.push(['approve','Схвалити + опублікувати','a']);acts.push(['request-changes','Повернути на доопрацювання','reason']);acts.push(['reject','Відхилити','reason']);}
+  if(mod==='approved'&&(bs==='draft'||bs==='scheduled')){acts.push(['publish','Опублікувати','a']);acts.push(['schedule','Запланувати','when']);}
+  if(bs==='published'||bs==='postponed'){acts.push(['reschedule','Перенести','resched']);acts.push(['cancel','Скасувати','cancel']);acts.push(['complete','Завершити','']);}
+  if(bs==='completed'||bs==='cancelled'){acts.push(['archive','Архівувати','']);}
+  const notes=(d.internalNotes||[]).map(n=>'<div class="hist" style="font-size:12px">'+esc(n.body)+'</div>').join('')||'<div class="meta" style="font-size:11px">Немає нотаток</div>';
+  const btns=acts.map(a=>'<button '+(a[2]==='a'?'class="a"':'')+' onclick="nadEventAct(\''+id+'\',\''+a[0]+'\',\''+a[2]+'\')">'+a[1]+'</button>').join('');
+  openModal('<h3>'+esc(d.title||'Подія')+'</h3>'+
+    '<div class="meta" style="margin:6px 0">'+esc(EV_MOD[mod]||mod)+' · '+esc(EV_BS[bs]||bs)+' · '+esc((d.organization&&d.organization.name)||'')+'</div>'+
+    '<div style="font-size:13px;line-height:1.5;margin:8px 0"><b>Формат:</b> '+esc(d.format_kind||'')+' · <b>Початок:</b> '+esc(d.starts_at||'—')+'<br><b>Місто:</b> '+esc(d.city||'—')+' · <b>Місткість:</b> '+(d.registered_count||0)+'/'+(d.capacity==null?'∞':d.capacity)+'<br><b>Реєстрація:</b> '+esc(d.registration_mode||'')+' · <b>Квитки:</b> '+esc(d.ticket_type||'')+'</div>'+
+    (d.moderation_reason?'<div class="hist" style="font-size:12px">Причина модерації: '+esc(d.moderation_reason)+'</div>':'')+
+    '<div class="meta" style="margin-top:8px">Внутрішні нотатки</div>'+notes+
+    '<div class="row" style="flex-wrap:wrap;gap:8px;margin-top:10px">'+btns+'</div>'+
+    '<div class="row"><button class="c" onclick="closeModal()">Закрити</button></div>','wide');
+}
+async function nadEventAct(id,action,kind){
+  let body={};
+  if(kind==='reason'){const r=prompt('Причина (буде надіслана організатору):');if(!r)return;body={reason:r};}
+  if(kind==='cancel'){const r=prompt('Публічна причина скасування:');if(!r)return;body={publicReason:r,internalNote:prompt('Внутрішня нотатка (необовʼязково):')||null};}
+  if(kind==='when'){const w=prompt('Дата публікації (YYYY-MM-DDTHH:MM):');if(!w)return;body={when:new Date(w).toISOString()};}
+  if(kind==='resched'){const s=prompt('Новий початок (YYYY-MM-DDTHH:MM):');if(!s)return;body={starts:new Date(s).toISOString(),ends:null,reason:prompt('Причина переносу:')||null};}
+  try{await smrAdmin.request('POST','/api/admin/events/'+id+'/'+action,body);closeModal();toast('Оновлено');nadEventsView();}catch(err){toast('Помилка: '+(err.code||err.message||''));}
+}
+if(typeof VIEWS!=='undefined'){const _de=VIEWS.events;VIEWS.events=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadEventsView();return;}return _de&&_de();};}
 </script>
 </body>
 </html>
