@@ -26,6 +26,7 @@ export default function AuthWidget() {
             <Link href="/profile/introductions" className="hover:text-accent">Знайомства</Link>
             <Link href="/profile/events" className="hover:text-accent">Мої події</Link>
             <Link href="/saved" className="hover:text-accent">Збережене</Link>
+            <Link href="/help" className="hover:text-accent">Допомога</Link>
             <button onClick={() => signOut()} className="hover:text-accent">Вийти</button>
           </span>
         </span>

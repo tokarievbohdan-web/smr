@@ -1098,6 +1098,32 @@ async function nadFlagNew(){const k=prompt('Ключ прапорця:');if(!k)r
 async function nadFlagToggle(k,en){try{await smrAdmin.request('POST','/api/admin/feature-flags',{key:k,enabled:en});toast('Оновлено');nadSettingsView();}catch(e){toast('Помилка');}}
 async function nadInviteNew(){const c=prompt('Cohort (напр. specialists):');if(c===null)return;try{const r=await smrAdmin.request('POST','/api/admin/beta-invitations',{cohort:c||null,maxUses:1});prompt('Код запрошення (збережіть — показується один раз):',r.code||'');nadSettingsView();}catch(e){toast('Помилка');}}
 if(typeof VIEWS!=='undefined'){const _ds=VIEWS.settings;VIEWS.settings=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadSettingsView();return;}return _ds&&_ds();};}
+
+/* ---- LIVE Beta dashboard (M8): funnels + business outcomes ---- */
+async function nadBetaView(){
+  V().innerHTML='<div class="toolbar"><b>Beta-аналітика</b> <button class="a" onclick="nadOutcomeNew()">+ Бізнес-результат</button></div><div id="btslot" class="meta">Завантаження…</div>';
+  try{
+    const [m,bo]=await Promise.all([
+      smrAdmin.request('GET','/api/admin/beta-metrics').catch(()=>({})),
+      smrAdmin.request('GET','/api/admin/business-outcomes').catch(()=>({items:[]})),
+    ]);
+    const fo=m.funnel_opportunities||{},fi=m.funnel_introductions||{},fe=m.funnel_events||{};
+    const funnel=(t,o)=>'<div style="background:var(--panel);border-radius:12px;padding:12px;min-width:200px"><div style="font-weight:800;font-size:12px;text-transform:uppercase;color:var(--muted)">'+t+'</div>'+Object.keys(o).map(k=>'<div style="display:flex;justify-content:space-between;font-size:13px;padding:2px 0"><span>'+k+'</span><b>'+o[k]+'</b></div>').join('')+'</div>';
+    const kpi=(l,v)=>'<div style="background:var(--panel);border-radius:12px;padding:14px;min-width:120px"><div class="meta" style="font-size:11px">'+l+'</div><div style="font-size:22px;font-weight:800">'+(v==null?'—':v)+'</div></div>';
+    const outRows=(bo.items||[]).map(o=>nadRow([esc(o.outcome_type),esc(o.source_module||'—'),esc(o.status),esc((o.short_description||'').slice(0,60)),(o.permission_for_public_use?'✅ дозвіл':'—')])).join('')||'<tr><td colspan=5 class=meta>Ще немає підтверджених результатів</td></tr>';
+    document.getElementById('btslot').innerHTML=
+      '<div class="section-title">Аудиторія</div><div style="display:flex;flex-wrap:wrap;gap:10px">'+
+        kpi('Інвайти',m.invitations_total)+kpi('Прийнято',m.invitations_accepted)+kpi('Профілі заповнені',m.profiles_completed)+kpi('Бізнес-результати',m.business_outcomes_total)+'</div>'+
+      '<div class="section-title" style="margin-top:18px">Воронки</div><div style="display:flex;flex-wrap:wrap;gap:12px">'+funnel('Можливості',fo)+funnel('Знайомства',fi)+funnel('Події',fe)+'</div>'+
+      '<div class="section-title" style="margin-top:18px">Підтверджені бізнес-результати</div><div class="card-table"><table><thead><tr><th>Тип</th><th>Модуль</th><th>Статус</th><th>Опис</th><th>Публікація</th></tr></thead><tbody>'+outRows+'</tbody></table></div>';
+  }catch(err){document.getElementById('btslot').innerHTML='<div class="hist">Помилка: '+esc(err.code||err.message||'')+'</div>';}
+}
+async function nadOutcomeNew(){
+  const t=prompt('Тип результату (contact_established, meeting_scheduled, partner_found, deal_completed…):');if(!t)return;
+  const desc=prompt('Короткий опис:')||'';const mod=prompt('Модуль (introductions/opportunities/events/network):')||null;
+  try{await smrAdmin.request('POST','/api/admin/business-outcomes',{outcome_type:t,short_description:desc,source_module:mod,status:'verified'});toast('Записано');nadBetaView();}catch(e){toast('Помилка');}
+}
+if(typeof VIEWS!=='undefined'){const _da=VIEWS.analytics;VIEWS.analytics=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadBetaView();return;}return _da&&_da();};}
 </script>
 </body>
 </html>
