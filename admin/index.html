@@ -1061,6 +1061,43 @@ async function nadEventAct(id,action,kind){
   try{await smrAdmin.request('POST','/api/admin/events/'+id+'/'+action,body);closeModal();toast('Оновлено');nadEventsView();}catch(err){toast('Помилка: '+(err.code||err.message||''));}
 }
 if(typeof VIEWS!=='undefined'){const _de=VIEWS.events;VIEWS.events=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadEventsView();return;}return _de&&_de();};}
+
+/* ---- LIVE Operational dashboard (M7): metrics + data quality + attention ---- */
+async function nadDashboardView(){
+  V().innerHTML='<div id="dbslot"><div class="meta">Завантаження метрик…</div></div>';
+  try{
+    const [m,dq,fb]=await Promise.all([
+      smrAdmin.request('GET','/api/admin/metrics').catch(()=>({})),
+      smrAdmin.request('GET','/api/admin/data-quality').catch(()=>({})),
+      smrAdmin.request('GET','/api/admin/feedback?status=new').catch(()=>({items:[]})),
+    ]);
+    const kpi=(l,v)=>'<div style="background:var(--panel);border-radius:12px;padding:14px;min-width:130px"><div class="meta" style="font-size:11px">'+l+'</div><div style="font-size:24px;font-weight:800">'+(v==null?'—':v)+'</div></div>';
+    const cards=[['Користувачі',m.users_total],['Верифіковані',m.profiles_verified],['Організації',m.orgs_approved],['Матеріали',m.articles_published],['Можливості',m.opportunities_active],['Події',m.events_published],['Реєстрації',m.registrations_total],['Знайомства',m.introductions_total]].map(x=>kpi(x[0],x[1])).join('');
+    const att=[['Черга модерації',m.moderation_backlog],['Відкриті скарги',m.reports_open],['Новий feedback',m.feedback_new],['Помилки доставки',m.delivery_failures]].filter(x=>x[1]).map(x=>'<span class="pill" style="background:var(--panel2)">'+x[0]+': <b>'+x[1]+'</b></span>').join('')||'<span class="meta">Немає термінових пунктів</span>';
+    const DQL={profiles_no_name:'Профілі без імені',orgs_no_owner:'Організації без власника',events_over_capacity:'Події понад місткість',waitlist_offers_no_expiry:'Waitlist-офери без терміну',active_opps_expired:'Активні можливості з простроченим дедлайном',intros_missing_party:'Знайомства без сторони',notifications_no_entity:'Сповіщення без обʼєкта'};
+    const dqRows=Object.keys(DQL).map(k=>'<tr><td>'+DQL[k]+'</td><td style="text-align:right"><b>'+(dq[k]==null?'—':dq[k])+'</b></td></tr>').join('');
+    document.getElementById('dbslot').innerHTML=
+      '<div class="section-title">Ключові метрики</div><div style="display:flex;flex-wrap:wrap;gap:10px">'+cards+'</div>'+
+      '<div class="section-title" style="margin-top:18px">Потребує уваги</div><div style="display:flex;flex-wrap:wrap;gap:8px">'+att+'</div>'+
+      '<div class="section-title" style="margin-top:18px">Якість даних</div><div class="card-table"><table><tbody>'+dqRows+'</tbody></table></div>';
+  }catch(err){document.getElementById('dbslot').innerHTML='<div class="hist">Помилка: '+esc(err.code||err.message||'')+'</div>';}
+}
+if(typeof VIEWS!=='undefined'){const _dd=VIEWS.dashboard;VIEWS.dashboard=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadDashboardView();return;}return _dd&&_dd();};}
+
+/* ---- LIVE Settings (M7): feature flags + beta invitations ---- */
+async function nadSettingsView(){
+  V().innerHTML='<div class="toolbar"><b>Прапорці функцій</b> <button class="a" onclick="nadFlagNew()">+ Прапорець</button></div><div id="ffslot" class="meta">Завантаження…</div><div class="toolbar" style="margin-top:18px"><b>Beta-запрошення</b> <button class="a" onclick="nadInviteNew()">+ Запрошення</button></div><div id="bislot" class="meta">Завантаження…</div>';
+  try{const d=await smrAdmin.request('GET','/api/admin/feature-flags');
+    document.getElementById('ffslot').innerHTML='<table class="tbl"><thead><tr><th>Ключ</th><th>Стан</th><th>Середовища</th><th></th></tr></thead><tbody>'+((d.items||[]).map(f=>nadRow([esc(f.key),(f.enabled?'✅ увімкнено':'⛔ вимкнено'),esc((f.environments||[]).join(', ')||'усі'),'<button onclick="nadFlagToggle(\''+f.key+'\','+(!f.enabled)+')">'+(f.enabled?'Вимкнути':'Увімкнути')+'</button>'])).join('')||'<tr><td colspan=4 class=meta>Порожньо</td></tr>')+'</tbody></table>';
+  }catch(e){document.getElementById('ffslot').innerHTML='<div class="hist">'+esc(e.code||e.message||'')+'</div>';}
+  try{const d=await smrAdmin.request('GET','/api/admin/beta-invitations');
+    document.getElementById('bislot').innerHTML='<table class="tbl"><thead><tr><th>Email/Cohort</th><th>Використань</th><th>Статус</th><th>Створено</th></tr></thead><tbody>'+((d.items||[]).map(i=>nadRow([esc(i.email||i.cohort||'—'),(i.uses_count+'/'+i.max_uses),esc(i.status),esc((i.created_at||'').slice(0,10))])).join('')||'<tr><td colspan=4 class=meta>Порожньо</td></tr>')+'</tbody></table>';
+  }catch(e){document.getElementById('bislot').innerHTML='<div class="hist">'+esc(e.code||e.message||'')+'</div>';}
+}
+async function nadFlagNew(){const k=prompt('Ключ прапорця:');if(!k)return;try{await smrAdmin.request('POST','/api/admin/feature-flags',{key:k,enabled:false});toast('Створено');nadSettingsView();}catch(e){toast('Помилка');}}
+async function nadFlagToggle(k,en){try{await smrAdmin.request('POST','/api/admin/feature-flags',{key:k,enabled:en});toast('Оновлено');nadSettingsView();}catch(e){toast('Помилка');}}
+async function nadInviteNew(){const c=prompt('Cohort (напр. specialists):');if(c===null)return;try{const r=await smrAdmin.request('POST','/api/admin/beta-invitations',{cohort:c||null,maxUses:1});prompt('Код запрошення (збережіть — показується один раз):',r.code||'');nadSettingsView();}catch(e){toast('Помилка');}}
+if(typeof VIEWS!=='undefined'){const _ds=VIEWS.settings;VIEWS.settings=function(){if(typeof SESSION!=='undefined'&&SESSION&&SESSION.supabase){nadSettingsView();return;}return _ds&&_ds();};}
 </script>
 </body>
 </html>
