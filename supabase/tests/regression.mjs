@@ -266,5 +266,31 @@ try { await asUser(U.ua, async () => { await db.query(`select public.data_qualit
 await asUser(SUPER, async () => { const r=await db.query(`select public.admin_metrics() j`); (r.rows[0].j.users_total!==undefined)?ok('admin_metrics returns aggregates'):bad('metrics'); });
 try { await asUser(U.ua, async () => { await db.query(`select public.admin_metrics()`); }); bad('user read admin metrics'); } catch { ok('non-admin cannot read admin metrics'); }
 
+// ============================================================
+// MILESTONE 8 — closed beta enablement
+// ============================================================
+// business outcome: admin records, participant reads own, non-participant cannot
+let BO;
+await asUser(SUPER, async () => { const r=await db.query(`select public.record_business_outcome($1::jsonb) j`,[JSON.stringify({outcome_type:'contact_established',source_module:'introductions',participants:[U.ua],status:'verified',short_description:'x'})]); BO=r.rows[0].j.id; ok('admin records business outcome'); });
+try { await asUser(U.ua, async () => { await db.query(`select public.record_business_outcome($1::jsonb)`,[JSON.stringify({outcome_type:'x'})]); }); bad('user recorded outcome'); } catch { ok('non-admin cannot record outcome'); }
+await asUser(U.ua, async () => { const c=(await db.query(`select count(*)::int c from public.business_outcomes where id=$1`,[BO])).rows[0].c; c===1?ok('participant reads own outcome'):bad('participant cannot see own outcome'); });
+await asUser(U.ub, async () => { const c=(await db.query(`select count(*)::int c from public.business_outcomes where id=$1`,[BO])).rows[0].c; c===0?ok('non-participant cannot read outcome (RLS)'):bad('outcome RLS leak'); });
+
+// survey response: own insert, admin aggregate read
+await asUser(U.ua, async () => { await db.query(`select public.submit_survey_response('onboarding','clear',5,'yes',null,null)`); ok('user submits survey response'); });
+try { await asUser(U.ua, async () => { await db.query(`select public.submit_survey_response('x',null,9,null,null,null)`); }); bad('invalid rating accepted'); } catch { ok('survey rating validated (1..5)'); }
+await asUser(U.ub, async () => { const c=(await db.query(`select count(*)::int c from public.survey_responses where user_id=$1`,[U.ua])).rows[0].c; c===0?ok('user cannot read others survey (RLS)'):bad('survey RLS leak'); });
+
+// beta metrics gating + shape
+await asUser(ANALYST, async () => { const r=await db.query(`select public.beta_metrics() j`); const j=r.rows[0].j; (j.funnel_opportunities && j.business_outcomes_total!==undefined && j.generated_at)?ok('analyst reads beta_metrics (funnels+outcomes)'):bad('beta_metrics shape'); });
+try { await asUser(U.ua, async () => { await db.query(`select public.beta_metrics()`); }); bad('user read beta metrics'); } catch { ok('non-admin cannot read beta metrics'); }
+
+// beta flags seeded
+{ const c=(await db.query(`select count(*)::int c from public.feature_flags where key in ('beta_invite_required','public_signup','maintenance_mode')`)).rows[0].c; c===3?ok('beta feature flags seeded'):bad('beta flags missing '+c); }
+{ const s=(await db.query(`select enabled from public.feature_flags where key='public_signup'`)).rows[0].enabled; (s===false)?ok('public_signup disabled by default (closed beta)'):bad('public_signup should be off'); }
+
+// is_seed marker present
+{ const c=(await db.query(`select count(*)::int c from information_schema.columns where table_name='opportunities' and column_name='is_seed'`)).rows[0].c; c===1?ok('is_seed marker on opportunities'):bad('is_seed missing'); }
+
 console.log(`\n==== ${PASS} passed, ${FAIL} failed ====`);
 process.exit(FAIL ? 1 : 0);

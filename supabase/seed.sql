@@ -66,6 +66,23 @@ insert into public.event_types (slug, title_uk, sort_order, supports_registratio
   ('deadline','Дедлайн',11,false,0),('round_table','Круглий стіл',12,true,120),('other','Інше',13,true,120)
 on conflict (slug) do nothing;
 
+-- ---------- Beta feature flags (Milestone 8) — керовані сервером, дефолти ----------
+insert into public.feature_flags (key, enabled, description) values
+  ('public_signup', false, 'Публічна реєстрація (beta: вимкнено)'),
+  ('beta_invite_required', true, 'Реєстрація лише за інвайтом'),
+  ('organization_creation_enabled', true, 'Створення організацій'),
+  ('opportunity_creation_enabled', true, 'Створення можливостей'),
+  ('applications_enabled', true, 'Відгуки на можливості'),
+  ('introductions_enabled', true, 'Професійні знайомства'),
+  ('events_enabled', true, 'Події'),
+  ('event_registration_enabled', true, 'Реєстрація на події'),
+  ('file_uploads_enabled', true, 'Завантаження файлів'),
+  ('push_enabled', false, 'Push-сповіщення (foundation)'),
+  ('email_enabled', false, 'Email-розсилки (foundation)'),
+  ('analytics_enabled', true, 'Аналітика'),
+  ('maintenance_mode', false, 'Режим обслуговування')
+on conflict (key) do nothing;
+
 -- ---------- Taxonomies ----------
 insert into public.taxonomies (kind, value, slug, "order") values
   ('sport','Футбол','football',1),
